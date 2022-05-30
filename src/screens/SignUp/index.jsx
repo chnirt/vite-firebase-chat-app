@@ -6,12 +6,8 @@ import { auth } from '../../firebase'
 export const SignUp = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
-  const [
-    createUserWithEmailAndPassword,
-    user,
-    loading,
-    error,
-  ] = useCreateUserWithEmailAndPassword(auth)
+  const [createUserWithEmailAndPassword, user, loading, error] =
+    useCreateUserWithEmailAndPassword(auth)
 
   if (loading) {
     return (
@@ -32,12 +28,14 @@ export const SignUp = () => {
   return (
     <div>
       SignUp
+      <br />
       <input
         type="email"
         placeholder="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
+      <br />
       <input
         type="password"
         placeholder="password"
@@ -45,6 +43,7 @@ export const SignUp = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      <br />
       <button onClick={() => createUserWithEmailAndPassword(email, password)}>
         Sign Up
       </button>

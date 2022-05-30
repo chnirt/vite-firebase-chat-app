@@ -22,7 +22,7 @@ function App() {
   }
   if (user) {
     return (
-      <div>
+      <div className="App">
         <Home />
       </div>
     )
