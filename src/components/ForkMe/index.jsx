@@ -1,8 +1,6 @@
-import React from 'react'
-
 export const ForkMe = ({
   href = 'https://github.com/chnirt/vite-firebase-chat-app',
-  size = 100
+  size = 149
 }) => {
   return (
     <a

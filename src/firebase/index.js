@@ -28,18 +28,3 @@ if (location.hostname === "localhost") {
   connectAuthEmulator(auth, "http://localhost:9099");
   connectFirestoreEmulator(db, 'localhost', 8080);
 }
-
-export const saveUserToFirestore = async (userInput) => {
-  try {
-    const userData = {
-      fullName: userInput.fullName,
-      email: userInput.email,
-      username: userInput.username,
-      createdAt: serverTimestamp(),
-    }
-    const docRef = await setDoc(doc(db, 'users', userInput.uid), userData)
-    // const docRef = await addDoc(collection(db, 'users'), userData)
-    return docRef
-  } catch (error) { }
-}
-

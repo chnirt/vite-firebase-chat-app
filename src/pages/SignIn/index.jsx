@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth'
+import { useCallback, useState } from 'react'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { Link } from 'react-router-dom'
 
 import { auth } from '../../firebase'
@@ -7,21 +7,20 @@ import { auth } from '../../firebase'
 const SignIn = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
-  const [signInWithEmailAndPassword, user, loading, error] =
-    useSignInWithEmailAndPassword(auth)
 
-  if (error) {
-    return (
-      <div>
-        <p>Error: {error.message}</p>
-      </div>
+  const handleLogin = useCallback(async () => {
+    if (email === '') return
+    if (password === '') return
+
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
     )
-  }
-  if (loading) {
-    return <p>Loading...</p>
-  }
+  }, [signInWithEmailAndPassword, email, password])
+
   return (
-    <div className='App'>
+    <div className="App">
       SignIn
       <br />
       <input
@@ -39,9 +38,7 @@ const SignIn = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <br />
-      <button onClick={() => signInWithEmailAndPassword(email, password)}>
-        Sign In
-      </button>
+      <button onClick={handleLogin}>Sign In</button>
       <br />
       No account? <Link to="/register">Sign up</Link>
     </div>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   collection,
   query,
@@ -7,16 +8,18 @@ import {
   // getDocs,
   startAfter,
   onSnapshot,
+  where,
 } from 'firebase/firestore'
 import moment from 'moment'
-import 'easymde/dist/easymde.min.css'
 
 import { db } from '../../firebase'
-import { Link } from 'react-router-dom'
+import { useAuth } from '../../context'
 
 const LIMIT = 3
 
 const Blog = () => {
+  let navigate = useNavigate()
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [blogs, setBlogs] = useState([])
   const [last, setLast] = useState(null)
@@ -24,9 +27,12 @@ const Blog = () => {
   const [loadedAll, setLoadedAll] = useState(false)
 
   const fetchBlogs = useCallback(async () => {
+    if (user?.uid === null) return
+
     // Query the first page of docs
     const first = query(
       collection(db, 'blogs'),
+      where('uid', '==', user.uid),
       orderBy('createdAt', 'desc'),
       limit(LIMIT)
     )
@@ -55,9 +61,9 @@ const Blog = () => {
 
       const lastVisible = docs[docs.length - 1]
       setLast(lastVisible)
-      if (docs.length < LIMIT) {
-        setLoadedAll(true)
-      }
+      // if (docs.length < LIMIT) {
+      setLoadedAll(docs.length < LIMIT)
+      // }
     })
   }, [])
 
@@ -93,9 +99,9 @@ const Blog = () => {
 
       const lastVisible = docs[docs.length - 1]
       setLast(lastVisible)
-      if (docs.length < LIMIT) {
-        setLoadedAll(true)
-      }
+      // if (docs.length < LIMIT) {
+      setLoadedAll(docs.length < LIMIT)
+      // }
     })
   }, [last])
 
@@ -105,6 +111,10 @@ const Blog = () => {
       setMoreLoading(false)
     })
   }, [fetchMoreBlogs])
+
+  const handleCreatePost = useCallback(() => {
+    navigate('/create-blog')
+  }, [navigate])
 
   useEffect(() => {
     setLoading(true)
@@ -117,6 +127,7 @@ const Blog = () => {
     <div>
       Blog
       <br />
+      <button onClick={handleCreatePost}>Create Post</button>
       <div
         style={{
           height: 500,
@@ -127,7 +138,7 @@ const Blog = () => {
         }}
       >
         {loading && <span>Collection: Loading...</span>}
-        {blogs.length && (
+        {blogs.length > 0 && (
           <div>
             {blogs.map((doc) => (
               <div

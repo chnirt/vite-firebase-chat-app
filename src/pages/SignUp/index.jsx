@@ -1,36 +1,34 @@
 import { useCallback, useState } from 'react'
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { Link } from 'react-router-dom'
 
 import { auth } from '../../firebase'
-import { Loading } from '../../components'
+// import { Loading } from '../../components'
+import { addDocument } from '../../firebase/service'
 
 const SignUp = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
-  const [createUserWithEmailAndPassword, user, loading, error] =
-    useCreateUserWithEmailAndPassword(auth)
 
-  const handleRegister = useCallback(() => {
-    createUserWithEmailAndPassword(email, password)
+  const handleRegister = useCallback(async () => {
+    if (email === '') return
+    if (password === '') return
+
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    )
+    if (userCredential) {
+      await addDocument('users', {
+        uid: userCredential.user.uid,
+        email,
+      })
+    }
   }, [email, password])
 
-  if (loading) {
-    return (
-      <Loading />
-    )
-  }
-
-  if (error) {
-    return (
-      <div>
-        <p>Error: {error.message}</p>
-      </div>
-    )
-  }
-
   return (
-    <div className='App'>
+    <div className="App">
       SignUp
       <br />
       <input
@@ -48,9 +46,7 @@ const SignUp = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <br />
-      <button onClick={handleRegister}>
-        Sign Up
-      </button>
+      <button onClick={handleRegister}>Sign Up</button>
       <br />
       Have an account? <Link to="/">Sign in</Link>
     </div>
