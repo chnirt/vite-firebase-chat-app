@@ -32,7 +32,6 @@ const Blog = () => {
     // Query the first page of docs
     const first = query(
       collection(db, 'blogs'),
-      where('uid', '==', user.uid),
       orderBy('createdAt', 'desc'),
       limit(LIMIT)
     )
@@ -61,9 +60,7 @@ const Blog = () => {
 
       const lastVisible = docs[docs.length - 1]
       setLast(lastVisible)
-      // if (docs.length < LIMIT) {
       setLoadedAll(docs.length < LIMIT)
-      // }
     })
   }, [])
 
@@ -99,9 +96,7 @@ const Blog = () => {
 
       const lastVisible = docs[docs.length - 1]
       setLast(lastVisible)
-      // if (docs.length < LIMIT) {
       setLoadedAll(docs.length < LIMIT)
-      // }
     })
   }, [last])
 
