@@ -1,5 +1,0 @@
-export * from './SignUp'
-export * from './SignIn'
-export * from './Home'
-export * from './Profile'
-export * from './NotFound'

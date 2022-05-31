@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useUpdateProfile } from 'react-firebase-hooks/auth'
 
 import { useAuth } from '../../context'
@@ -47,7 +47,7 @@ const Profile = ({ }) => {
       </button>
       <br />
       <h4>{user?.displayName}</h4>
-      <img src={user?.photoURL} alt={'photoURL'} width={300} />
+      {photoURL.length > 0 && <img src={user?.photoURL} alt={'photoURL'} width={300} />}
     </div>
   )
 }

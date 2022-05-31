@@ -21,7 +21,7 @@ const SignIn = () => {
     return <p>Loading...</p>
   }
   return (
-    <div>
+    <div className='App'>
       SignIn
       <br />
       <input

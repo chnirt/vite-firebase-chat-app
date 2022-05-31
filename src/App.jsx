@@ -9,6 +9,9 @@ const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
 
 const LazyHomeScreen = lazy(() => import('./pages/Home'))
+const LazyBlogScreen = lazy(() => import("./pages/Blog"));
+const LazyBlogDetailScreen = lazy(() => import("./pages/BlogDetail"));
+const LazyMessengerScreen = lazy(() => import("./pages/Messenger"));
 const LazyProfileScreen = lazy(() => import("./pages/Profile"));
 const LazyChangePasswordScreen = lazy(() => import("./pages/ChangePassword"));
 
@@ -49,6 +52,18 @@ function App() {
         </PrivateRoute>
       ),
       children: [
+        {
+          path: 'blog',
+          element: <LazyBlogScreen />,
+        },
+        {
+          path: 'blog/:blogId',
+          element: <LazyBlogDetailScreen />,
+        },
+        {
+          path: 'messenger',
+          element: <LazyMessengerScreen />,
+        },
         {
           path: 'profile',
           element: <LazyProfileScreen />,

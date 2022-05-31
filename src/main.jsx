@@ -4,12 +4,13 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 import App from './App'
 import { AuthProvider } from './context'
-import { Loading } from './components'
+import { ForkMe, Loading } from './components'
 
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <ForkMe />
     <AuthProvider>
       <Suspense fallback={<Loading />}>
         <Router>

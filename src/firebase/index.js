@@ -2,7 +2,8 @@
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-import { getAuth } from "firebase/auth";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -17,5 +18,28 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Initialize Cloud Firestore and get a reference to the service
+export const db = getFirestore(app);
+
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
+
+if (location.hostname === "localhost") {
+  connectAuthEmulator(auth, "http://localhost:9099");
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
+
+export const saveUserToFirestore = async (userInput) => {
+  try {
+    const userData = {
+      fullName: userInput.fullName,
+      email: userInput.email,
+      username: userInput.username,
+      createdAt: serverTimestamp(),
+    }
+    const docRef = await setDoc(doc(db, 'users', userInput.uid), userData)
+    // const docRef = await addDoc(collection(db, 'users'), userData)
+    return docRef
+  } catch (error) { }
+}
+

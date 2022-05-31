@@ -1,17 +1,24 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const NotFound = () => {
-  let location = useLocation();
+  let location = useLocation()
+  let navigate = useNavigate()
 
   return (
-    <div>
+    <div className='App'>
       <h3>
         No match for <code>{location.pathname}</code>
         <br />
-        <Link to="/">Back to Home</Link>
+        <button
+          onClick={() => {
+            navigate(-1)
+          }}
+        >
+          Back
+        </button>
       </h3>
     </div>
-  );
+  )
 }
 
 export default NotFound
