@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useUpdateProfile } from 'react-firebase-hooks/auth'
 
+import { useAuth } from '../../context'
 import { auth } from '../../firebase'
 
-export const UpdateProfile = ({ user }) => {
+const Profile = ({ }) => {
+  const { user } = useAuth()
   const [displayName, setDisplayName] = useState(user?.displayName ?? '')
   const [photoURL, setPhotoURL] = useState(user?.photoURL ?? '')
   const [updateProfile, updating, error] = useUpdateProfile(auth)
@@ -18,8 +20,8 @@ export const UpdateProfile = ({ user }) => {
     return <p>Updating...</p>
   }
   return (
-    <div className="App">
-      Update Profile
+    <div>
+      Profile
       <br />
       <input
         type="displayName"
@@ -38,13 +40,16 @@ export const UpdateProfile = ({ user }) => {
       <button
         onClick={async () => {
           await updateProfile({ displayName, photoURL })
+          alert('Updated profile');
         }}
       >
         Update profile
       </button>
       <br />
       <h4>{user?.displayName}</h4>
-      <img src={user?.photoURL} alt={"photoURL"} width={300} />
+      <img src={user?.photoURL} alt={'photoURL'} width={300} />
     </div>
   )
 }
+
+export default Profile

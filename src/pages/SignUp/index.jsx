@@ -1,13 +1,22 @@
 import { useState } from 'react'
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth'
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth'
+import { Link } from 'react-router-dom'
 
 import { auth } from '../../firebase'
 
-export const SignIn = () => {
+const SignUp = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
-  const [signInWithEmailAndPassword, user, loading, error] =
-    useSignInWithEmailAndPassword(auth)
+  const [createUserWithEmailAndPassword, user, loading, error] =
+    useCreateUserWithEmailAndPassword(auth)
+
+  if (loading) {
+    return (
+      <div>
+        <p>RegisterUser...</p>
+      </div>
+    )
+  }
 
   if (error) {
     return (
@@ -16,12 +25,10 @@ export const SignIn = () => {
       </div>
     )
   }
-  if (loading) {
-    return <p>Loading...</p>
-  }
+
   return (
     <div>
-      SignIn
+      SignUp
       <br />
       <input
         type="email"
@@ -38,9 +45,13 @@ export const SignIn = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <br />
-      <button onClick={() => signInWithEmailAndPassword(email, password)}>
-        Sign In
+      <button onClick={() => createUserWithEmailAndPassword(email, password)}>
+        Sign Up
       </button>
+      <br />
+      Have an account? <Link to="/">Sign in</Link>
     </div>
   )
 }
+
+export default SignUp
