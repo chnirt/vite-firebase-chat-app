@@ -9,9 +9,13 @@ const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
 
 const LazyHomeScreen = lazy(() => import('./pages/Home'))
+
 const LazyCreateBlogScreen = lazy(() => import("./pages/CreateBlog"));
 const LazyBlogScreen = lazy(() => import("./pages/Blog"));
 const LazyBlogDetailScreen = lazy(() => import("./pages/BlogDetail"));
+
+const LazyWhatsAppScreen = lazy(() => import("./pages/WhatsApp"));
+
 const LazyMessengerScreen = lazy(() => import("./pages/Messenger"));
 const LazyProfileScreen = lazy(() => import("./pages/Profile"));
 const LazyChangePasswordScreen = lazy(() => import("./pages/ChangePassword"));
@@ -65,6 +69,12 @@ function App() {
           path: 'blog/:blogId',
           element: <LazyBlogDetailScreen />,
         },
+
+        {
+          path: 'whatsapp',
+          element: <LazyWhatsAppScreen />,
+        },
+
         {
           path: 'messenger',
           element: <LazyMessengerScreen />,

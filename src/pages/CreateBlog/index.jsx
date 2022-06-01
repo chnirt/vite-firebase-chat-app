@@ -13,7 +13,7 @@ const CreateBlog = () => {
   const [value, setValue] = useState('**Hello world!!!**')
 
   const handlePublish = useCallback(async () => {
-    if (user?.id === null) return
+    if (user?.uid === null) return
     if (title === '') return
     if (value === '') return
 

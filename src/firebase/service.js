@@ -5,6 +5,7 @@ import {
   collection,
   addDoc,
   deleteDoc,
+  updateDoc,
 } from 'firebase/firestore'
 
 import { db } from '.'
@@ -33,6 +34,16 @@ export const addDocument = async (
   }
 
   return docRef
+}
+
+export const updateDocument = async (collectionName = "todos", docId = "", data = {}) => {
+  const docRef = doc(db, collectionName, docId);
+
+  // Update the timestamp field with the value from the server
+  await updateDoc(docRef, {
+    ...data,
+    updatedAt: serverTimestamp()
+  });
 }
 
 export const deleteDocument = async (collectionName = 'todos', docId = '') => {

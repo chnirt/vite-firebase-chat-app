@@ -10,6 +10,7 @@
   "dependencies": {
     "@uiw/react-md-editor": "^3.14.1",
     "firebase": "^9.8.2",
+    "lodash": "^4.17.21",
     "moment": "^2.29.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

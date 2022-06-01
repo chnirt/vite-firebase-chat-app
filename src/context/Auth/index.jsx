@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [user, loading, error] = useAuthState(auth)
 
   const value = useMemo(() => ({
-    isAuth: !!user,
+    isAuth: !!user ?? false,
     user,
   }), [user])
 
