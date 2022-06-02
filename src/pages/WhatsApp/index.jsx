@@ -7,13 +7,18 @@ import {
   where,
   limit,
   onSnapshot,
+  doc,
 } from 'firebase/firestore'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { UserList } from '../../components'
 import { useAuth } from '../../context'
 import { db } from '../../firebase'
-import { addDocument, updateDocument } from '../../firebase/service'
+import {
+  addDocument,
+  // addSubCollection,
+  updateDocument,
+} from '../../firebase/service'
 
 const constraints = {
   audio: !true,
@@ -26,7 +31,11 @@ const constraints = {
 const servers = {
   iceServers: [
     {
-      urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+      urls: [
+        'stun:stun.l.google.com:19302',
+        'stun:stun1.l.google.com:19302',
+        'stun:stun2.l.google.com:19302',
+      ],
     },
   ],
   iceCandidatePoolSize: 10,
@@ -41,13 +50,10 @@ const CALL_STATUS = {
 const WhatsApp = () => {
   const { user } = useAuth()
   const [currentCallReference, setCurrentCallReference] = useState(null)
-  const [callSnapshot, setCallSnapshot] = useState(null)
-  const callIdRef = useRef()
-  const callSnapshotRef = useRef()
+  const [callDocument, setCallDocument] = useState(null)
   const localVideoRef = useRef()
   const remoteVideoRef = useRef()
-  // const pc = useRef(new RTCPeerConnection(servers))
-  const pc = useRef(new RTCPeerConnection())
+  const pc = useRef(new RTCPeerConnection(servers))
 
   const handleGetStreamedVideo = useCallback(async (videoRef) => {
     try {
@@ -72,7 +78,6 @@ const WhatsApp = () => {
   }, [])
 
   const handleCall = useCallback(async (callee) => {
-    // Step 1
     // console.log('handleCall')
     const offer = await pc.current.createOffer({
       offerToReceiveAudio: true,
@@ -96,23 +101,78 @@ const WhatsApp = () => {
     const options = {
       generated: true,
     }
+    console.log('Save offer: ')
     const callRef = await addDocument('calls', callWithOffer, options)
-    // console.log("1", callRef)
-    callIdRef.current = callRef.id
     setCurrentCallReference(callRef)
 
-    console.log('Set local description: ', offer)
+    pc.current.onicecandidate = async (event) => {
+      if (event.candidate) {
+        const json = event.candidate.toJSON()
+        if (json.sdpMid !== '0' && json.sdpMLineIndex !== 0) return
+        const docRef = doc(db, 'calls', callRef.id)
+        const offerICECandidatesData = {
+          ...json,
+          uid: user.uid,
+        }
+
+        // v2
+        // console.log('Save offer ICE candidates: ')
+        // await addSubCollection(
+        //   docRef,
+        //   'offerICECandidates',
+        //   offerICECandidatesData
+        // )
+
+        // v1
+        const callData = {
+          offerIceCandidate: json,
+        }
+        await updateDocument('calls', callRef.id, callData)
+      }
+    }
+
+    console.log('Set offer to local description: ', offer)
     await pc.current.setLocalDescription(offer)
   }, [])
 
   const handleAccept = useCallback(async () => {
-    // Step - 6 callee
-    if (callSnapshot && currentCallReference) {
+    if (currentCallReference && callDocument) {
       // console.log('handleAccept')
-      const offer = callSnapshot.data().offer
+
+      pc.current.onicecandidate = async (event) => {
+        if (event.candidate) {
+          const json = event.candidate.toJSON()
+          if (json.sdpMid !== '0' && json.sdpMLineIndex !== 0) return
+          const docRef = doc(db, 'calls', currentCallReference.id)
+          const answerICECandidatesData = {
+            ...json,
+            uid: user.uid,
+          }
+
+          // v2
+          // console.log('Save answer ICE candidates: ')
+          // await addSubCollection(
+          //   docRef,
+          //   'answerICECandidates',
+          //   answerICECandidatesData
+          // )
+
+          // v1
+          const callData = {
+            answerIceCandidate: json,
+          }
+          await updateDocument('calls', currentCallReference.id, callData)
+        }
+      }
+
+      const offer = callDocument.offer
+      console.log('Set remote offer to remote description: ')
       await pc.current.setRemoteDescription(offer)
+
       const answer = await pc.current.createAnswer()
+      console.log('Set local answer to local description: ')
       await pc.current.setLocalDescription(answer)
+
       const callWithAnswer = {
         answer: {
           type: answer.type,
@@ -120,9 +180,10 @@ const WhatsApp = () => {
         },
         status: CALL_STATUS.ACCEPT,
       }
+      console.log('Save answer: ')
       await updateDocument('calls', currentCallReference.id, callWithAnswer)
     }
-  }, [callSnapshot, currentCallReference])
+  }, [currentCallReference, callDocument])
 
   const handleDecline = useCallback(async () => {
     if (currentCallReference) {
@@ -136,101 +197,54 @@ const WhatsApp = () => {
     }
   }, [currentCallReference, stopStreamedVideo])
 
-  const handleInitPC = useCallback(async () => {
-    const _pc = new RTCPeerConnection(null)
 
+  const handleVideo = async () => {
     const stream = await handleGetStreamedVideo(localVideoRef.current)
 
     // Step 0 add stream to pc
     // add stream for track after set remote description
     stream.getTracks().forEach(function (track) {
-      _pc.addTrack(track, stream)
+      pc.current.addTrack(track, stream)
     })
 
-    _pc.onicecandidate = async (e) => {
-      if (e.candidate) {
-        console.log('onicecandidate---', JSON.stringify(e.candidate))
+    // pc.current.onconnectionstatechange = (e) => {
+    //   console.log('onconnectionstatechange---', e)
+    // }
 
-        // 3a
-        const json = e.candidate.toJSON()
-
-        // console.log(callIdRef.current)
-        if (
-          typeof callSnapshotRef?.current?.data !== 'function' &&
-          callIdRef.current &&
-          json.sdpMid === '0'
-        ) {
-          // console.log('Set offer ICE candidate: ', json)
-          const callData = {
-            offerIceCandidate: json,
-          }
-          await updateDocument('calls', callIdRef.current, callData)
-        }
-
-        if (typeof callSnapshotRef?.current?.data === 'function') {
-          const callId = callSnapshotRef?.current?.id
-          // const isCaller =
-          //   callSnapshotRef?.current?.data().caller.uid === user.uid
-          const isCallee =
-            callSnapshotRef?.current?.data().callee.uid === user.uid
-
-          // Step - 7 callee
-          // console.log('Set answer ICE candidate: ', json)
-          if (isCallee) {
-            const callData = {
-              answerIceCandidate: json,
-            }
-            await updateDocument('calls', callId, callData)
-          }
-        }
-      }
-    }
-    _pc.onconnectionstatechange = (e) => {
-      // console.log('onconnectionstatechange---', e)
-    }
-    _pc.ontrack = (e) => {
+    pc.current.ontrack = (e) => {
       // we got remote stream
       // Step - 8 callee
-      console.log('Set remote stream', e.streams[0])
+      console.log('Set remote stream: ', e.streams[0])
       remoteVideoRef.current.srcObject = e.streams[0]
     }
-
-    pc.current = _pc
-  }, [])
+  }
 
   useEffect(() => {
-    handleInitPC()
-  }, [handleInitPC])
+    handleVideo()
+  }, [handleVideo])
 
   useEffect(() => {
-    // Step - 2 caller
     if (currentCallReference) {
-      const unsubscribe = onSnapshot(
+      const unsubscribeCall = onSnapshot(
         currentCallReference,
         { includeMetadataChanges: true },
-        async (snapshot) => {
-          console.log('Listen my call:', snapshot.data())
-          const data = snapshot.data()
+        async (querySnapshot) => {
+          const data = querySnapshot.data()
           const isCaller = data?.caller?.uid === user.uid
           const isCallee = data?.callee?.uid === user.uid
-          if (isCaller || isCallee) {
-            callSnapshotRef.current = snapshot
-            setCallSnapshot(snapshot)
-          }
+          setCallDocument(data)
 
-          // Step - 3 caller
           // Listen for remote answer
           if (
             !pc.current.currentRemoteDescription &&
             data?.answer &&
             isCaller
           ) {
-            console.log('Set remote description: ', data.answer)
+            console.log('Set answer to remote description: ', data.answer)
             const answer = new RTCSessionDescription(data.answer)
             await pc.current.setRemoteDescription(answer)
           }
 
-          // Step - 4 caller
           // Listen for answer ICE candidates
           if (data?.answerIceCandidate && isCaller) {
             console.log('Set answer ICE candidates', data.answerIceCandidate)
@@ -251,42 +265,94 @@ const WhatsApp = () => {
           }
         }
       )
+      const unsubscribeAnswerICECandidates = onSnapshot(
+        query(
+          collection(currentCallReference, 'answerICECandidates'),
+          limit(1)
+        ),
+        async (querySnapshot) => {
+          querySnapshot.docChanges().forEach((change) => {
+            const data = change.doc.data()
+            const isCaller = data?.caller?.uid === user.uid
+            // const isCallee = data?.callee?.uid === user.uid
+            if (change.type === 'added') {
+              if (data && isCaller) {
+                // console.log('Added answerICECandidates: ', data)
+                // const candidate = new RTCIceCandidate(data)
+                // pc.current.addIceCandidate(candidate)
+              }
+            }
+            // if (change.type === 'modified') {
+            //   console.log('Modified answerIceCandidates: ', data)
+            // }
+            // if (change.type === 'removed') {
+            //   console.log('Removed answerIceCandidates: ', data)
+            // }
+          })
+        }
+      )
+      const unsubscribeOfferICECandidates = onSnapshot(
+        query(collection(currentCallReference, 'offerICECandidates'), limit(1)),
+        async (querySnapshot) => {
+          querySnapshot.docChanges().forEach((change) => {
+            const data = change.doc.data()
+            // const isCaller = data?.caller?.uid === user.uid
+            const isCallee = data?.callee?.uid === user.uid
+            if (change.type === 'added') {
+              if (data && isCallee) {
+                // console.log('Added offerIceCandidates: ', data)
+                // const candidate = new RTCIceCandidate(data)
+                // pc.current.addIceCandidate(candidate)
+              }
+            }
+            // if (change.type === 'modified') {
+            //   console.log('Modified offerIceCandidates: ', data)
+            // }
+            // if (change.type === 'removed') {
+            //   console.log('Removed offerIceCandidates: ', data)
+            // }
+          })
+        }
+      )
       return () => {
-        unsubscribe()
+        unsubscribeCall()
+        unsubscribeAnswerICECandidates()
+        unsubscribeOfferICECandidates()
       }
     }
   }, [currentCallReference])
 
   useEffect(() => {
-    // Step - 5 callee
     const incomingCallRef = query(
       collection(db, 'calls'),
+      where('status', '!=', CALL_STATUS.DECLINE),
       where('callee.uid', '==', user.uid),
+      orderBy('status'),
       orderBy('callee.uid'),
       orderBy('createdAt', 'desc'),
       limit(1)
     )
     const unsubscribe = onSnapshot(
       incomingCallRef,
-      async (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          // console.log(change.doc.id)
+      async (querySnapshot) => {
+        querySnapshot.docChanges().forEach((change) => {
+          const data = change.doc.data()
+          const callRef = change.doc.ref
+          // const isCaller = data?.caller?.uid === user.uid
+          const isCallee = data?.callee?.uid === user.uid
           if (change.type === 'added') {
-            // console.log('Listen incoming call:', change.doc.data())
-            // console.log('New call: ', change.doc.data(), change.doc.ref, change.doc.id)
-            const callRef = change.doc.ref
-            callSnapshotRef.current = change.doc
-            // console.log("2", callRef)
-            callIdRef.current = callRef.id
-            setCurrentCallReference(callRef)
-            setCallSnapshot(change.doc)
+            if (data && isCallee) {
+              console.log('Added incoming call: ', data)
+              setCurrentCallReference(callRef)
+              setCallDocument(data)
+            }
           }
-          if (change.type === 'modified') {
-            // console.log('Modified call: ', change.doc.data())
-          }
-          if (change.type === 'removed') {
-            // console.log('Removed call: ', change.doc.data())
-          }
+          // if (change.type === 'modified') {
+          //   console.log('Modified incoming call: ', data)
+          // }
+          // if (change.type === 'removed') {
+          //   console.log('Removed incoming call: ', data)
+          // }
         })
       },
       (error) => {
@@ -301,31 +367,28 @@ const WhatsApp = () => {
   return (
     <div>
       WhatsApp
-      <UserList handleCall={handleCall} />
+      {!callDocument && <UserList handleCall={handleCall} />}
       <br />
       {[CALL_STATUS.CALLING, CALL_STATUS.ACCEPT].some(
-        (status) => status === callSnapshot?.data()?.status
+        (status) => status === callDocument?.status
       ) && (
           <div>
-            CallId: {callSnapshot?.id}
-            <div>
-              {((callSnapshot?.data()?.status === CALL_STATUS.CALLING &&
-                callSnapshot?.data()?.caller?.uid === user?.uid) ||
-                callSnapshot?.data()?.status === CALL_STATUS.ACCEPT) && (
-                  <div>
-                    {callSnapshot?.data()?.caller?.email}
-                    <button onClick={handleDecline}>Decline</button>
-                  </div>
-                )}
-              {callSnapshot?.data()?.status === CALL_STATUS.CALLING &&
-                callSnapshot?.data()?.callee?.uid === user?.uid && (
-                  <div>
-                    {callSnapshot?.data()?.caller?.email}
-                    <button onClick={handleDecline}>Decline</button>
-                    <button onClick={handleAccept}>Accept</button>
-                  </div>
-                )}
-            </div>
+            {((callDocument?.status === CALL_STATUS.CALLING &&
+              callDocument?.caller?.uid === user?.uid) ||
+              callDocument?.status === CALL_STATUS.ACCEPT) && (
+                <div>
+                  {callDocument?.caller?.email}
+                  <button onClick={handleDecline}>Decline</button>
+                </div>
+              )}
+            {callDocument?.status === CALL_STATUS.CALLING &&
+              callDocument?.callee?.uid === user?.uid && (
+                <div>
+                  {callDocument?.caller?.email}
+                  <button onClick={handleDecline}>Decline</button>
+                  <button onClick={handleAccept}>Accept</button>
+                </div>
+              )}
           </div>
         )}
       <br />

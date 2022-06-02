@@ -36,14 +36,28 @@ export const addDocument = async (
   return docRef
 }
 
-export const updateDocument = async (collectionName = "todos", docId = "", data = {}) => {
-  const docRef = doc(db, collectionName, docId);
+export const addSubCollection = async (
+  docRef = doc(db, 'todos', '1234'),
+  collectionName = 'subTodos',
+  data = {}
+) => {
+  const colRef = collection(docRef, collectionName)
+  docRef = await addDoc(colRef, data)
+  return docRef
+}
+
+export const updateDocument = async (
+  collectionName = 'todos',
+  docId = '',
+  data = {}
+) => {
+  const docRef = doc(db, collectionName, docId)
 
   // Update the timestamp field with the value from the server
   await updateDoc(docRef, {
     ...data,
-    updatedAt: serverTimestamp()
-  });
+    updatedAt: serverTimestamp(),
+  })
 }
 
 export const deleteDocument = async (collectionName = 'todos', docId = '') => {
