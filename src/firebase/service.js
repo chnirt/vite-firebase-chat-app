@@ -15,6 +15,7 @@ export const addDocument = async (
   data = {},
   options = {
     generated: false,
+    ref: null,
   }
 ) => {
   const formatData = {
@@ -26,11 +27,10 @@ export const addDocument = async (
 
   if (options.generated) {
     collectionRef = collection(db, collectionName)
-    docRef = await addDoc(collectionRef, formatData)
+    docRef = await addDoc(options.ref ?? collectionRef, formatData)
   } else {
     collectionRef = doc(collection(db, collectionName))
-    // later...
-    docRef = await setDoc(collectionRef, formatData)
+    docRef = await setDoc(options.ref ?? collectionRef, formatData)
   }
 
   return docRef

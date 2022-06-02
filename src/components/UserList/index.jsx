@@ -64,7 +64,7 @@ export const UserList = ({ handleCall = () => { } }) => {
           {users.map((user, ui) => (
             <div key={`user-${ui}`}>
               {user.email}
-              <button onClick={() => handleCall(user.uid)}>Call</button>
+              <button onClick={() => handleCall(user)}>Call</button>
             </div>
           ))}
         </div>

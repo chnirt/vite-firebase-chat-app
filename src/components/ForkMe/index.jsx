@@ -1,6 +1,6 @@
 export const ForkMe = ({
   href = 'https://github.com/chnirt/vite-firebase-chat-app',
-  size = 149
+  size = 149,
 }) => {
   return (
     <a
