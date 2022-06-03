@@ -350,13 +350,12 @@ const WhatsApp = () => {
   useEffect(() => {
     const incomingCallRef = query(
       collection(db, 'calls'),
-      where('status', '!=', CALL_STATUS.DECLINE),
+      where('status', '==', CALL_STATUS.CALLING),
       where('callee', '==', {
         uid: user.uid,
         email: user.email
       }),
       orderBy('status'),
-      // orderBy('callee'),
       orderBy('createdAt', 'desc'),
       limit(1)
     )
@@ -437,6 +436,8 @@ const WhatsApp = () => {
           /*Mirror code ends*/
         }}
         autoPlay
+        playsInline
+        controls={false}
       />
       <video
         ref={remoteVideoRef}
@@ -453,6 +454,8 @@ const WhatsApp = () => {
           /*Mirror code ends*/
         }}
         autoPlay
+        playsInline
+        controls={false}
       />
     </div>
   )

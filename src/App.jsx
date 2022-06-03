@@ -1,24 +1,25 @@
-import { lazy } from 'react'
+import { lazy, Suspense } from 'react'
 import { useRoutes } from 'react-router-dom'
 
 import './App.css'
 import { Layout } from './layout'
 import { PublicRoute, PrivateRoute } from './helpers'
+import { Loading } from './components'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
 
 const LazyHomeScreen = lazy(() => import('./pages/Home'))
 
-const LazyCreateBlogScreen = lazy(() => import("./pages/CreateBlog"));
-const LazyBlogScreen = lazy(() => import("./pages/Blog"));
-const LazyBlogDetailScreen = lazy(() => import("./pages/BlogDetail"));
+const LazyCreateBlogScreen = lazy(() => import('./pages/CreateBlog'))
+const LazyBlogScreen = lazy(() => import('./pages/Blog'))
+const LazyBlogDetailScreen = lazy(() => import('./pages/BlogDetail'))
 
-const LazyWhatsAppScreen = lazy(() => import("./pages/WhatsApp"));
+const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp'))
 
-const LazyMessengerScreen = lazy(() => import("./pages/Messenger"));
-const LazyProfileScreen = lazy(() => import("./pages/Profile"));
-const LazyChangePasswordScreen = lazy(() => import("./pages/ChangePassword"));
+const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
+const LazyProfileScreen = lazy(() => import('./pages/Profile'))
+const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 
 const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 
@@ -35,7 +36,9 @@ function App() {
       path: '/login',
       element: (
         <PublicRoute>
-          <LazySignInScreen />
+          <Suspense fallback={<Loading />}>
+            <LazySignInScreen />
+          </Suspense>
         </PublicRoute>
       ),
     },
@@ -43,7 +46,9 @@ function App() {
       path: '/register',
       element: (
         <PublicRoute>
-          <LazySignUpScreen />
+          <Suspense fallback={<Loading />}>
+            <LazySignUpScreen />
+          </Suspense>
         </PublicRoute>
       ),
     },
@@ -52,44 +57,81 @@ function App() {
       element: (
         <PrivateRoute>
           <Layout>
-            <LazyHomeScreen />
+            <Suspense fallback={<Loading />}>
+              <LazyHomeScreen />
+            </Suspense>
           </Layout>
         </PrivateRoute>
       ),
       children: [
         {
           path: 'create-blog',
-          element: <LazyCreateBlogScreen />,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyCreateBlogScreen />
+            </Suspense>
+          ),
         },
         {
           path: 'blog',
-          element: <LazyBlogScreen />,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyBlogScreen />
+            </Suspense>
+          ),
         },
         {
           path: 'blog/:blogId',
-          element: <LazyBlogDetailScreen />,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyBlogDetailScreen />
+            </Suspense>
+          ),
         },
 
         {
           path: 'whatsapp',
-          element: <LazyWhatsAppScreen />,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyWhatsAppScreen />
+            </Suspense>
+          ),
         },
 
         {
           path: 'messenger',
-          element: <LazyMessengerScreen />,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyMessengerScreen />
+            </Suspense>
+          ),
         },
         {
           path: 'profile',
-          element: <LazyProfileScreen />,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyProfileScreen />
+            </Suspense>
+          ),
         },
         {
           path: 'change-password',
-          element: <LazyChangePasswordScreen />,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyChangePasswordScreen />
+            </Suspense>
+          ),
         },
       ],
     },
-    { path: '*', element: <LazyNotFoundScreen /> },
+    {
+      path: '*',
+      element: (
+        <Suspense fallback={<Loading />}>
+          <LazyNotFoundScreen />{' '}
+        </Suspense>
+      ),
+    },
   ])
 
   return element
