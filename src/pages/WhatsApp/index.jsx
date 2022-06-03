@@ -222,16 +222,16 @@ const WhatsApp = () => {
           const data = querySnapshot.data()
           const isCaller = data?.caller?.uid === user.uid
           const isCallee = data?.callee?.uid === user.uid
-          // setCallDocument(data)
+          setCallDocument(data)
 
-          if (data && isCaller) {
-            console.log('Added incoming call: ', data)
-            // setCurrentCallReference(callRef)
-            setCallDocument(data)
+          // if (data && isCaller) {
+          //   console.log('Added incoming call: ', data)
+          //   // setCurrentCallReference(callRef)
+          //   setCallDocument(data)
 
-            // console.log('PC Start: ')
-            // pc.current = new RTCPeerConnection(servers)
-          }
+          //   // console.log('PC Start: ')
+          //   // pc.current = new RTCPeerConnection(servers)
+          // }
 
           // Listen for remote answer
           if (
@@ -284,9 +284,9 @@ const WhatsApp = () => {
             stopStreamedVideo(remoteVideoRef.current)
             console.log('PC close: ')
             pc.current.close()
-            if (isCallee) {
-              setCallDocument(data)
-            }
+            // if (isCallee) {
+            //   setCallDocument(data)
+            // }
           }
         }
       )
