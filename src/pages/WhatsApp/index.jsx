@@ -355,7 +355,6 @@ const WhatsApp = () => {
         uid: user.uid,
         email: user.email
       }),
-      orderBy('status'),
       orderBy('createdAt', 'desc'),
       limit(1)
     )
