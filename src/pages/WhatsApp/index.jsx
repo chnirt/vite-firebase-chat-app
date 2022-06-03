@@ -59,6 +59,11 @@ const WhatsApp = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
       videoRef.srcObject = stream
+      // add stream for track after set remote description
+      stream.getTracks().forEach(function (track) {
+        pc.current.addTrack(track, stream)
+      })
+
       return stream
     } catch (error) {
       console.log(error)
@@ -79,6 +84,11 @@ const WhatsApp = () => {
 
   const handleCall = useCallback(async (callee) => {
     // console.log('handleCall')
+    console.log('PC open: ')
+    pc.current = new RTCPeerConnection(servers)
+
+    await handleGetStreamedVideo(localVideoRef.current)
+
     const offer = await pc.current.createOffer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
@@ -115,8 +125,8 @@ const WhatsApp = () => {
           uid: user.uid,
         }
 
+        console.log('Save offer ICE candidates: ')
         // v2
-        // console.log('Save offer ICE candidates: ')
         // await addSubCollection(
         //   docRef,
         //   'offerICECandidates',
@@ -138,6 +148,9 @@ const WhatsApp = () => {
   const handleAccept = useCallback(async () => {
     if (currentCallReference && callDocument) {
       // console.log('handleAccept')
+      // pc.current = new RTCPeerConnection(servers)
+
+      await handleGetStreamedVideo(localVideoRef.current)
 
       pc.current.onicecandidate = async (event) => {
         if (event.candidate) {
@@ -149,8 +162,8 @@ const WhatsApp = () => {
             uid: user.uid,
           }
 
+          console.log('Save answer ICE candidates: ')
           // v2
-          // console.log('Save answer ICE candidates: ')
           // await addSubCollection(
           //   docRef,
           //   'answerICECandidates',
@@ -192,36 +205,13 @@ const WhatsApp = () => {
         status: CALL_STATUS.DECLINE,
       }
       await updateDocument('calls', currentCallReference.id, callData)
+
       // stopStreamedVideo(localVideoRef.current)
-      stopStreamedVideo(remoteVideoRef.current)
+      // stopStreamedVideo(remoteVideoRef.current)
+      // console.log('PC close: ')
+      // pc.current.close()
     }
   }, [currentCallReference, stopStreamedVideo])
-
-
-  const handleVideo = async () => {
-    const stream = await handleGetStreamedVideo(localVideoRef.current)
-
-    // Step 0 add stream to pc
-    // add stream for track after set remote description
-    stream.getTracks().forEach(function (track) {
-      pc.current.addTrack(track, stream)
-    })
-
-    // pc.current.onconnectionstatechange = (e) => {
-    //   console.log('onconnectionstatechange---', e)
-    // }
-
-    pc.current.ontrack = (e) => {
-      // we got remote stream
-      // Step - 8 callee
-      console.log('Set remote stream: ', e.streams[0])
-      remoteVideoRef.current.srcObject = e.streams[0]
-    }
-  }
-
-  useEffect(() => {
-    handleVideo()
-  }, [handleVideo])
 
   useEffect(() => {
     if (currentCallReference) {
@@ -232,7 +222,16 @@ const WhatsApp = () => {
           const data = querySnapshot.data()
           const isCaller = data?.caller?.uid === user.uid
           const isCallee = data?.callee?.uid === user.uid
-          setCallDocument(data)
+          // setCallDocument(data)
+
+          if (data && isCaller) {
+            console.log('Added incoming call: ', data)
+            // setCurrentCallReference(callRef)
+            setCallDocument(data)
+
+            // console.log('PC Start: ')
+            // pc.current = new RTCPeerConnection(servers)
+          }
 
           // Listen for remote answer
           if (
@@ -246,22 +245,48 @@ const WhatsApp = () => {
           }
 
           // Listen for answer ICE candidates
-          if (data?.answerIceCandidate && isCaller) {
+          if (
+            pc.current.signalingState !== 'closed' &&
+            data?.answerIceCandidate &&
+            isCaller
+          ) {
             console.log('Set answer ICE candidates', data.answerIceCandidate)
             const candidate = new RTCIceCandidate(data.answerIceCandidate)
             pc.current.addIceCandidate(candidate)
           }
 
+          console.log(pc.current.signalingState)
+
           // Listen for offer ICE candidates
-          if (data?.offerIceCandidate && isCallee) {
+          if (
+            pc.current.signalingState !== 'closed' &&
+            data?.offerIceCandidate &&
+            isCallee
+          ) {
             console.log('Set offer ICE candidates', data.offerIceCandidate)
             const candidate = new RTCIceCandidate(data.offerIceCandidate)
             pc.current.addIceCandidate(candidate)
           }
 
+          // Listen for track
+          pc.current.ontrack = (e) => {
+            // we got remote stream
+            console.log('Set remote stream: ', e.streams[0])
+            remoteVideoRef.current.srcObject = e.streams[0]
+          }
+
           // Listen for status
-          if (data?.status === CALL_STATUS.DECLINE) {
+          if (
+            pc.current.signalingState === 'stable' &&
+            data?.status === CALL_STATUS.DECLINE
+          ) {
+            stopStreamedVideo(localVideoRef.current)
             stopStreamedVideo(remoteVideoRef.current)
+            console.log('PC close: ')
+            pc.current.close()
+            if (isCallee) {
+              setCallDocument(data)
+            }
           }
         }
       )
@@ -326,9 +351,12 @@ const WhatsApp = () => {
     const incomingCallRef = query(
       collection(db, 'calls'),
       where('status', '!=', CALL_STATUS.DECLINE),
-      where('callee.uid', '==', user.uid),
+      where('callee', '==', {
+        uid: user.uid,
+        email: user.email
+      }),
       orderBy('status'),
-      orderBy('callee.uid'),
+      orderBy('callee'),
       orderBy('createdAt', 'desc'),
       limit(1)
     )
@@ -345,6 +373,9 @@ const WhatsApp = () => {
               console.log('Added incoming call: ', data)
               setCurrentCallReference(callRef)
               setCallDocument(data)
+
+              console.log('PC Start: ')
+              pc.current = new RTCPeerConnection(servers)
             }
           }
           // if (change.type === 'modified') {
@@ -367,7 +398,7 @@ const WhatsApp = () => {
   return (
     <div>
       WhatsApp
-      {!callDocument && <UserList handleCall={handleCall} />}
+      <UserList handleCall={handleCall} />
       <br />
       {[CALL_STATUS.CALLING, CALL_STATUS.ACCEPT].some(
         (status) => status === callDocument?.status
