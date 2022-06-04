@@ -205,11 +205,6 @@ const WhatsApp = () => {
         status: CALL_STATUS.DECLINE,
       }
       await updateDocument('calls', currentCallReference.id, callData)
-
-      // stopStreamedVideo(localVideoRef.current)
-      // stopStreamedVideo(remoteVideoRef.current)
-      // console.log('PC close: ')
-      // pc.current.close()
     }
   }, [currentCallReference, stopStreamedVideo])
 

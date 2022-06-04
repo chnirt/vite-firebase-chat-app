@@ -5,6 +5,7 @@ import './App.css'
 import { Layout } from './layout'
 import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
+import { WebRTCProvider } from './context'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -15,7 +16,7 @@ const LazyCreateBlogScreen = lazy(() => import('./pages/CreateBlog'))
 const LazyBlogScreen = lazy(() => import('./pages/Blog'))
 const LazyBlogDetailScreen = lazy(() => import('./pages/BlogDetail'))
 
-const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp'))
+const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp2'))
 
 const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
@@ -35,33 +36,33 @@ function App() {
     {
       path: '/login',
       element: (
-        <PublicRoute>
-          <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
+          <PublicRoute>
             <LazySignInScreen />
-          </Suspense>
-        </PublicRoute>
+          </PublicRoute>
+        </Suspense>
       ),
     },
     {
       path: '/register',
       element: (
-        <PublicRoute>
-          <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
+          <PublicRoute>
             <LazySignUpScreen />
-          </Suspense>
-        </PublicRoute>
+          </PublicRoute>
+        </Suspense>
       ),
     },
     {
       path: '/',
       element: (
-        <PrivateRoute>
-          <Layout>
-            <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
+          <PrivateRoute>
+            <Layout>
               <LazyHomeScreen />
-            </Suspense>
-          </Layout>
-        </PrivateRoute>
+            </Layout>
+          </PrivateRoute>
+        </Suspense>
       ),
       children: [
         {
@@ -93,7 +94,9 @@ function App() {
           path: 'whatsapp',
           element: (
             <Suspense fallback={<Loading />}>
-              <LazyWhatsAppScreen />
+              <WebRTCProvider>
+                <LazyWhatsAppScreen />
+              </WebRTCProvider>
             </Suspense>
           ),
         },
