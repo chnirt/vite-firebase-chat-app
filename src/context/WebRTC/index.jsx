@@ -18,6 +18,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { auth, db } from '../../firebase'
@@ -42,15 +43,16 @@ const servers = {
   iceCandidatePoolSize: 10,
 }
 
-let pc = new RTCPeerConnection(servers)
-
 const WebRTCContext = createContext()
 
 export const WebRTCProvider = ({ children }) => {
   const [currentCallReference, setCurrentCallReference] = useState(null)
   const [currentCallData, setCurrentCallData] = useState(null)
+  const pc = useRef(new RTCPeerConnection(servers))
 
   const getStreamVideo = useCallback(async ({ localRef, remoteRef }) => {
+    pc.current = new RTCPeerConnection(servers)
+
     const localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true,
@@ -58,10 +60,10 @@ export const WebRTCProvider = ({ children }) => {
     const remoteStream = new MediaStream()
 
     localStream.getTracks().forEach((track) => {
-      pc.addTrack(track, localStream)
+      pc.current.addTrack(track, localStream)
     })
 
-    pc.ontrack = (event) => {
+    pc.current.ontrack = (event) => {
       event.streams[0].getTracks().forEach((track) => {
         remoteStream.addTrack(track)
       })
@@ -87,7 +89,7 @@ export const WebRTCProvider = ({ children }) => {
     if (!auth.currentUser) return
     const user = auth.currentUser
 
-    const offerDescription = await pc.createOffer()
+    const offerDescription = await pc.current.createOffer()
 
     const callWithOffer = {
       offer: {
@@ -110,9 +112,10 @@ export const WebRTCProvider = ({ children }) => {
     const callReference = await addDocument('calls', callWithOffer, options)
     setCurrentCallReference(callReference)
 
-    pc.onicecandidate = async (event) => {
+    pc.current.onicecandidate = async (event) => {
       if (event.candidate) {
         const json = event.candidate.toJSON()
+        console.log("onicecandidate---", json)
         const docRef = doc(db, 'calls', callReference.id)
         const offerICECandidatesData = {
           ...json,
@@ -126,13 +129,13 @@ export const WebRTCProvider = ({ children }) => {
       }
     }
 
-    await pc.setLocalDescription(offerDescription)
+    await pc.current.setLocalDescription(offerDescription)
 
     onSnapshot(callReference, async (doc) => {
       const data = doc.data()
-      if (!pc.currentRemoteDescription && data?.answer) {
+      if (!pc.current.currentRemoteDescription && data?.answer) {
         const answerDescription = new RTCSessionDescription(data.answer)
-        pc.setRemoteDescription(answerDescription)
+        pc.current.setRemoteDescription(answerDescription)
       }
     })
 
@@ -143,7 +146,7 @@ export const WebRTCProvider = ({ children }) => {
           if (change.type === 'added') {
             const data = change.doc.data()
             const candidate = new RTCIceCandidate(data)
-            pc.addIceCandidate(candidate)
+            pc.current.addIceCandidate(candidate)
           }
         })
       }
@@ -156,9 +159,10 @@ export const WebRTCProvider = ({ children }) => {
     if (!auth.currentUser) return
     const user = auth.currentUser
 
-    pc.onicecandidate = async (event) => {
+    pc.current.onicecandidate = async (event) => {
       if (event.candidate) {
         const json = event.candidate.toJSON()
+        console.log("onicecandidate---", json)
         const docRef = doc(db, 'calls', currentCallReference.id)
         const answerICECandidatesData = {
           ...json,
@@ -176,10 +180,10 @@ export const WebRTCProvider = ({ children }) => {
     const callData = docSnap.data()
 
     const offerDescription = callData.offer
-    await pc.setRemoteDescription(new RTCSessionDescription(offerDescription))
+    await pc.current.setRemoteDescription(new RTCSessionDescription(offerDescription))
 
-    const answerDescription = await pc.createAnswer()
-    await pc.setLocalDescription(answerDescription)
+    const answerDescription = await pc.current.createAnswer()
+    await pc.current.setLocalDescription(answerDescription)
 
     const callWithAnswer = {
       answer: {
@@ -197,20 +201,18 @@ export const WebRTCProvider = ({ children }) => {
           if (change.type === 'added') {
             const data = change.doc.data()
             const candidate = new RTCIceCandidate(data)
-            pc.addIceCandidate(candidate)
+            pc.current.addIceCandidate(candidate)
           }
         })
       }
     )
-  }, [currentCallReference])
+  }, [currentCallReference?.id])
 
   const decline = useCallback(async () => {
     if (!currentCallReference) return
 
     if (!auth.currentUser) return
     const user = auth.currentUser
-
-    pc.close()
 
     const docSnap = await getDoc(currentCallReference)
     const callData = docSnap.data()
@@ -250,7 +252,8 @@ export const WebRTCProvider = ({ children }) => {
     }
     await updateDocument('calls', currentCallReference.id, updateCallData)
     setCurrentCallReference(null)
-  }, [currentCallReference])
+    pc.current.close()
+  }, [currentCallReference?.id])
 
   useEffect(() => {
     if (!auth.currentUser) return
@@ -286,7 +289,7 @@ export const WebRTCProvider = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    if (currentCallReference) {
+    if (currentCallReference?.id) {
       const unsubscribeCurrentCall = onSnapshot(
         currentCallReference,
         async (querySnapshot) => {
@@ -294,12 +297,13 @@ export const WebRTCProvider = ({ children }) => {
             id: querySnapshot.id,
             ...querySnapshot.data(),
           }
+          console.log(data)
           setCurrentCallData(data)
         }
       )
 
-      // pc.onconnectionstatechange = (event) => {
-      //   switch (pc.connectionState) {
+      // pc.current.onconnectionstatechange = (event) => {
+      //   switch (pc.current.connectionState) {
       //     case 'new':
       //     case 'checking':
       //       // setOnlineStatus("Connecting...");
@@ -327,7 +331,7 @@ export const WebRTCProvider = ({ children }) => {
         unsubscribeCurrentCall()
       }
     }
-  }, [currentCallReference, decline])
+  }, [currentCallReference?.id, decline])
 
   const value = useMemo(
     () => ({
