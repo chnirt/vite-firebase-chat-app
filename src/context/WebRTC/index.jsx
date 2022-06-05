@@ -43,25 +43,46 @@ const servers = {
   iceCandidatePoolSize: 10,
 }
 
+if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+  console.log("enumerateDevices() not supported.");
+}
+
+// List cameras and microphones.
+
+navigator.mediaDevices.enumerateDevices()
+  .then(function (devices) {
+    devices.forEach(function (device) {
+      console.log(device.kind + ": " + device.label +
+        " id = " + device.deviceId);
+    });
+  })
+  .catch(function (err) {
+    console.log(err.name + ": " + err.message);
+  });
+
 const WebRTCContext = createContext()
 
 export const WebRTCProvider = ({ children }) => {
   const [currentCallReference, setCurrentCallReference] = useState(null)
   const [currentCallData, setCurrentCallData] = useState(null)
   const pc = useRef(new RTCPeerConnection(servers))
+  const dc = useRef(null)
 
   const getStreamVideo = useCallback(async ({ localRef, remoteRef }) => {
     pc.current = new RTCPeerConnection(servers)
 
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    })
-    const remoteStream = new MediaStream()
+    const constraints = { audio: true, video: { facingMode: "user" } }
+
+    const localStream = await navigator.mediaDevices.getUserMedia(constraints)
+
+    const track = localStream.getVideoTracks()[0]
+    track.onended = (e) => console.log('Hangup or dropped call')
 
     localStream.getTracks().forEach((track) => {
       pc.current.addTrack(track, localStream)
     })
+
+    const remoteStream = new MediaStream()
 
     pc.current.ontrack = (event) => {
       event.streams[0].getTracks().forEach((track) => {
@@ -69,17 +90,42 @@ export const WebRTCProvider = ({ children }) => {
       })
     }
 
+    // pc.current.ontrack = (e) => {
+    //   // we got remote stream
+    //   console.log('Set remote stream: ', e.streams[0])
+    //   remoteRef.srcObject = e.streams[0]
+    // }
+
     localRef.srcObject = localStream
     remoteRef.srcObject = remoteStream
+
+    if (!auth.currentUser) return
+    const user = auth.currentUser
+
+    dc.current = pc.current.createDataChannel(user.uid)
+
+    dc.current.onmessage = function (event) {
+      console.log('received: ' + event.data)
+    }
+
+    dc.current.onopen = function () {
+      console.log('datachannel open')
+    }
+
+    dc.current.onclose = function () {
+      console.log('datachannel close')
+    }
   }, [])
 
-  const stopStreamedVideo = useCallback((videoRef) => {
+  const stopStreamedVideo = useCallback(async (videoRef) => {
     try {
       const stream = videoRef.srcObject
-      stream?.getTracks().forEach(function (track) {
+      const tracks = await stream?.getTracks()
+      tracks?.forEach(function (track) {
         track.stop()
-        videoRef.srcObject = null
+        videoRef.srcObject.removeTrack(track)
       })
+      videoRef.srcObject = null
     } catch (error) {
       console.log(error)
     }
@@ -115,7 +161,6 @@ export const WebRTCProvider = ({ children }) => {
     pc.current.onicecandidate = async (event) => {
       if (event.candidate) {
         const json = event.candidate.toJSON()
-        console.log("onicecandidate---", json)
         const docRef = doc(db, 'calls', callReference.id)
         const offerICECandidatesData = {
           ...json,
@@ -162,7 +207,6 @@ export const WebRTCProvider = ({ children }) => {
     pc.current.onicecandidate = async (event) => {
       if (event.candidate) {
         const json = event.candidate.toJSON()
-        console.log("onicecandidate---", json)
         const docRef = doc(db, 'calls', currentCallReference.id)
         const answerICECandidatesData = {
           ...json,
@@ -180,7 +224,9 @@ export const WebRTCProvider = ({ children }) => {
     const callData = docSnap.data()
 
     const offerDescription = callData.offer
-    await pc.current.setRemoteDescription(new RTCSessionDescription(offerDescription))
+    await pc.current.setRemoteDescription(
+      new RTCSessionDescription(offerDescription)
+    )
 
     const answerDescription = await pc.current.createAnswer()
     await pc.current.setLocalDescription(answerDescription)
@@ -252,6 +298,7 @@ export const WebRTCProvider = ({ children }) => {
     }
     await updateDocument('calls', currentCallReference.id, updateCallData)
     setCurrentCallReference(null)
+    dc.current.close()
     pc.current.close()
   }, [currentCallReference?.id])
 
@@ -342,14 +389,7 @@ export const WebRTCProvider = ({ children }) => {
       answer,
       decline,
     }),
-    [
-      currentCallData,
-      getStreamVideo,
-      stopStreamedVideo,
-      call,
-      answer,
-      decline,
-    ]
+    [currentCallData, getStreamVideo, stopStreamedVideo, call, answer, decline]
   )
 
   return (
