@@ -43,22 +43,16 @@ const servers = {
   iceCandidatePoolSize: 10,
 }
 
-if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-  console.log("enumerateDevices() not supported.");
+export const CONSTRAINTS = {
+  audio: !true,
+  video: {
+    facingMode: 'user',
+    width: 256,
+    height: 256,
+  },
 }
 
-// List cameras and microphones.
-
-navigator.mediaDevices.enumerateDevices()
-  .then(function (devices) {
-    devices.forEach(function (device) {
-      console.log(device.kind + ": " + device.label +
-        " id = " + device.deviceId);
-    });
-  })
-  .catch(function (err) {
-    console.log(err.name + ": " + err.message);
-  });
+const IS_MOBILE = !true
 
 const WebRTCContext = createContext()
 
@@ -68,64 +62,78 @@ export const WebRTCProvider = ({ children }) => {
   const pc = useRef(new RTCPeerConnection(servers))
   const dc = useRef(null)
 
-  const getStreamVideo = useCallback(async ({ localRef, remoteRef }) => {
-    pc.current = new RTCPeerConnection(servers)
+  const getStreamVideo = useCallback(
+    async ({ handleLocalVideo, handleRemoteVideo }) => {
+      pc.current = new RTCPeerConnection(servers)
 
-    const constraints = { audio: true, video: { facingMode: "user" } }
+      let localStream
 
-    const localStream = await navigator.mediaDevices.getUserMedia(constraints)
+      if (IS_MOBILE) {
+        localStream = await mediaDevices.getUserMedia(CONSTRAINTS)
+      } else {
+        localStream = await navigator.mediaDevices.getUserMedia(CONSTRAINTS)
+      }
 
-    const track = localStream.getVideoTracks()[0]
-    track.onended = (e) => console.log('Hangup or dropped call')
+      // const track = localStream.getVideoTracks()[0]
+      // track.onended = (e) => console.log('Hangup or dropped call')
 
-    localStream.getTracks().forEach((track) => {
-      pc.current.addTrack(track, localStream)
-    })
-
-    const remoteStream = new MediaStream()
-
-    pc.current.ontrack = (event) => {
-      event.streams[0].getTracks().forEach((track) => {
-        remoteStream.addTrack(track)
+      localStream.getTracks().forEach((track) => {
+        if (IS_MOBILE) {
+          pc.current.addStream(localStream);
+          pc.current.getLocalStreams()[0].addTrack(track);
+        } else {
+          pc.current.addTrack(track, localStream)
+        }
       })
-    }
 
-    // pc.current.ontrack = (e) => {
-    //   // we got remote stream
-    //   console.log('Set remote stream: ', e.streams[0])
-    //   remoteRef.srcObject = e.streams[0]
-    // }
+      const remoteStream = new MediaStream()
 
-    localRef.srcObject = localStream
-    remoteRef.srcObject = remoteStream
+      pc.current.ontrack = (event) => {
+        event.streams[0].getTracks().forEach((track) => {
+          remoteStream.addTrack(track)
+        })
+      }
 
-    if (!auth.currentUser) return
-    const user = auth.currentUser
+      if (IS_MOBILE) {
+        pc.current.onaddstream = event => {
+          handleRemoteVideo(event.stream);
+        };
+      }
 
-    dc.current = pc.current.createDataChannel(user.uid)
+      handleLocalVideo(localStream)
+      handleRemoteVideo(remoteStream)
 
-    dc.current.onmessage = function (event) {
-      console.log('received: ' + event.data)
-    }
+      if (!auth.currentUser) return
+      const user = auth.currentUser
 
-    dc.current.onopen = function () {
-      console.log('datachannel open')
-    }
+      dc.current = pc.current.createDataChannel(user.uid)
 
-    dc.current.onclose = function () {
-      console.log('datachannel close')
-    }
-  }, [])
+      dc.current.onmessage = function (event) {
+        console.log('received: ' + event.data)
+      }
 
-  const stopStreamedVideo = useCallback(async (videoRef) => {
+      dc.current.onopen = function () {
+        console.log('datachannel open')
+      }
+
+      dc.current.onclose = function () {
+        console.log('datachannel close')
+      }
+    },
+    []
+  )
+
+  // const stopStreamedVideo = useCallback(async (videoRef) => {
+  const stopStreamedVideo = useCallback(async ({ stream, handleStream }) => {
     try {
-      const stream = videoRef.srcObject
       const tracks = await stream?.getTracks()
       tracks?.forEach(function (track) {
         track.stop()
-        videoRef.srcObject.removeTrack(track)
+        if (!IS_MOBILE) {
+          stream.removeTrack(track)
+        }
       })
-      videoRef.srcObject = null
+      handleStream(null)
     } catch (error) {
       console.log(error)
     }

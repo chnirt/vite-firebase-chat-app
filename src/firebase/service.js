@@ -1,5 +1,6 @@
 import {
   doc,
+  getDoc,
   serverTimestamp,
   setDoc,
   collection,
@@ -9,6 +10,26 @@ import {
 } from 'firebase/firestore'
 
 import { db } from '.'
+
+export const getDocument = async (
+  collectionName = 'todos',
+  docId = '',
+) => {
+  try {
+    const docRef = doc(db, collectionName, docId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      console.log("Document data:", docSnap.data());
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+    }
+
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export const addDocument = async (
   collectionName = 'todos',
@@ -22,15 +43,16 @@ export const addDocument = async (
     ...data,
     createdAt: serverTimestamp(),
   }
-  let collectionRef
+
   let docRef
 
+  const collectionRef = collection(db, collectionName)
+
   if (options.generated) {
-    collectionRef = collection(db, collectionName)
     docRef = await addDoc(options.ref ?? collectionRef, formatData)
   } else {
-    collectionRef = doc(collection(db, collectionName))
-    docRef = await setDoc(options.ref ?? collectionRef, formatData)
+    const documentRef = doc(collection(db, collectionName))
+    docRef = await setDoc(options.ref ?? documentRef, formatData)
   }
 
   return docRef

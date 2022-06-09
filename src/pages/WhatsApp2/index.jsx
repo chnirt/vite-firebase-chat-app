@@ -1,15 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 
 import { UserList } from '../../components'
-import { CALL_STATUS, useAuth, useWebRTC } from '../../context'
-
-const constraints = {
-  audio: !true,
-  video: {
-    width: 256,
-    height: 256,
-  },
-}
+import { CALL_STATUS, CONSTRAINTS, useAuth, useWebRTC } from '../../context'
 
 const WhatsApp = () => {
   const { user } = useAuth()
@@ -24,18 +16,20 @@ const WhatsApp = () => {
   const localVideoRef = useRef()
   const remoteVideoRef = useRef()
 
-  useEffect(() => {
-    if (currentCallData?.status === CALL_STATUS.DECLINE) {
-      stopStreamedVideo(localVideoRef.current)
-      stopStreamedVideo(remoteVideoRef.current)
-    }
-  }, [currentCallData])
+  const handleLocalVideo = useCallback((stream) => {
+    localVideoRef.current.srcObject = stream
+
+  }, [])
+
+  const handleRemoteVideo = useCallback((stream) => {
+    remoteVideoRef.current.srcObject = stream
+  }, [])
 
   const handleCall = useCallback(
     async (callee) => {
       await getStreamVideo({
-        localRef: localVideoRef.current,
-        remoteRef: remoteVideoRef.current,
+        handleLocalVideo,
+        handleRemoteVideo,
       })
       call({
         callee: {
@@ -44,13 +38,13 @@ const WhatsApp = () => {
         },
       })
     },
-    [getStreamVideo, call]
+    [getStreamVideo, handleLocalVideo, handleRemoteVideo, call]
   )
 
   const handleAnswer = useCallback(async () => {
     await getStreamVideo({
-      localRef: localVideoRef.current,
-      remoteRef: remoteVideoRef.current,
+      handleLocalVideo,
+      handleRemoteVideo,
     })
     answer()
   }, [getStreamVideo, answer])
@@ -58,6 +52,19 @@ const WhatsApp = () => {
   const handleDecline = useCallback(() => {
     decline()
   }, [decline])
+
+  useEffect(() => {
+    if (currentCallData?.status === CALL_STATUS.DECLINE) {
+      stopStreamedVideo({
+        stream: localVideoRef.current.srcObject,
+        handleStream: handleLocalVideo
+      })
+      stopStreamedVideo({
+        stream: remoteVideoRef.current.srcObject,
+        handleStream: handleRemoteVideo
+      })
+    }
+  }, [currentCallData])
 
   return (
     <div>
@@ -90,8 +97,8 @@ const WhatsApp = () => {
       <video
         ref={localVideoRef}
         style={{
-          width: constraints.video.width,
-          height: constraints.video.height,
+          width: CONSTRAINTS.video.width,
+          height: CONSTRAINTS.video.height,
           backgroundColor: 'grey',
 
           /*Mirror code starts*/
@@ -107,8 +114,8 @@ const WhatsApp = () => {
       <video
         ref={remoteVideoRef}
         style={{
-          width: constraints.video.width,
-          height: constraints.video.height,
+          width: CONSTRAINTS.video.width,
+          height: CONSTRAINTS.video.height,
           backgroundColor: 'grey',
           marginLeft: 10,
 
