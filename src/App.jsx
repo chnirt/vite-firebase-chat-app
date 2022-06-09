@@ -1,11 +1,12 @@
-import { lazy, Suspense } from 'react'
-import { useRoutes } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { useLocation, useRoutes } from 'react-router-dom'
 
 import './App.css'
 import { Layout } from './layout'
 import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
 import { WebRTCProvider } from './context'
+import { analytics } from './firebase'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -25,6 +26,16 @@ const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 
 function App() {
+  let location = useLocation();
+
+  useEffect(() => {
+    if (typeof analytics === "function") {
+      const page_path = location.pathname + location.search;
+      analytics().setCurrentScreen(page_path);
+      analytics().logEvent("page_view", { page_path });
+    }
+  }, [location]);
+
   // We removed the <BrowserRouter> element from App because the
   // useRoutes hook needs to be in the context of a <BrowserRouter>
   // element. This is a common pattern with React Router apps that

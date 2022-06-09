@@ -1,10 +1,13 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MDEditor from '@uiw/react-md-editor'
+import { logEvent } from 'firebase/analytics'
 
 import { BackButton } from '../../components'
 import { useAuth } from '../../context'
 import { addDocument } from '../../firebase/service'
+import { analytics } from '../../firebase'
+import { eventNames } from '../../constants'
 
 const CreateBlog = () => {
   let navigate = useNavigate()
@@ -25,8 +28,13 @@ const CreateBlog = () => {
       content: value,
       uid: user.uid,
     }, options)
-    docRef && navigate(-1)
 
+    logEvent(analytics, eventNames.createBlog, {
+      title,
+      content: value,
+    })
+
+    docRef && navigate(-1)
   }, [title, value, user])
 
   return (

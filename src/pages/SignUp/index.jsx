@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { auth } from '../../firebase'
 // import { Loading } from '../../components'
 import { addDocument } from '../../firebase/service'
+import { eventNames } from '../../constants'
 
 const SignUp = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
@@ -19,13 +20,18 @@ const SignUp = () => {
       email,
       password
     )
+
     if (userCredential) {
       await addDocument('users', {
         uid: userCredential.user.uid,
         email,
       })
     }
-  }, [email, password])
+
+    logEvent(analytics, eventNames.register, {
+      email,
+    })
+  }, [email, password, createUserWithEmailAndPassword, addDocument, logEvent])
 
   return (
     <div className="App">

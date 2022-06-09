@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useRef } from 'react'
+import { logEvent } from 'firebase/analytics'
 
 import { UserList } from '../../components'
+import { eventNames } from '../../constants'
 import { CALL_STATUS, CONSTRAINTS, useAuth, useWebRTC } from '../../context'
+import { analytics } from '../../firebase'
 
 const WhatsApp = () => {
   const { user } = useAuth()
@@ -31,11 +34,17 @@ const WhatsApp = () => {
         handleLocalVideo,
         handleRemoteVideo,
       })
+
       call({
         callee: {
           uid: callee.uid,
           email: callee.email,
         },
+      })
+
+      logEvent(analytics, eventNames.call, {
+        caller: user.uid,
+        callee: callee.uid
       })
     },
     [getStreamVideo, handleLocalVideo, handleRemoteVideo, call]
@@ -46,11 +55,20 @@ const WhatsApp = () => {
       handleLocalVideo,
       handleRemoteVideo,
     })
+
     answer()
+
+    logEvent(analytics, eventNames.answer, {
+      userId: user.uid,
+    })
   }, [getStreamVideo, answer])
 
   const handleDecline = useCallback(() => {
     decline()
+
+    logEvent(analytics, eventNames.decline, {
+      userId: user.uid,
+    })
   }, [decline])
 
   useEffect(() => {

@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { Link } from 'react-router-dom'
+import { logEvent } from 'firebase/analytics'
 
-import { auth } from '../../firebase'
+import { analytics, auth } from '../../firebase'
+import { eventNames } from '../../constants'
 
 const SignIn = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
@@ -12,12 +14,12 @@ const SignIn = () => {
     if (email === '') return
     if (password === '') return
 
-    await signInWithEmailAndPassword(
-      auth,
+    await signInWithEmailAndPassword(auth, email, password)
+
+    logEvent(analytics, eventNames.login, {
       email,
-      password
-    )
-  }, [signInWithEmailAndPassword, email, password])
+    })
+  }, [email, password, signInWithEmailAndPassword, logEvent])
 
   return (
     <div className="App">

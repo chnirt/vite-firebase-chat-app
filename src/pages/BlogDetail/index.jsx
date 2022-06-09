@@ -4,11 +4,13 @@ import { doc } from 'firebase/firestore'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { logEvent } from 'firebase/analytics'
 
-import { db } from '../../firebase'
+import { analytics, db } from '../../firebase'
 import { BackButton } from '../../components'
 import { useCallback } from 'react'
 import { deleteDocument } from '../../firebase/service'
+import { eventNames } from '../../constants'
 
 const BlogDetail = () => {
   let { blogId } = useParams()
@@ -20,6 +22,11 @@ const BlogDetail = () => {
   const handleDelete = useCallback(
     async (id) => {
       await deleteDocument('blogs', id)
+
+      logEvent(analytics, eventNames.deleteBlog, {
+        blogId: id,
+      })
+
       navigate(-1)
     },
     [deleteDocument]
