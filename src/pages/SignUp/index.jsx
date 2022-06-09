@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { Link } from 'react-router-dom'
+import { logEvent } from 'firebase/analytics'
 
-import { auth } from '../../firebase'
+import { analytics, auth } from '../../firebase'
 // import { Loading } from '../../components'
 import { addDocument } from '../../firebase/service'
 import { eventNames } from '../../constants'

@@ -7,6 +7,8 @@ import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
 import { WebRTCProvider } from './context'
 import { analytics } from './firebase'
+import { paths } from './constants'
+import { setUpBaseName } from './utils'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -25,27 +27,48 @@ const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 
 const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 
+setUpBaseName()
+
 function App() {
-  let location = useLocation();
+  let location = useLocation()
 
   useEffect(() => {
-    if (typeof analytics === "function") {
-      const page_path = location.pathname + location.search;
-      analytics().setCurrentScreen(page_path);
-      analytics().logEvent("page_view", { page_path });
+    if (typeof analytics === 'function') {
+      const page_path = location.pathname + location.search
+      analytics().setCurrentScreen(page_path)
+      analytics().logEvent('page_view', { page_path })
     }
-  }, [location]);
+  }, [location])
 
   // We removed the <BrowserRouter> element from App because the
   // useRoutes hook needs to be in the context of a <BrowserRouter>
   // element. This is a common pattern with React Router apps that
   // are rendered in different environments. To render an <App>,
   // you'll need to wrap it in your own <BrowserRouter> element.
+  // let element1 = useRoutes([
+  //   {
+  //     path: '/',
+  //     element: <Navigate to="/👾/login" />,
+  //     children: [
+  //       {
+  //         path: paths.login,
+  //         element: (
+  //           <Suspense fallback={<Loading />}>
+  //             {/* <PublicRoute> */}
+  //             <LazySignInScreen />
+  //             {/* </PublicRoute> */}
+  //           </Suspense>
+  //         ),
+  //       },
+  //     ],
+  //   },
+  // ])
+  // return element1
   let element = useRoutes([
     // A route object has the same properties as a <Route>
     // element. The `children` is just an array of child routes.
     {
-      path: '/login',
+      path: paths.login,
       element: (
         <Suspense fallback={<Loading />}>
           <PublicRoute>
@@ -55,7 +78,7 @@ function App() {
       ),
     },
     {
-      path: '/register',
+      path: paths.register,
       element: (
         <Suspense fallback={<Loading />}>
           <PublicRoute>
@@ -65,7 +88,7 @@ function App() {
       ),
     },
     {
-      path: '/',
+      path: paths.home,
       element: (
         <Suspense fallback={<Loading />}>
           <PrivateRoute>
@@ -77,7 +100,7 @@ function App() {
       ),
       children: [
         {
-          path: 'create-blog',
+          path: paths.createBlog,
           element: (
             <Suspense fallback={<Loading />}>
               <LazyCreateBlogScreen />
@@ -85,7 +108,7 @@ function App() {
           ),
         },
         {
-          path: 'blog',
+          path: paths.blog,
           element: (
             <Suspense fallback={<Loading />}>
               <LazyBlogScreen />
@@ -93,7 +116,7 @@ function App() {
           ),
         },
         {
-          path: 'blog/:blogId',
+          path: paths.blogDetail,
           element: (
             <Suspense fallback={<Loading />}>
               <LazyBlogDetailScreen />
@@ -102,7 +125,7 @@ function App() {
         },
 
         {
-          path: 'whatsapp',
+          path: paths.whatsapp,
           element: (
             <Suspense fallback={<Loading />}>
               <WebRTCProvider>
@@ -113,7 +136,7 @@ function App() {
         },
 
         {
-          path: 'messenger',
+          path: paths.messenger,
           element: (
             <Suspense fallback={<Loading />}>
               <LazyMessengerScreen />
@@ -121,7 +144,7 @@ function App() {
           ),
         },
         {
-          path: 'profile',
+          path: paths.profile,
           element: (
             <Suspense fallback={<Loading />}>
               <LazyProfileScreen />
@@ -129,7 +152,7 @@ function App() {
           ),
         },
         {
-          path: 'change-password',
+          path: paths.changePassword,
           element: (
             <Suspense fallback={<Loading />}>
               <LazyChangePasswordScreen />
@@ -139,10 +162,10 @@ function App() {
       ],
     },
     {
-      path: '*',
+      path: paths.notFound,
       element: (
         <Suspense fallback={<Loading />}>
-          <LazyNotFoundScreen />{' '}
+          <LazyNotFoundScreen />
         </Suspense>
       ),
     },
