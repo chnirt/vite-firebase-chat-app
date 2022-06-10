@@ -1,3 +1,5 @@
+export const env = import.meta.env
+
 export const basename = encodeURIComponent('👾')
 
 export const paths = {

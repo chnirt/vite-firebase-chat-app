@@ -1,12 +1,18 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
 import { getAnalytics, logEvent } from 'firebase/analytics'
+import {
+  getRemoteConfig,
+  getAll,
+  fetchConfig,
+  fetchAndActivate,
+} from 'firebase/remote-config'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
 
-const env = import.meta.env
+import { env } from '../constants'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,6 +31,9 @@ const app = initializeApp(firebaseConfig)
 // Initialize Analytics and get a reference to the service
 export const analytics = getAnalytics(app)
 
+// Initialize Remote Config and get a reference to the service
+const remoteConfig = getRemoteConfig(app)
+
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app)
 
@@ -36,7 +45,27 @@ if (location.hostname === 'localhost') {
   const FIRESTORE_PORT = 8080
   connectAuthEmulator(auth, `http://localhost:${AUTH_PORT}`)
   connectFirestoreEmulator(db, 'localhost', FIRESTORE_PORT)
+
+  // remoteConfig.settings.minimumFetchIntervalMillis = 3600000
+  remoteConfig.settings.minimumFetchIntervalMillis = 0
+  remoteConfig.defaultConfig = {
+    vite_app_title: '',
+  }
+  await fetchConfig(remoteConfig)
 }
 
 export const logFbEvent = (eventName = 'create_todo', data = {}) =>
   logEvent(analytics, eventName, data)
+
+export const parametersFb = getAll(remoteConfig)
+
+export const fetchedRemotely = fetchAndActivate(remoteConfig).then((a) =>
+  console.log(a)
+)
+
+// Object.entries(parametersFb).forEach(($) => {
+//   const [key, entry] = $
+//   console.log('Key: ', key)
+//   console.log('Source: ', entry.getSource())
+//   console.log('Value: ', entry.asString())
+// })

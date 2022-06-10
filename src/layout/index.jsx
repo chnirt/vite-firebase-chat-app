@@ -2,7 +2,8 @@ import { signOut } from 'firebase/auth'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context'
 
-import { auth } from '../firebase'
+import { auth, parametersFb } from '../firebase'
+import { APP_TITLE } from '../env'
 
 const LinkRoutes = [
   {
@@ -33,10 +34,11 @@ const LinkRoutes = [
 
 export const Layout = ({ children }) => {
   const { user } = useAuth()
+  parametersFb
 
   return (
     <div className="App">
-      {import.meta.env.VITE_APP_TITLE}
+      {APP_TITLE}
       <p>Current User: {user.email}</p>
       <button onClick={() => signOut(auth)}>Log out</button>
       <ul style={{
