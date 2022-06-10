@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "dev:fb": "firebase emulators:start"
+    "dev:fb": "firebase emulators:start",
+    "deploy:hosting": "vite build && firebase deploy"
   },
   "dependencies": {
     "@uiw/react-md-editor": "^3.14.1",
