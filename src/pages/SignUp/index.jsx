@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { Link } from 'react-router-dom'
-import { logEvent } from 'firebase/analytics'
 
-import { analytics, auth } from '../../firebase'
+import { auth, logFbEvent } from '../../firebase'
 // import { Loading } from '../../components'
 import { addDocument } from '../../firebase/service'
 import { eventNames } from '../../constants'
@@ -29,10 +28,10 @@ const SignUp = () => {
       })
     }
 
-    logEvent(analytics, eventNames.register, {
-      email,
+    logFbEvent(eventNames.register, {
+      email
     })
-  }, [email, password, createUserWithEmailAndPassword, addDocument, logEvent])
+  }, [email, password, createUserWithEmailAndPassword, addDocument, logFbEvent])
 
   return (
     <div className="App">

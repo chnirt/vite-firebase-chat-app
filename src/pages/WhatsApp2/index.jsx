@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react'
-import { logEvent } from 'firebase/analytics'
 
 import { UserList } from '../../components'
 import { eventNames } from '../../constants'
 import { CALL_STATUS, CONSTRAINTS, useAuth, useWebRTC } from '../../context'
-import { analytics } from '../../firebase'
+import { logFbEvent } from '../../firebase'
 
 const WhatsApp = () => {
   const { user } = useAuth()
@@ -21,7 +20,6 @@ const WhatsApp = () => {
 
   const handleLocalVideo = useCallback((stream) => {
     localVideoRef.current.srcObject = stream
-
   }, [])
 
   const handleRemoteVideo = useCallback((stream) => {
@@ -42,12 +40,12 @@ const WhatsApp = () => {
         },
       })
 
-      logEvent(analytics, eventNames.call, {
+      logFbEvent(eventNames.call, {
         caller: user.uid,
         callee: callee.uid
       })
     },
-    [getStreamVideo, handleLocalVideo, handleRemoteVideo, call]
+    [getStreamVideo, handleLocalVideo, handleRemoteVideo, call, logFbEvent]
   )
 
   const handleAnswer = useCallback(async () => {
@@ -58,18 +56,18 @@ const WhatsApp = () => {
 
     answer()
 
-    logEvent(analytics, eventNames.answer, {
+    logFbEvent(eventNames.answer, {
       userId: user.uid,
     })
-  }, [getStreamVideo, answer])
+  }, [getStreamVideo, answer, logFbEvent])
 
   const handleDecline = useCallback(() => {
     decline()
 
-    logEvent(analytics, eventNames.decline, {
+    logFbEvent(eventNames.decline, {
       userId: user.uid,
     })
-  }, [decline])
+  }, [decline, logFbEvent])
 
   useEffect(() => {
     if (currentCallData?.status === CALL_STATUS.DECLINE) {

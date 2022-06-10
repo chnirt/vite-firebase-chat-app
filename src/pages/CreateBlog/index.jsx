@@ -1,12 +1,11 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MDEditor from '@uiw/react-md-editor'
-import { logEvent } from 'firebase/analytics'
 
 import { BackButton } from '../../components'
 import { useAuth } from '../../context'
 import { addDocument } from '../../firebase/service'
-import { analytics } from '../../firebase'
+import { logFbEvent } from '../../firebase'
 import { eventNames } from '../../constants'
 
 const CreateBlog = () => {
@@ -29,13 +28,13 @@ const CreateBlog = () => {
       uid: user.uid,
     }, options)
 
-    logEvent(analytics, eventNames.createBlog, {
+    logFbEvent(eventNames.createBlog, {
       title,
       content: value,
     })
 
     docRef && navigate(-1)
-  }, [title, value, user])
+  }, [title, value, user, logFbEvent])
 
   return (
     <div>
