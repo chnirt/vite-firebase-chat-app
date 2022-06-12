@@ -10,27 +10,32 @@ import { eventNames } from '../../constants'
 const SignUp = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
+  const [error, setError] = useState(null)
 
   const handleRegister = useCallback(async () => {
-    if (email === '') return
-    if (password === '') return
+    try {
+      if (email === '') return
+      if (password === '') return
 
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    )
-
-    if (userCredential) {
-      await addDocument('users', {
-        uid: userCredential.user.uid,
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
         email,
-      })
-    }
+        password
+      )
 
-    logFbEvent(eventNames.register, {
-      email
-    })
+      if (userCredential) {
+        await addDocument('users', {
+          uid: userCredential.user.uid,
+          email,
+        })
+      }
+
+      logFbEvent(eventNames.register, {
+        email
+      })
+    } catch (err) {
+      setError(err.message)
+    }
   }, [email, password, createUserWithEmailAndPassword, addDocument, logFbEvent])
 
   return (
@@ -51,6 +56,8 @@ const SignUp = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      <br />
+      {error && <p>{error}</p>}
       <br />
       <button onClick={handleRegister}>Sign Up</button>
       <br />

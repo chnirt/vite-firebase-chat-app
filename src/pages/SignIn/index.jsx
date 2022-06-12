@@ -8,14 +8,19 @@ import { eventNames } from '../../constants'
 const SignIn = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
+  const [error, setError] = useState(null)
 
   const handleLogin = useCallback(async () => {
-    if (email === '') return
-    if (password === '') return
+    try {
+      if (email === '') return
+      if (password === '') return
 
-    await signInWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPassword(auth, email, password)
 
-    logFbEvent(eventNames, { email })
+      logFbEvent(eventNames, { email })
+    } catch (err) {
+      setError(err.message)
+    }
   }, [email, password, signInWithEmailAndPassword, logFbEvent])
 
   return (
@@ -36,6 +41,8 @@ const SignIn = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      <br />
+      {error && <p>{error}</p>}
       <br />
       <button onClick={handleLogin}>Sign In</button>
       <br />
