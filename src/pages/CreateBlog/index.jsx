@@ -5,8 +5,8 @@ import MDEditor from '@uiw/react-md-editor'
 import { BackButton } from '../../components'
 import { useAuth } from '../../context'
 import { addDocument } from '../../firebase/service'
-import { logFbEvent } from '../../firebase'
 import { eventNames } from '../../constants'
+import { logEventAnalytics } from '../../firebase/analytics'
 
 const CreateBlog = () => {
   let navigate = useNavigate()
@@ -28,13 +28,13 @@ const CreateBlog = () => {
       uid: user.uid,
     }, options)
 
-    logFbEvent(eventNames.createBlog, {
+    logEventAnalytics(eventNames.createBlog, {
       title,
       content: value,
     })
 
     docRef && navigate(-1)
-  }, [title, value, user, logFbEvent])
+  }, [title, value, user, logEventAnalytics])
 
   return (
     <div>

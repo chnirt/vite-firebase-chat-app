@@ -1,16 +1,16 @@
+import { useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDocument } from 'react-firebase-hooks/firestore'
 import { doc } from 'firebase/firestore'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { logEvent } from 'firebase/analytics'
 
-import { analytics, db, logFbEvent } from '../../firebase'
+import { db } from '../../firebase'
 import { BackButton } from '../../components'
-import { useCallback } from 'react'
 import { deleteDocument } from '../../firebase/service'
 import { eventNames } from '../../constants'
+import { logEventAnalytics } from '../../firebase/analytics'
 
 const BlogDetail = () => {
   let { blogId } = useParams()
@@ -23,14 +23,13 @@ const BlogDetail = () => {
     async (id) => {
       await deleteDocument('blogs', id)
 
-      logFbEvent(eventNames.deleteBlog, {
+      logEventAnalytics(eventNames.deleteBlog, {
         blogId: id,
       })
 
-
       navigate(-1)
     },
-    [deleteDocument, logFbEvent]
+    [deleteDocument, logEventAnalytics]
   )
 
   return (

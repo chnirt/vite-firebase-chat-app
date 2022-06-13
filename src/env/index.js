@@ -1,4 +1,4 @@
 import { env } from "../constants";
-import { parametersFb } from "../firebase";
+import { getRemoteValue } from "../firebase/remoteConfig";
 
-export const APP_TITLE = parametersFb?.vite_app_title?.asString() || env?.VITE_APP_TITLE
+export const APP_TITLE = getRemoteValue('vite_app_title', 'string') || env?.VITE_APP_TITLE

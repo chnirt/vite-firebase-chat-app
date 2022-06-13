@@ -7,6 +7,7 @@ import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
 import { WebRTCProvider } from './context'
 import { analytics } from './firebase'
+import { getAllRemoteValue, getRemoteValue, refreshRemoteConfig } from './firebase/remoteConfig'
 import { paths } from './constants'
 import { setUpBaseName } from './utils'
 
@@ -33,12 +34,24 @@ function App() {
   let location = useLocation()
 
   useEffect(() => {
+    refreshRemoteConfig()
+
+    // const allRemoteValue = getAllRemoteValue()
+    // const appTitle = getRemoteValue('vite_app_title', 'string')
+    // const darkMode = getRemoteValue('dark_mode', 'boolean')
+    // const timeout = getRemoteValue('timeout', 'number')
+
+    // console.log(allRemoteValue)
+    // console.log(typeof appTitle, appTitle)
+    // console.log(typeof darkMode, darkMode)
+    // console.log(typeof timeout, timeout)
+
     if (typeof analytics === 'function') {
       const page_path = location.pathname + location.search
       analytics().setCurrentScreen(page_path)
       analytics().logEvent('page_view', { page_path })
     }
-  }, [location])
+  }, [location, refreshRemoteConfig, getAllRemoteValue, getRemoteValue])
 
   // We removed the <BrowserRouter> element from App because the
   // useRoutes hook needs to be in the context of a <BrowserRouter>

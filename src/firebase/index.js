@@ -1,11 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
-import { getAnalytics, logEvent } from 'firebase/analytics'
+import { getAnalytics } from 'firebase/analytics'
 import {
   getRemoteConfig,
-  getAll,
-  fetchConfig,
-  fetchAndActivate,
 } from 'firebase/remote-config'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -32,7 +29,7 @@ const app = initializeApp(firebaseConfig)
 export const analytics = getAnalytics(app)
 
 // Initialize Remote Config and get a reference to the service
-const remoteConfig = getRemoteConfig(app)
+export const remoteConfig = getRemoteConfig(app)
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app)
@@ -49,23 +46,8 @@ if (location.hostname === 'localhost') {
   // remoteConfig.settings.minimumFetchIntervalMillis = 3600000
   remoteConfig.settings.minimumFetchIntervalMillis = 0
   remoteConfig.defaultConfig = {
-    vite_app_title: '',
+    vite_app_title: 'Vite firebase chat app from default',
+    dark_mode: false,
+    timeout: 2000,
   }
-  await fetchConfig(remoteConfig)
 }
-
-export const logFbEvent = (eventName = 'create_todo', data = {}) =>
-  logEvent(analytics, eventName, data)
-
-export const parametersFb = getAll(remoteConfig)
-
-export const fetchedRemotely = fetchAndActivate(remoteConfig).then((a) =>
-  console.log(a)
-)
-
-// Object.entries(parametersFb).forEach(($) => {
-//   const [key, entry] = $
-//   console.log('Key: ', key)
-//   console.log('Source: ', entry.getSource())
-//   console.log('Value: ', entry.asString())
-// })

@@ -2,8 +2,9 @@ import { useCallback, useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { Link } from 'react-router-dom'
 
-import { auth, logFbEvent } from '../../firebase'
+import { auth } from '../../firebase'
 import { eventNames } from '../../constants'
+import { logEventAnalytics } from '../../firebase/analytics'
 
 const SignIn = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
@@ -17,11 +18,11 @@ const SignIn = () => {
 
       await signInWithEmailAndPassword(auth, email, password)
 
-      logFbEvent(eventNames, { email })
+      logEventAnalytics(eventNames, { email })
     } catch (err) {
       setError(err.message)
     }
-  }, [email, password, signInWithEmailAndPassword, logFbEvent])
+  }, [email, password, signInWithEmailAndPassword, logEventAnalytics])
 
   return (
     <div className="App">

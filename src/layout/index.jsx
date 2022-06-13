@@ -2,7 +2,7 @@ import { signOut } from 'firebase/auth'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context'
 
-import { auth, parametersFb } from '../firebase'
+import { auth } from '../firebase'
 import { APP_TITLE } from '../env'
 
 const LinkRoutes = [
@@ -34,7 +34,6 @@ const LinkRoutes = [
 
 export const Layout = ({ children }) => {
   const { user } = useAuth()
-  parametersFb
 
   return (
     <div className="App">
