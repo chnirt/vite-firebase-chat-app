@@ -10,6 +10,7 @@ export const paths = {
   blog: 'blog',
   blogDetail: 'blog/:blogId',
   whatsapp: 'whatsapp',
+  pexels: 'pexels',
   messenger: 'messenger',
   profile: 'profile',
   changePassword: 'change-password',

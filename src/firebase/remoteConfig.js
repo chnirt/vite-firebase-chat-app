@@ -2,9 +2,9 @@ import { fetchAndActivate, getAll, getValue } from "firebase/remote-config"
 
 import { remoteConfig } from "."
 
-export const refreshRemoteConfig = async () => await fetchAndActivate(remoteConfig)
+export const refreshRemote = async () => await fetchAndActivate(remoteConfig)
 
-export const getAllRemoteValue = () => getAll(remoteConfig)
+export const getRemoteAll = () => getAll(remoteConfig)
 
 export const getRemoteValue = (key = 'vite_app_title', type = 'string') =>
   type === 'string'

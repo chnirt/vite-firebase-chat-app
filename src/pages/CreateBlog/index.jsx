@@ -6,7 +6,7 @@ import { BackButton } from '../../components'
 import { useAuth } from '../../context'
 import { addDocument } from '../../firebase/service'
 import { eventNames } from '../../constants'
-import { logEventAnalytics } from '../../firebase/analytics'
+import { logAnalyticsEvent } from '../../firebase/analytics'
 
 const CreateBlog = () => {
   let navigate = useNavigate()
@@ -28,13 +28,13 @@ const CreateBlog = () => {
       uid: user.uid,
     }, options)
 
-    logEventAnalytics(eventNames.createBlog, {
+    logAnalyticsEvent(eventNames.createBlog, {
       title,
       content: value,
     })
 
     docRef && navigate(-1)
-  }, [title, value, user, logEventAnalytics])
+  }, [title, value, user, logAnalyticsEvent])
 
   return (
     <div>

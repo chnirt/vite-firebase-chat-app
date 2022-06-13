@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { auth } from '../../firebase'
 import { eventNames } from '../../constants'
-import { logEventAnalytics } from '../../firebase/analytics'
+import { logAnalyticsEvent } from '../../firebase/analytics'
 
 const SignIn = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
@@ -18,11 +18,11 @@ const SignIn = () => {
 
       await signInWithEmailAndPassword(auth, email, password)
 
-      logEventAnalytics(eventNames, { email })
+      logAnalyticsEvent(eventNames, { email })
     } catch (err) {
       setError(err.message)
     }
-  }, [email, password, signInWithEmailAndPassword, logEventAnalytics])
+  }, [email, password, signInWithEmailAndPassword, logAnalyticsEvent])
 
   return (
     <div className="App">

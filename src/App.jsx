@@ -1,3 +1,4 @@
+// https://gist.github.com/codediodeio/513bf77ee45be6d38d27868f5345a002
 import { lazy, Suspense, useEffect } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
 
@@ -7,7 +8,7 @@ import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
 import { WebRTCProvider } from './context'
 import { analytics } from './firebase'
-import { getAllRemoteValue, getRemoteValue, refreshRemoteConfig } from './firebase/remoteConfig'
+import { getRemoteAll, getRemoteValue, refreshRemote } from './firebase/remoteConfig'
 import { paths } from './constants'
 import { setUpBaseName } from './utils'
 
@@ -22,7 +23,10 @@ const LazyBlogDetailScreen = lazy(() => import('./pages/BlogDetail'))
 
 const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp2'))
 
+const LazyPexelsScreen = lazy(() => import('./pages/Pexels'))
+
 const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
+
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 
@@ -34,9 +38,9 @@ function App() {
   let location = useLocation()
 
   useEffect(() => {
-    refreshRemoteConfig()
+    refreshRemote()
 
-    // const allRemoteValue = getAllRemoteValue()
+    // const allRemoteValue = getRemoteAll()
     // const appTitle = getRemoteValue('vite_app_title', 'string')
     // const darkMode = getRemoteValue('dark_mode', 'boolean')
     // const timeout = getRemoteValue('timeout', 'number')
@@ -51,7 +55,7 @@ function App() {
       analytics().setCurrentScreen(page_path)
       analytics().logEvent('page_view', { page_path })
     }
-  }, [location, refreshRemoteConfig, getAllRemoteValue, getRemoteValue])
+  }, [location, refreshRemote, getRemoteAll, getRemoteValue])
 
   // We removed the <BrowserRouter> element from App because the
   // useRoutes hook needs to be in the context of a <BrowserRouter>
@@ -143,6 +147,17 @@ function App() {
             <Suspense fallback={<Loading />}>
               <WebRTCProvider>
                 <LazyWhatsAppScreen />
+              </WebRTCProvider>
+            </Suspense>
+          ),
+        },
+
+        {
+          path: paths.pexels,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <WebRTCProvider>
+                <LazyPexelsScreen />
               </WebRTCProvider>
             </Suspense>
           ),

@@ -6,7 +6,7 @@ import { auth } from '../../firebase'
 // import { Loading } from '../../components'
 import { addDocument } from '../../firebase/service'
 import { eventNames } from '../../constants'
-import { logEventAnalytics } from '../../firebase/analytics'
+import { logAnalyticsEvent } from '../../firebase/analytics'
 
 const SignUp = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
@@ -31,13 +31,13 @@ const SignUp = () => {
         })
       }
 
-      logEventAnalytics(eventNames.register, {
+      logAnalyticsEvent(eventNames.register, {
         email
       })
     } catch (err) {
       setError(err.message)
     }
-  }, [email, password, createUserWithEmailAndPassword, addDocument, logEventAnalytics])
+  }, [email, password, createUserWithEmailAndPassword, addDocument, logAnalyticsEvent])
 
   return (
     <div className="App">

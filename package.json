@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "dev:fb": "firebase emulators:start",
+    "emulators": "firebase emulators:start",
     "deploy:hosting": "vite build && firebase deploy"
   },
   "dependencies": {

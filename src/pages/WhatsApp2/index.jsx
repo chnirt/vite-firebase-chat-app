@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { UserList } from '../../components'
 import { eventNames } from '../../constants'
 import { CALL_STATUS, CONSTRAINTS, useAuth, useWebRTC } from '../../context'
-import { logEventAnalytics } from '../../firebase/analytics'
+import { logAnalyticsEvent } from '../../firebase/analytics'
 
 const WhatsApp = () => {
   const { user } = useAuth()
@@ -40,12 +40,12 @@ const WhatsApp = () => {
         },
       })
 
-      logEventAnalytics(eventNames.call, {
+      logAnalyticsEvent(eventNames.call, {
         caller: user.uid,
         callee: callee.uid
       })
     },
-    [getStreamVideo, handleLocalVideo, handleRemoteVideo, call, logEventAnalytics]
+    [getStreamVideo, handleLocalVideo, handleRemoteVideo, call, logAnalyticsEvent]
   )
 
   const handleAnswer = useCallback(async () => {
@@ -56,18 +56,18 @@ const WhatsApp = () => {
 
     answer()
 
-    logEventAnalytics(eventNames.answer, {
+    logAnalyticsEvent(eventNames.answer, {
       userId: user.uid,
     })
-  }, [getStreamVideo, answer, logEventAnalytics])
+  }, [getStreamVideo, answer, logAnalyticsEvent])
 
   const handleDecline = useCallback(() => {
     decline()
 
-    logEventAnalytics(eventNames.decline, {
+    logAnalyticsEvent(eventNames.decline, {
       userId: user.uid,
     })
-  }, [decline, logEventAnalytics])
+  }, [decline, logAnalyticsEvent])
 
   useEffect(() => {
     if (currentCallData?.status === CALL_STATUS.DECLINE) {

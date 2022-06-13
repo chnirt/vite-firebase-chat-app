@@ -19,6 +19,10 @@ const LinkRoutes = [
     name: 'WhatsApp',
   },
   {
+    path: '/pexels',
+    name: 'Pexels',
+  },
+  {
     path: '/messenger',
     name: 'Messenger',
   },

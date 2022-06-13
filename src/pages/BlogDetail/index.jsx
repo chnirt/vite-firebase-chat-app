@@ -10,7 +10,7 @@ import { db } from '../../firebase'
 import { BackButton } from '../../components'
 import { deleteDocument } from '../../firebase/service'
 import { eventNames } from '../../constants'
-import { logEventAnalytics } from '../../firebase/analytics'
+import { logAnalyticsEvent } from '../../firebase/analytics'
 
 const BlogDetail = () => {
   let { blogId } = useParams()
@@ -23,13 +23,13 @@ const BlogDetail = () => {
     async (id) => {
       await deleteDocument('blogs', id)
 
-      logEventAnalytics(eventNames.deleteBlog, {
+      logAnalyticsEvent(eventNames.deleteBlog, {
         blogId: id,
       })
 
       navigate(-1)
     },
-    [deleteDocument, logEventAnalytics]
+    [deleteDocument, logAnalyticsEvent]
   )
 
   return (
