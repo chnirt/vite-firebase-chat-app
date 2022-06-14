@@ -1,5 +1,6 @@
 // https://github.com/raymon-zhang/webrtc-react-videochat/blob/master/src/App.js#L35
 // https://blog.logrocket.com/creating-rn-video-calling-app-react-native-webrtc/
+// https://gabrieltanner.org/blog/turn-server/
 import React, {
   createContext,
   useCallback,
@@ -28,7 +29,7 @@ import {
   addSubCollection,
   updateDocument,
 } from '../../firebase/service'
-
+import { env } from '../../constants'
 
 export const CALL_STATUS = {
   CALLING: 'calling',
@@ -39,7 +40,15 @@ export const CALL_STATUS = {
 const servers = {
   iceServers: [
     {
-      urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+      urls: [
+        'stun:stun1.l.google.com:19302',
+        'stun:stun2.l.google.com:19302',
+        {
+          urls: env.VITE_APP_TURN_URLS,
+          username: env.VITE_APP_TURN_USERNAME,
+          credentials: env.VITE_APP_TURN_CREDENTIALS,
+        },
+      ],
     },
   ],
   iceCandidatePoolSize: 10,
@@ -61,75 +70,85 @@ const WebRTCContext = createContext()
 export const WebRTCProvider = ({ children, navigatorConfig }) => {
   const [currentCallReference, setCurrentCallReference] = useState(null)
   const [currentCallData, setCurrentCallData] = useState(null)
-  const pc = useRef(navigatorConfig ? new navigatorConfig.RTCPeerConnection(servers) : new RTCPeerConnection(servers))
+  const pc = useRef(
+    navigatorConfig
+      ? new navigatorConfig.RTCPeerConnection(servers)
+      : new RTCPeerConnection(servers)
+  )
   const dc = useRef(null)
 
-  const getStreamVideo = useCallback(async ({
-    handleLocalVideo,
-    handleRemoteVideo
-  }) => {
-    pc.current = navigatorConfig ? new navigatorConfig.RTCPeerConnection(servers) : new RTCPeerConnection(servers)
+  const getStreamVideo = useCallback(
+    async ({ handleLocalVideo, handleRemoteVideo }) => {
+      pc.current = navigatorConfig
+        ? new navigatorConfig.RTCPeerConnection(servers)
+        : new RTCPeerConnection(servers)
 
-    let localStream
+      let localStream
 
-    if (navigatorConfig) {
-      localStream = await navigatorConfig?.mediaDevices?.getUserMedia(CONSTRAINTS)
-    } else {
-      localStream = await navigator.mediaDevices.getUserMedia(CONSTRAINTS)
-    }
-
-    localStream.getTracks().forEach((track) => {
       if (navigatorConfig) {
-        pc.current.addStream(localStream);
-        pc.current.getLocalStreams()[0]?.addTrack(track);
+        localStream = await navigatorConfig?.mediaDevices?.getUserMedia(
+          CONSTRAINTS
+        )
       } else {
-        pc.current.addTrack(track, localStream)
+        localStream = await navigator.mediaDevices.getUserMedia(CONSTRAINTS)
       }
-    })
 
-    const remoteStream = navigatorConfig ? new navigatorConfig.MediaStream() : new MediaStream()
+      localStream.getTracks().forEach((track) => {
+        if (navigatorConfig) {
+          pc.current.addStream(localStream)
+          pc.current.getLocalStreams()[0]?.addTrack(track)
+        } else {
+          pc.current.addTrack(track, localStream)
+        }
+      })
 
-    if (navigatorConfig) {
-      pc.current.onaddstream = event => {
-        handleRemoteVideo(event.stream);
-      };
-    } else {
-      pc.current.ontrack = (event) => {
-        event.streams[0].getTracks().forEach((track) => {
-          remoteStream.addTrack(track)
-        })
+      const remoteStream = navigatorConfig
+        ? new navigatorConfig.MediaStream()
+        : new MediaStream()
+
+      if (navigatorConfig) {
+        pc.current.onaddstream = (event) => {
+          handleRemoteVideo(event.stream)
+        }
+      } else {
+        pc.current.ontrack = (event) => {
+          event.streams[0].getTracks().forEach((track) => {
+            remoteStream.addTrack(track)
+          })
+        }
       }
-    }
 
-    pc.current.onconnectionstatechange = (event) => {
-      console.log('pc.current.connectionState---', pc.current.connectionState)
-      switch (pc.current.connectionState) {
-        case 'new':
-        case 'checking':
-          // setOnlineStatus("Connecting...");
-          break
-        case 'connected':
-          // setOnlineStatus("Online");
-          break
-        case 'disconnected':
-          // setOnlineStatus("Disconnecting...");
-          // decline()
-          break
-        case 'closed':
-          // setOnlineStatus("Offline");
-          break
-        case 'failed':
-          // setOnlineStatus("Error");
-          break
-        default:
-          // setOnlineStatus("Unknown");
-          break
+      pc.current.onconnectionstatechange = (event) => {
+        console.log('pc.current.connectionState---', pc.current.connectionState)
+        switch (pc.current.connectionState) {
+          case 'new':
+          case 'checking':
+            // setOnlineStatus("Connecting...");
+            break
+          case 'connected':
+            // setOnlineStatus("Online");
+            break
+          case 'disconnected':
+            // setOnlineStatus("Disconnecting...");
+            // decline()
+            break
+          case 'closed':
+            // setOnlineStatus("Offline");
+            break
+          case 'failed':
+            // setOnlineStatus("Error");
+            break
+          default:
+            // setOnlineStatus("Unknown");
+            break
+        }
       }
-    }
 
-    handleLocalVideo(localStream)
-    handleRemoteVideo(remoteStream)
-  }, [])
+      handleLocalVideo(localStream)
+      handleRemoteVideo(remoteStream)
+    },
+    []
+  )
 
   const stopStreamedVideo = useCallback(async ({ stream, handleStream }) => {
     try {
@@ -194,7 +213,9 @@ export const WebRTCProvider = ({ children, navigatorConfig }) => {
     onSnapshot(callReference, async (doc) => {
       const data = doc.data()
       if (!pc.current.currentRemoteDescription && data?.answer) {
-        const answerDescription = navigatorConfig ? new navigatorConfig.RTCSessionDescription(data.answer) : new RTCSessionDescription(data.answer)
+        const answerDescription = navigatorConfig
+          ? new navigatorConfig.RTCSessionDescription(data.answer)
+          : new RTCSessionDescription(data.answer)
         pc.current.setRemoteDescription(answerDescription)
       }
     })
@@ -205,7 +226,9 @@ export const WebRTCProvider = ({ children, navigatorConfig }) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             const data = change.doc.data()
-            const candidate = navigatorConfig ? new navigatorConfig.RTCIceCandidate(data) : new RTCIceCandidate(data)
+            const candidate = navigatorConfig
+              ? new navigatorConfig.RTCIceCandidate(data)
+              : new RTCIceCandidate(data)
             pc.current.addIceCandidate(candidate)
           }
         })
@@ -240,7 +263,9 @@ export const WebRTCProvider = ({ children, navigatorConfig }) => {
 
     const offerDescription = callData.offer
     await pc.current.setRemoteDescription(
-      navigatorConfig ? new navigatorConfig.RTCSessionDescription(offerDescription) : new RTCSessionDescription(offerDescription)
+      navigatorConfig
+        ? new navigatorConfig.RTCSessionDescription(offerDescription)
+        : new RTCSessionDescription(offerDescription)
     )
 
     const answerDescription = await pc.current.createAnswer()
@@ -261,7 +286,9 @@ export const WebRTCProvider = ({ children, navigatorConfig }) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             const data = change.doc.data()
-            const candidate = navigatorConfig ? new navigatorConfig.RTCIceCandidate(data) : new RTCIceCandidate(data)
+            const candidate = navigatorConfig
+              ? new navigatorConfig.RTCIceCandidate(data)
+              : new RTCIceCandidate(data)
             pc.current.addIceCandidate(candidate)
           }
         })
