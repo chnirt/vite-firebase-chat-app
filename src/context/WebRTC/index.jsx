@@ -42,13 +42,12 @@ const servers = {
     {
       urls: [
         'stun:stun1.l.google.com:19302',
-        'stun:stun2.l.google.com:19302',
-        {
-          urls: env.VITE_APP_TURN_URLS,
-          username: env.VITE_APP_TURN_USERNAME,
-          credentials: env.VITE_APP_TURN_CREDENTIALS,
-        },
       ],
+    },
+    {
+      urls: env.VITE_APP_TURN_URLS,
+      username: env.VITE_APP_TURN_USERNAME,
+      credentials: env.VITE_APP_TURN_CREDENTIALS,
     },
   ],
   iceCandidatePoolSize: 10,
