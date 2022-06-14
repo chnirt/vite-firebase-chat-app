@@ -42,7 +42,7 @@ function App() {
   useLayoutEffect(() => {
     const unsubscribed = refreshRemote();
     const isTurnServer = getRemoteValue('vite_app_turn_server', 'boolean')
-    console.log('vite_app_turn_server', vite_app_turn_server)
+    console.log('vite_app_turn_server', isTurnServer)
     setEnableTurnServer(isTurnServer)
     return () => {
       unsubscribed;
