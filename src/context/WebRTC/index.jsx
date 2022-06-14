@@ -47,7 +47,7 @@ const servers = {
     {
       urls: env.VITE_APP_TURN_URLS,
       username: env.VITE_APP_TURN_USERNAME,
-      credentials: env.VITE_APP_TURN_CREDENTIALS,
+      credential: env.VITE_APP_TURN_CREDENTIALS,
     },
   ],
   iceCandidatePoolSize: 10,
