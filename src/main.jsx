@@ -6,7 +6,6 @@ import App from './App'
 import { AuthProvider } from './context'
 import { ForkMe } from './components'
 import { basename } from './constants'
-import './firebase'
 
 import './index.css'
 

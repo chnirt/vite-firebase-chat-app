@@ -31,28 +31,10 @@ import {
 } from '../../firebase/service'
 import { TURN_CREDENTIALS, TURN_URLS, TURN_USERNAME } from '../../env'
 
-console.log(TURN_CREDENTIALS, TURN_URLS, TURN_USERNAME)
-
 export const CALL_STATUS = {
   CALLING: 'calling',
   ANSWER: 'answer',
   DECLINE: 'decline',
-}
-
-const servers = {
-  iceServers: [
-    {
-      urls: [
-        'stun:stun1.l.google.com:19302',
-      ],
-    },
-    {
-      urls: TURN_URLS,
-      username: TURN_USERNAME,
-      credential: TURN_CREDENTIALS,
-    },
-  ],
-  iceCandidatePoolSize: 10,
 }
 
 export const CONSTRAINTS = {
@@ -64,11 +46,31 @@ export const CONSTRAINTS = {
   },
 }
 
-const IS_MOBILE = true
-
 const WebRTCContext = createContext()
 
-export const WebRTCProvider = ({ children, navigatorConfig }) => {
+export const WebRTCProvider = ({
+  children,
+  navigatorConfig,
+  enableTurnServer,
+}) => {
+  const servers = {
+    iceServers: [
+      {
+        urls: ['stun:stun1.l.google.com:19302'],
+      },
+      ...(enableTurnServer
+        ? [
+          {
+            urls: TURN_URLS,
+            username: TURN_USERNAME,
+            credential: TURN_CREDENTIALS,
+          },
+        ]
+        : []),
+    ],
+    iceCandidatePoolSize: 10,
+  }
+
   const [currentCallReference, setCurrentCallReference] = useState(null)
   const [currentCallData, setCurrentCallData] = useState(null)
   const pc = useRef(
@@ -155,7 +157,7 @@ export const WebRTCProvider = ({ children, navigatorConfig }) => {
       const tracks = await stream?.getTracks()
       tracks?.forEach(function (track) {
         track.stop()
-        if (!IS_MOBILE) {
+        if (!navigatorConfig) {
           stream.removeTrack(track)
         }
       })

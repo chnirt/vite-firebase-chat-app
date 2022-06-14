@@ -1,5 +1,5 @@
 // https://gist.github.com/codediodeio/513bf77ee45be6d38d27868f5345a002
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
 
 import './App.css'
@@ -11,6 +11,7 @@ import { analytics } from './firebase'
 import { getRemoteAll, getRemoteValue, refreshRemote } from './firebase/remoteConfig'
 import { paths } from './constants'
 import { setUpBaseName } from './utils'
+import { TURN_CREDENTIALS } from './env'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -36,10 +37,19 @@ setUpBaseName()
 
 function App() {
   let location = useLocation()
+  const [enableTurnServer, setEnableTurnServer] = useState(false)
+
+  useLayoutEffect(() => {
+    const unsubscribed = refreshRemote();
+    const isTurnServer = getRemoteValue('vite_app_turn_server', 'boolean')
+    setEnableTurnServer(isTurnServer)
+    return () => {
+      unsubscribed;
+    };
+  }, [refreshRemote]);
+
 
   useEffect(() => {
-    refreshRemote()
-
     // const allRemoteValue = getRemoteAll()
     // const appTitle = getRemoteValue('vite_app_title', 'string')
     // const darkMode = getRemoteValue('dark_mode', 'boolean')
@@ -145,7 +155,7 @@ function App() {
           path: paths.whatsapp,
           element: (
             <Suspense fallback={<Loading />}>
-              <WebRTCProvider>
+              <WebRTCProvider enableTurnServer={enableTurnServer}>
                 <LazyWhatsAppScreen />
               </WebRTCProvider>
             </Suspense>

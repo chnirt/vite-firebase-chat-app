@@ -59,3 +59,8 @@ if (location.hostname === 'localhost') {
 }
 
 remoteConfig.settings.minimumFetchIntervalMillis = 0
+remoteConfig.defaultConfig = {
+  vite_app_title: 'Vite firebase chat app from default',
+  dark_mode: false,
+  timeout: 2000,
+}
