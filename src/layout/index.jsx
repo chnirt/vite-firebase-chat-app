@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context'
 
 import { auth } from '../firebase'
-import { APP_TITLE } from '../env'
+import { TITLE } from '../env'
 
 const LinkRoutes = [
   {
@@ -41,7 +41,7 @@ export const Layout = ({ children }) => {
 
   return (
     <div className="App">
-      {APP_TITLE}
+      {TITLE}
       <p>Current User: {user.email}</p>
       <button onClick={() => signOut(auth)}>Log out</button>
       <ul style={{

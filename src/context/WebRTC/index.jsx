@@ -29,7 +29,9 @@ import {
   addSubCollection,
   updateDocument,
 } from '../../firebase/service'
-import { env } from '../../constants'
+import { TURN_CREDENTIALS, TURN_URLS, TURN_USERNAME } from '../../env'
+
+console.log(TURN_CREDENTIALS, TURN_URLS, TURN_USERNAME)
 
 export const CALL_STATUS = {
   CALLING: 'calling',
@@ -45,9 +47,9 @@ const servers = {
       ],
     },
     {
-      urls: env.VITE_APP_TURN_URLS,
-      username: env.VITE_APP_TURN_USERNAME,
-      credential: env.VITE_APP_TURN_CREDENTIALS,
+      urls: TURN_URLS,
+      username: TURN_USERNAME,
+      credential: TURN_CREDENTIALS,
     },
   ],
   iceCandidatePoolSize: 10,
@@ -74,7 +76,6 @@ export const WebRTCProvider = ({ children, navigatorConfig }) => {
       ? new navigatorConfig.RTCPeerConnection(servers)
       : new RTCPeerConnection(servers)
   )
-  const dc = useRef(null)
 
   const getStreamVideo = useCallback(
     async ({ handleLocalVideo, handleRemoteVideo }) => {
@@ -339,7 +340,6 @@ export const WebRTCProvider = ({ children, navigatorConfig }) => {
     }
     await updateDocument('calls', currentCallReference.id, updateCallData)
     setCurrentCallReference(null)
-    dc.current.close()
     pc.current.close()
   }, [currentCallReference?.id])
 
