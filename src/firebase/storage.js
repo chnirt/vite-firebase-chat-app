@@ -1,16 +1,24 @@
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage"
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from 'firebase/storage'
 
-import { auth, storage } from "."
+import { auth, storage } from '.'
 
-export const uploadStorageBytesResumable = (e, onProgress, onError, onComplete) => {
+export const uploadStorageBytesResumable = (
+  e,
+  onProgress,
+  onError,
+  onComplete
+) => {
   // Get the file
   const file = Array.from(e.target.files)[0]
   const extension = file.type.split('/')[1]
 
-  const storageRef = ref(
-    storage,
-    `uploads/${auth.currentUser.uid}/${Date.now()}.${extension}`
-  )
+  const url = `uploads/${auth.currentUser.uid}/${Date.now()}.${extension}`
+  const storageRef = ref(storage, url)
 
   const uploadTask = uploadBytesResumable(storageRef, file)
   // Listen for state changes, errors, and completion of the upload.
@@ -22,7 +30,7 @@ export const uploadStorageBytesResumable = (e, onProgress, onError, onComplete) 
       console.log('Upload is ' + progress + '% done')
       onProgress({
         state: snapshot.state,
-        progress
+        progress,
       })
       switch (snapshot.state) {
         case 'paused':
@@ -56,8 +64,21 @@ export const uploadStorageBytesResumable = (e, onProgress, onError, onComplete) 
       // Upload completed successfully, now we can get the download URL
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
         console.log('File available at', downloadURL)
-        onComplete(downloadURL)
+        onComplete({ downloadURL, url })
       })
     }
   )
+}
+
+export const deleteStorageFile = async (url) => {
+  try {
+    // Create a reference to the file to delete
+    const fileRef = ref(storage, url)
+
+    // Delete the file
+    const result = await deleteObject(fileRef)
+    return result
+  } catch (error) {
+    console.log(error)
+  }
 }

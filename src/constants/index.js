@@ -25,4 +25,5 @@ export const eventNames = {
   call: 'call',
   answer: 'answer',
   decline: 'decline',
+  createPhoto: 'create_photo'
 }
