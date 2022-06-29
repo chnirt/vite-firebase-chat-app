@@ -1,122 +1,141 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import {
-  collection,
-  query,
-  orderBy,
-  limit,
-  // getDocs,
-  startAfter,
-  onSnapshot,
-  // where,
-} from 'firebase/firestore'
+// import {
+//   collection,
+//   query,
+//   orderBy,
+//   limit,
+//   // getDocs,
+//   startAfter,
+//   onSnapshot,
+//   // where,
+// } from 'firebase/firestore'
 import moment from 'moment'
 
-import { db } from '../../firebase'
-import { useAuth } from '../../context'
+// import { db } from '../../firebase'
+// import { useAuth } from '../../context'
+import { useFetch } from '../../firebase/hooks'
 
-const LIMIT = 3
+// const LIMIT = 3
 
 const Blog = () => {
   let navigate = useNavigate()
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [blogs, setBlogs] = useState([])
-  const [last, setLast] = useState(null)
-  const [moreLoading, setMoreLoading] = useState(false)
-  const [loadedAll, setLoadedAll] = useState(false)
+  // const { user } = useAuth()
+  const {
+    loading,
+    data: blogs,
+    moreLoading,
+    loadedAll,
+    handleLoadMore
+  } = useFetch('blogs', 3)
+  // const [loading, setLoading] = useState(false)
+  // const [blogs, setBlogs] = useState([])
+  // const [last, setLast] = useState(null)
+  // const [moreLoading, setMoreLoading] = useState(false)
+  // const [loadedAll, setLoadedAll] = useState(false)
 
-  const fetchBlogs = useCallback(async () => {
-    if (user?.uid === null) return
+  // const fetchBlogs = useCallback(async () => {
+  //   if (user?.uid === null) return
 
-    // Query the first page of docs
-    const first = query(
-      collection(db, 'blogs'),
-      orderBy('createdAt', 'desc'),
-      limit(LIMIT)
-    )
+  //   const currentLimit = LIMIT + 1
 
-    // const documentSnapshots = await getDocs(first)
-    // const docs = documentSnapshots.docs
-    // setBlogs(docs.map((doc) => ({ id: doc.id, ...doc.data() })))
+  //   // Query the first page of docs
+  //   const first = query(
+  //     collection(db, 'blogs'),
+  //     orderBy('createdAt', 'desc'),
+  //     limit(currentLimit)
+  //   )
 
-    // // Get the last visible document
-    // const lastVisible =
-    //   docs[docs.length - 1]
-    // setLast(lastVisible)
-    // if (docs.length < LIMIT) {
-    //   setLoadedAll(true)
-    // }
+  //   // const documentSnapshots = await getDocs(first)
+  //   // const docs = documentSnapshots.docs
+  //   // setBlogs(docs.map((doc) => ({ id: doc.id, ...doc.data() })))
 
-    onSnapshot(first, (querySnapshot) => {
-      const docs = querySnapshot.docs
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
-      setBlogs(data)
+  //   // // Get the last visible document
+  //   // const lastVisible =
+  //   //   docs[docs.length - 1]
+  //   // setLast(lastVisible)
+  //   // if (docs.length < LIMIT) {
+  //   //   setLoadedAll(true)
+  //   // }
 
-      const lastVisible = docs[docs.length - 1]
-      setLast(lastVisible)
-      setLoadedAll(docs.length < LIMIT)
-    })
-  }, [])
+  //   onSnapshot(first, (querySnapshot) => {
+  //     const docs = querySnapshot.docs.slice(0, LIMIT)
+  //     const data = docs.map((docSnapshot) => {
+  //       return {
+  //         id: docSnapshot.id,
+  //         ...docSnapshot.data(),
+  //       }
+  //     })
+  //     setBlogs(data)
 
-  const fetchMoreBlogs = useCallback(async () => {
-    const next = query(
-      collection(db, 'blogs'),
-      orderBy('createdAt', 'desc'),
-      limit(LIMIT),
-      startAfter(last)
-    )
+  //     const lastVisible = docs[docs.length - 1]
+  //     setLast(lastVisible)
 
-    // const documentSnapshots = await getDocs(next)
-    // const nextDocs = documentSnapshots.docs
-    // const nextBlogs = nextDocs.map((doc) => ({ id: doc.id, ...doc.data() }))
-    // setBlogs((prevState) => [...prevState, ...nextBlogs])
+  //     const size = querySnapshot.size
+  //     setLoadedAll(size < currentLimit)
+  //   })
+  // }, [])
 
-    // // Get the last visible document
-    // const lastVisible = nextDocs[nextDocs.length - 1]
-    // setLast(lastVisible)
-    // if (nextDocs.length < LIMIT) {
-    //   setLoadedAll(true)
-    // }
 
-    onSnapshot(next, (querySnapshot) => {
-      const docs = querySnapshot.docs
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
-      setBlogs((prevState) => [...prevState, ...data])
+  // const fetchMoreBlogs = useCallback(async () => {
+  //   if (user?.uid === null) return
 
-      const lastVisible = docs[docs.length - 1]
-      setLast(lastVisible)
-      setLoadedAll(docs.length < LIMIT)
-    })
-  }, [last])
+  //   const currentLimit = LIMIT + 1
 
-  const handleLoadMore = useCallback(() => {
-    setMoreLoading(true)
-    fetchMoreBlogs().finally(() => {
-      setMoreLoading(false)
-    })
-  }, [fetchMoreBlogs])
+  //   const next = query(
+  //     collection(db, 'blogs'),
+  //     orderBy('createdAt', 'desc'),
+  //     limit(currentLimit),
+  //     startAfter(last)
+  //   )
+
+  //   // const documentSnapshots = await getDocs(next)
+  //   // const nextDocs = documentSnapshots.docs
+  //   // const nextBlogs = nextDocs.map((doc) => ({ id: doc.id, ...doc.data() }))
+  //   // setBlogs((prevState) => [...prevState, ...nextBlogs])
+
+  //   // // Get the last visible document
+  //   // const lastVisible = nextDocs[nextDocs.length - 1]
+  //   // setLast(lastVisible)
+  //   // if (nextDocs.length < LIMIT) {
+  //   //   setLoadedAll(true)
+  //   // }
+
+  //   onSnapshot(next, (querySnapshot) => {
+  //     const docs = querySnapshot.docs.slice(0, LIMIT)
+  //     const data = docs.map((docSnapshot) => {
+  //       return {
+  //         id: docSnapshot.id,
+  //         ...docSnapshot.data(),
+  //       }
+  //     })
+  //     setBlogs((prevState) => [...prevState, ...data])
+
+  //     const lastVisible = docs[docs.length - 1]
+  //     setLast(lastVisible)
+
+  //     const size = querySnapshot.size
+  //     setLoadedAll(size < currentLimit)
+  //   })
+  // }, [last])
+
+  // const handleLoadMore = useCallback(() => {
+  //   setMoreLoading(true)
+  //   fetchMoreBlogs().finally(() => {
+  //     setMoreLoading(false)
+  //   })
+  // }, [fetchMoreBlogs])
 
   const handleCreatePost = useCallback(() => {
     navigate('/create-blog')
   }, [navigate])
 
-  useEffect(() => {
-    setLoading(true)
-    fetchBlogs().finally(() => {
-      setLoading(false)
-    })
-  }, [fetchBlogs])
+  // useEffect(() => {
+  //   setLoading(true)
+  //   fetchBlogs().finally(() => {
+  //     setLoading(false)
+  //   })
+  // }, [fetchBlogs])
 
   return (
     <div>

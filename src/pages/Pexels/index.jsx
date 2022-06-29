@@ -1,12 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
-import {
-  collection,
-  limit,
-  onSnapshot,
-  orderBy,
-  query,
-  startAfter,
-} from 'firebase/firestore'
+import { useState, useCallback } from 'react'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 
@@ -15,9 +7,7 @@ import { useAuth } from '../../context'
 import { addDocument, deleteDocument } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { eventNames } from '../../constants'
-import { db } from '../../firebase'
-
-const LIMIT = 3
+import { useFetch } from '../../firebase/hooks'
 
 const Pexels = () => {
   const { user } = useAuth()
@@ -26,11 +16,13 @@ const Pexels = () => {
   const [progress, setProgress] = useState(0)
   const [downloadURL, setDownloadURL] = useState(null)
 
-  const [loading, setLoading] = useState(false)
-  const [photos, setPhotos] = useState([])
-  const [last, setLast] = useState(null)
-  const [loadedAll, setLoadedAll] = useState(false)
-  const [moreLoading, setMoreLoading] = useState(false)
+  const {
+    loading,
+    data: photos,
+    moreLoading,
+    loadedAll,
+    handleLoadMore
+  } = useFetch('photos', 3)
 
   const onProgress = useCallback(
     ({ state, progress }) => {
@@ -84,75 +76,10 @@ const Pexels = () => {
     [uploadStorageBytesResumable, onProgress, onComplete, setUploading]
   )
 
-  const fetchPhotos = useCallback(async () => {
-    if (user?.uid === null) return
-
-    // Query the first page of docs
-    const first = query(
-      collection(db, 'photos'),
-      orderBy('createdAt', 'desc'),
-      limit(LIMIT)
-    )
-
-    onSnapshot(first, (querySnapshot) => {
-      const docs = querySnapshot.docs
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-          ref: docSnapshot.ref
-        }
-      })
-      setPhotos(data)
-
-      const lastVisible = docs[docs.length - 1]
-      setLast(lastVisible)
-      setLoadedAll(docs.length < LIMIT)
-    })
-  }, [])
-
-  const fetchMorePhotos = useCallback(async () => {
-    const next = query(
-      collection(db, 'photos'),
-      orderBy('createdAt', 'desc'),
-      limit(LIMIT),
-      startAfter(last)
-    )
-
-    onSnapshot(next, (querySnapshot) => {
-      const docs = querySnapshot.docs
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
-      setPhotos((prevState) => [...prevState, ...data])
-
-      const lastVisible = docs[docs.length - 1]
-      setLast(lastVisible)
-      setLoadedAll(docs.length < LIMIT)
-    })
-  }, [last])
-
   const handleDelete = useCallback(async (doc) => {
     await deleteDocument('photos', doc.id)
     await deleteStorageFile(doc.url)
   }, [])
-
-  const handleLoadMore = useCallback(() => {
-    setMoreLoading(true)
-    fetchMorePhotos().finally(() => {
-      setMoreLoading(false)
-    })
-  }, [fetchMorePhotos])
-
-  useEffect(() => {
-    setLoading(true)
-    fetchPhotos().finally(() => {
-      setLoading(false)
-    })
-  }, [fetchPhotos])
 
   const Upload = () => {
     return (
