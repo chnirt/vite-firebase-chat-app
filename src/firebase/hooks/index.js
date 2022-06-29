@@ -17,7 +17,7 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
   const [moreLoading, setMoreLoading] = useState(false)
   const [loadedAll, setLoadedAll] = useState(false)
 
-  const fetchBlogs = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     const limitNumber = LIMIT + 1
 
     // Query the first page of docs
@@ -46,7 +46,7 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
   }, [])
 
 
-  const fetchMoreBlogs = useCallback(async () => {
+  const fetchMoreData = useCallback(async () => {
     const limitNumber = LIMIT + 1
 
     const next = query(
@@ -76,17 +76,17 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
 
   const handleLoadMore = useCallback(() => {
     setMoreLoading(true)
-    fetchMoreBlogs().finally(() => {
+    fetchMoreData().finally(() => {
       setMoreLoading(false)
     })
-  }, [fetchMoreBlogs])
+  }, [fetchMoreData])
 
   useEffect(() => {
     setLoading(true)
-    fetchBlogs().finally(() => {
+    fetchData().finally(() => {
       setLoading(false)
     })
-  }, [fetchBlogs])
+  }, [fetchData])
 
   return {
     loading,
