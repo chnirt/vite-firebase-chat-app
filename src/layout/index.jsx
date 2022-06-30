@@ -23,6 +23,10 @@ const LinkRoutes = [
     name: 'Pexels',
   },
   {
+    path: '/search',
+    name: 'Search',
+  },
+  {
     path: '/messenger',
     name: 'Messenger',
   },

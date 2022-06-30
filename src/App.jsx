@@ -11,7 +11,6 @@ import { analytics } from './firebase'
 import { getRemoteAll, getRemoteValue, refreshRemote } from './firebase/remoteConfig'
 import { paths } from './constants'
 import { setUpBaseName } from './utils'
-import { TURN_CREDENTIALS } from './env'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -25,6 +24,8 @@ const LazyBlogDetailScreen = lazy(() => import('./pages/BlogDetail'))
 const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp2'))
 
 const LazyPexelsScreen = lazy(() => import('./pages/Pexels'))
+
+const LazySearchScreen = lazy(() => import('./pages/Search'))
 
 const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 
@@ -172,6 +173,15 @@ function App() {
               <WebRTCProvider>
                 <LazyPexelsScreen />
               </WebRTCProvider>
+            </Suspense>
+          ),
+        },
+
+        {
+          path: paths.search,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazySearchScreen />
             </Suspense>
           ),
         },

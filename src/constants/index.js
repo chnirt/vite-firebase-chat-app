@@ -11,6 +11,7 @@ export const paths = {
   blogDetail: 'blog/:blogId',
   whatsapp: 'whatsapp',
   pexels: 'pexels',
+  search: "search",
   messenger: 'messenger',
   profile: 'profile',
   changePassword: 'change-password',

@@ -25,19 +25,31 @@ const SignUp = () => {
       )
 
       if (userCredential) {
-        await addDocument('users', {
-          uid: userCredential.user.uid,
-          email,
-        })
+        await addDocument(
+          'users',
+          {
+            uid: userCredential.user.uid,
+            email,
+          },
+          {
+            keywords: ['email'],
+          }
+        )
       }
 
       logAnalyticsEvent(eventNames.register, {
-        email
+        email,
       })
     } catch (err) {
       setError(err.message)
     }
-  }, [email, password, createUserWithEmailAndPassword, addDocument, logAnalyticsEvent])
+  }, [
+    email,
+    password,
+    createUserWithEmailAndPassword,
+    addDocument,
+    logAnalyticsEvent,
+  ])
 
   return (
     <div className="App">

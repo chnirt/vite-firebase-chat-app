@@ -6,6 +6,7 @@ import {
   limit,
   startAfter,
   onSnapshot,
+  where,
 } from 'firebase/firestore'
 
 import { db } from '../../firebase'
@@ -17,12 +18,13 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
   const [moreLoading, setMoreLoading] = useState(false)
   const [loadedAll, setLoadedAll] = useState(false)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (keyword) => {
     const limitNumber = LIMIT + 1
 
     // Query the first page of docs
     const first = query(
       collection(db, collectionName),
+      ...(keyword ? [where('keywords', 'array-contains', keyword)] : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)
     )
@@ -91,6 +93,7 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
   return {
     loading,
     data,
+    fetchData,
     moreLoading,
     loadedAll,
     handleLoadMore

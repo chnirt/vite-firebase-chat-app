@@ -10,22 +10,19 @@ import {
 } from 'firebase/firestore'
 
 import { db } from '.'
+import { generateKeywords } from './utils'
 
-export const getDocument = async (
-  collectionName = 'todos',
-  docId = '',
-) => {
+export const getDocument = async (collectionName = 'todos', docId = '') => {
   try {
-    const docRef = doc(db, collectionName, docId);
-    const docSnap = await getDoc(docRef);
+    const docRef = doc(db, collectionName, docId)
+    const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data());
+      console.log('Document data:', docSnap.data())
     } else {
       // doc.data() will be undefined in this case
-      console.log("No such document!");
+      console.log('No such document!')
     }
-
   } catch (error) {
     console.log(error)
   }
@@ -34,25 +31,36 @@ export const getDocument = async (
 export const addDocument = async (
   collectionName = 'todos',
   data = {},
-  options = {
+  options = {}
+) => {
+  const formatOptions = {
     generated: false,
     ref: null,
+    keywords: [],
+    ...options,
   }
-) => {
   const formatData = {
     ...data,
     createdAt: serverTimestamp(),
+    ...(formatOptions.keywords.length > 0
+      ? {
+        keywords: generateKeywords(
+          formatOptions.keywords.map((keyword) => data[keyword] ?? '').join(' ') ??
+          'Hello world'
+        ),
+      }
+      : {}),
   }
 
   let docRef
 
   const collectionRef = collection(db, collectionName)
 
-  if (options.generated) {
-    docRef = await addDoc(options.ref ?? collectionRef, formatData)
+  if (formatOptions.generated) {
+    docRef = await addDoc(formatOptions.ref ?? collectionRef, formatData)
   } else {
     const documentRef = doc(collection(db, collectionName))
-    docRef = await setDoc(options.ref ?? documentRef, formatData)
+    docRef = await setDoc(formatOptions.ref ?? documentRef, formatData)
   }
 
   return docRef
