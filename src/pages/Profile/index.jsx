@@ -14,6 +14,7 @@ const Profile = ({ }) => {
   const [photoURL, setPhotoURL] = useState(user?.photoURL ?? '')
   const [followingList, setFollowingList] = useState([])
   const [followerList, setFollowerList] = useState([])
+  const [likeList, setLikeList] = useState([])
 
   useEffect(() => {
     const fetchFollowingData = async () => {
@@ -46,8 +47,24 @@ const Profile = ({ }) => {
       setFollowerList(data)
       setLoading(false)
     }
+    const fetchLikeData = async () => {
+      setLoading(true)
+      const likeDocRef = getColRef('users', user.uid, 'likes')
+      const querySnapshot = await getDocs(likeDocRef)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setLikeList(data)
+      setLoading(false)
+    }
     fetchFollowingData()
     fetchFollowerData()
+    fetchLikeData()
   }, [])
 
   if (loading) {
@@ -68,7 +85,8 @@ const Profile = ({ }) => {
       Profile
       <br />
       {followerList.length} followers{` - `}
-      {followingList.length} following
+      {followingList.length} following{` - `}
+      {likeList.length} likes
       <br />
       <input
         type="displayName"
