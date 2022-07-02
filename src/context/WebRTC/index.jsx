@@ -121,7 +121,7 @@ export const WebRTCProvider = ({
       }
 
       pc.current.onconnectionstatechange = (event) => {
-        console.log('pc.current.connectionState---', pc.current.connectionState)
+        // console.log('pc.current.connectionState---', pc.current.connectionState)
         switch (pc.current.connectionState) {
           case 'new':
           case 'checking':
@@ -223,7 +223,7 @@ export const WebRTCProvider = ({
     })
 
     onSnapshot(
-      query(collection(callReference, 'answerICECandidates')),
+      collection(callReference, 'answerICECandidates'),
       async (querySnapshot) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
@@ -283,7 +283,7 @@ export const WebRTCProvider = ({
     await updateDocument('calls', currentCallReference.id, callWithAnswer)
 
     onSnapshot(
-      query(collection(currentCallReference, 'offerICECandidates')),
+      collection(currentCallReference, 'offerICECandidates'),
       async (querySnapshot) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {

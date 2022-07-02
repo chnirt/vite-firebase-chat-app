@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { auth } from '../../firebase'
 // import { Loading } from '../../components'
-import { addDocument } from '../../firebase/service'
+import { addDocument, getDocRef } from '../../firebase/service'
 import { eventNames } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 
@@ -32,6 +32,7 @@ const SignUp = () => {
             email,
           },
           {
+            ref: getDocRef('users', userCredential.user.uid),
             keywords: ['email'],
           }
         )

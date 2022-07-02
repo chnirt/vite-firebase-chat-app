@@ -1,25 +1,110 @@
-import { useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
+import { getDoc, onSnapshot, setDoc } from 'firebase/firestore'
 
 import { useFetch } from '../../firebase/hooks'
-import { useEffect } from 'react'
+import {
+  deleteDocument,
+  getColRef,
+  getDocRef,
+} from '../../firebase/service'
+import { useAuth } from '../../context'
 
 const Search = () => {
-  const [search, setSearch] = useState('')
+  const { user } = useAuth()
   const {
     loading,
-    data: photos,
+    data: users,
     fetchData,
     moreLoading,
     loadedAll,
     handleLoadMore,
   } = useFetch('users', 3)
+  const [search, setSearch] = useState('')
+  const [followList, setFollowList] = useState([])
+
+  const handleFollow = useCallback(
+    async (doc) => {
+      // follower
+      // const followerDocRef = getDocRef('users', user.uid)
+      const followingData = {
+        email: doc.email,
+        uid: doc.uid,
+      }
+      // await addSubCollection(followerDocRef, 'following', followingData)
+
+      const followerDocRef = getDocRef('users', user.uid, 'following', doc.uid)
+      await setDoc(followerDocRef, followingData)
+
+      // followee
+      // const followeeDocRef = doc.ref
+      const followerData = {
+        email: user.email,
+        uid: user.uid,
+      }
+      // await addSubCollection(followeeDocRef, 'follower', followerData)
+      const followeeDocRef = getDocRef('users', doc.uid, 'follower', user.uid)
+      await setDoc(followeeDocRef, followerData)
+    },
+    [user]
+  )
+
+  const handleUnFollow = useCallback(
+    async (doc) => {
+      // follower
+      const followerDocRef = getDocRef('users', user.uid, 'following', doc.uid)
+      const followerDocSnap = await getDoc(followerDocRef)
+      // console.log(followerDocSnap.data())
+      if (followerDocSnap.exists()) {
+        await deleteDocument('users', user.uid, 'following', doc.uid)
+      }
+
+      // followee
+      const followeeDocRef = getDocRef('users', doc.uid, 'follower', user.uid)
+      const followeeDocSnap = await getDoc(followeeDocRef)
+      // console.log(followeeDocSnap.data())
+      if (followeeDocSnap.exists()) {
+        await deleteDocument('users', doc.uid, 'follower', user.uid)
+      }
+    },
+    [user]
+  )
 
   useEffect(() => {
     const formatSearch = search.trim().toLowerCase()
     fetchData(formatSearch.length ? formatSearch : null)
   }, [search])
+
+  useEffect(() => {
+    if (!user) return
+    const followerDocRef = getColRef('users', user.uid, 'following')
+    const unsubscribe = onSnapshot(
+      followerDocRef,
+      async (querySnapshot) => {
+        // querySnapshot.docChanges().forEach((change) => {
+        //   console.log(change.doc.data())
+        //   if (change.type === 'added') {
+        //     const callRef = change.doc.ref
+        //     // setCurrentCallReference(callRef)
+        //   }
+        // })
+        const data = querySnapshot.docs.map((docSnapshot) => {
+          return {
+            id: docSnapshot.id,
+            ...docSnapshot.data(),
+          }
+        })
+        setFollowList(data)
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+    return () => {
+      unsubscribe()
+    }
+  }, [user])
 
   return (
     <div>
@@ -37,25 +122,44 @@ const Search = () => {
         }}
       >
         {loading && <span>Collection: Loading...</span>}
-        {photos.length > 0 && (
+        {users.length > 0 && (
           <div>
-            {photos.map((doc) => (
-              <div
-                key={doc.id}
-                style={{
-                  border: 'solid 1px black',
-                  margin: 8,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
-                <p>{doc.email}</p>
-                <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
-              </div>
-            ))}
+            {users.map((doc) => {
+              const isOwner = doc.uid === user.uid
+              const isFollowing = followList.some(
+                (item) => item.uid === doc.uid
+              )
+              return (
+                <div
+                  key={doc.id}
+                  style={{
+                    border: 'solid 1px black',
+                    margin: 8,
+                    // display: 'flex',
+                    // flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
+                  <p>{doc.email}</p>
+                  <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
+                  {!isOwner && (
+                    <div>
+                      {!isFollowing ? (
+                        <button onClick={() => handleFollow(doc)}>
+                          follow
+                        </button>
+                      ) : (
+                        <button onClick={() => handleUnFollow(doc)}>
+                          following
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
         {!loadedAll ? (

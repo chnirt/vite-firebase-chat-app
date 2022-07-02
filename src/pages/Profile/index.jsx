@@ -1,14 +1,58 @@
-import { useState } from 'react'
+import { getDocs } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
 import { useUpdateProfile } from 'react-firebase-hooks/auth'
 
 import { useAuth } from '../../context'
 import { auth } from '../../firebase'
+import { getColRef } from '../../firebase/service'
 
 const Profile = ({ }) => {
   const { user } = useAuth()
+  const [updateProfile, updating, error] = useUpdateProfile(auth)
+  const [loading, setLoading] = useState(false)
   const [displayName, setDisplayName] = useState(user?.displayName ?? '')
   const [photoURL, setPhotoURL] = useState(user?.photoURL ?? '')
-  const [updateProfile, updating, error] = useUpdateProfile(auth)
+  const [followingList, setFollowingList] = useState([])
+  const [followerList, setFollowerList] = useState([])
+
+  useEffect(() => {
+    const fetchFollowingData = async () => {
+      setLoading(true)
+      const followerDocRef = getColRef('users', user.uid, 'following')
+      const querySnapshot = await getDocs(followerDocRef)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setFollowingList(data)
+      setLoading(false)
+    }
+    const fetchFollowerData = async () => {
+      setLoading(true)
+      const followerDocRef = getColRef('users', user.uid, 'follower')
+      const querySnapshot = await getDocs(followerDocRef)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setFollowerList(data)
+      setLoading(false)
+    }
+    fetchFollowingData()
+    fetchFollowerData()
+  }, [])
+
+  if (loading) {
+    return <p>Loading...</p>
+  }
   if (error) {
     return (
       <div>
@@ -22,6 +66,9 @@ const Profile = ({ }) => {
   return (
     <div>
       Profile
+      <br />
+      {followerList.length} followers{` - `}
+      {followingList.length} following
       <br />
       <input
         type="displayName"
@@ -40,7 +87,7 @@ const Profile = ({ }) => {
       <button
         onClick={async () => {
           await updateProfile({ displayName, photoURL })
-          alert('Updated profile');
+          alert('Updated profile')
         }}
       >
         Update profile
@@ -48,7 +95,9 @@ const Profile = ({ }) => {
       <br />
       <h4>{user?.displayName}</h4>
       {/* <h5>{user?.createdAt}</h5> */}
-      {photoURL.length > 0 && <img src={user?.photoURL} alt={'photoURL'} width={300} />}
+      {photoURL.length > 0 && (
+        <img src={user?.photoURL} alt={'photoURL'} width={300} />
+      )}
     </div>
   )
 }

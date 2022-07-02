@@ -18,19 +18,27 @@ import {
 import { db } from '.'
 import { generateKeywords } from './utils'
 
-export const getDocuments = async (collectionName = 'todos', pathSegments = []) => {
-  const queryConstraints = pathSegments.map((segment) => {
-    const queryConstraint = segment[0]
-    const fieldPath = segment[1]
-    const opStr = segment[2]
-    const value = segment[3]
-    if (queryConstraint === 'where') {
-      return where(fieldPath, opStr, value)
-    }
-    return null
-  }).filter(item => item)
+export const getDocuments = async (
+  collectionName = 'todos',
+  pathSegments = []
+) => {
+  const queryConstraints = pathSegments
+    .map((segment) => {
+      const queryConstraint = segment[0]
+      const fieldPath = segment[1]
+      const opStr = segment[2]
+      const value = segment[3]
+      if (queryConstraint === 'where') {
+        return where(fieldPath, opStr, value)
+      }
+      return null
+    })
+    .filter((item) => item)
 
-  const q = query.apply(null, [collection(db, collectionName), ...queryConstraints])
+  const q = query.apply(null, [
+    collection(db, collectionName),
+    ...queryConstraints,
+  ])
   const querySnapshot = await getDocs(q)
   const docs = querySnapshot.docs
   const data = docs.map((docSnapshot) => {
@@ -91,6 +99,8 @@ export const addDocument = async (
     docRef = await setDoc(formatOptions.ref ?? documentRef, formatData)
   }
 
+  // const docRef = await setDoc(doc(db, 'users', userInput.uid), userData)
+
   return docRef
 }
 
@@ -118,6 +128,14 @@ export const updateDocument = async (
   })
 }
 
-export const deleteDocument = async (collectionName = 'todos', docId = '') => {
-  await deleteDoc(doc(db, collectionName, docId))
+export const getDocRef = (collectionName = 'todos', ...pathSegments) =>
+  doc(db, collectionName, ...pathSegments)
+
+export const getColRef = (collectionName = 'todos', ...pathSegments) =>
+  collection(db, collectionName, ...pathSegments)
+
+export const deleteDocument = async (collectionName = 'todos', ...pathSegments) => {
+  const docRef = getDocRef(collectionName, ...pathSegments)
+  await deleteDoc(docRef)
 }
+

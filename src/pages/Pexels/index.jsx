@@ -138,7 +138,7 @@ const Pexels = () => {
                   alignItems: 'center',
                 }}
               >
-                <Link to={`/users/${doc.uid}`}>@{doc.uid}</Link><br />
+                <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link><br />
                 <img src={doc.downloadURL} width={200} height={200} />
                 <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
                 <button onClick={() => handleDelete(doc)}>Delete</button>

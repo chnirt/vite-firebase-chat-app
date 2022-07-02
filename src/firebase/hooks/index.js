@@ -30,9 +30,12 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
     )
 
     onSnapshot(first, (querySnapshot) => {
+      // querySnapshot.docs.map(a => a.ref)
       const docs = querySnapshot.docs.slice(0, LIMIT)
       const data = docs.map((docSnapshot) => {
+        // console.log(docSnapshot)
         return {
+          // ...docSnapshot,
           id: docSnapshot.id,
           ...docSnapshot.data(),
         }
