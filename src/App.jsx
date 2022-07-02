@@ -26,6 +26,7 @@ const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp2'))
 const LazyPexelsScreen = lazy(() => import('./pages/Pexels'))
 
 const LazySearchScreen = lazy(() => import('./pages/Search'))
+const LazyUserDetailScreen = lazy(() => import('./pages/UserDetail'))
 
 const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 
@@ -182,6 +183,15 @@ function App() {
           element: (
             <Suspense fallback={<Loading />}>
               <LazySearchScreen />
+            </Suspense>
+          ),
+        },
+
+        {
+          path: paths.userDetail,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyUserDetailScreen />
             </Suspense>
           ),
         },

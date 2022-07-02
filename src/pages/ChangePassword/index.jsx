@@ -21,21 +21,25 @@ const ChangePassword = () => {
     <div>
       Change Password
       <br />
-      <input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br />
-      <button
-        onClick={async () => {
-          await updatePassword(password);
-          alert('Updated password');
-        }}
-      >
-        Update password
-      </button>
+      <form>
+
+        <input
+          type="password"
+          placeholder="password"
+          autoComplete="off"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <br />
+        <button
+          onClick={async () => {
+            await updatePassword(password);
+            alert('Updated password');
+          }}
+        >
+          Update password
+        </button>
+      </form>
     </div>
   );
 }

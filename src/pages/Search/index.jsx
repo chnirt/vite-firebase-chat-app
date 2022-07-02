@@ -51,7 +51,7 @@ const Search = () => {
                   alignItems: 'center',
                 }}
               >
-                <Link to={`/users/${doc.uid}`}>@{doc.uid}</Link>
+                <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
                 <p>{doc.email}</p>
                 <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
               </div>

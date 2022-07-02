@@ -164,7 +164,7 @@ const Blog = () => {
               >
                 <h3>{doc.title}</h3>
                 <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
-                <Link to={`/users/${doc.uid}`}>@{doc.uid}</Link><br />
+                <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link><br />
                 <Link to={`/blog/${doc.id}`}>See more</Link>
               </div>
             ))}

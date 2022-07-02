@@ -1,3 +1,6 @@
+// https://www.javascripttutorial.net/javascript-apply-method/
+// https://bobbyhadz.com/blog/javascript-remove-null-values-from-array
+// https://stackoverflow.com/questions/70571720/firestore-query-snapshot-foreach-seems-to-be-overwriting-products-state
 import {
   doc,
   getDoc,
@@ -7,24 +10,49 @@ import {
   addDoc,
   deleteDoc,
   updateDoc,
+  query,
+  where,
+  getDocs,
 } from 'firebase/firestore'
 
 import { db } from '.'
 import { generateKeywords } from './utils'
 
-export const getDocument = async (collectionName = 'todos', docId = '') => {
-  try {
-    const docRef = doc(db, collectionName, docId)
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      console.log('Document data:', docSnap.data())
-    } else {
-      // doc.data() will be undefined in this case
-      console.log('No such document!')
+export const getDocuments = async (collectionName = 'todos', pathSegments = []) => {
+  const queryConstraints = pathSegments.map((segment) => {
+    const queryConstraint = segment[0]
+    const fieldPath = segment[1]
+    const opStr = segment[2]
+    const value = segment[3]
+    if (queryConstraint === 'where') {
+      return where(fieldPath, opStr, value)
     }
-  } catch (error) {
-    console.log(error)
+    return null
+  }).filter(item => item)
+
+  const q = query.apply(null, [collection(db, collectionName), ...queryConstraints])
+  const querySnapshot = await getDocs(q)
+  const docs = querySnapshot.docs
+  const data = docs.map((docSnapshot) => {
+    return {
+      id: docSnapshot.id,
+      ...docSnapshot.data(),
+    }
+  })
+  return data
+}
+
+export const getDocument = async (collectionName = 'todos', docId = '') => {
+  const docRef = doc(db, collectionName, docId)
+  const docSnap = await getDoc(docRef)
+
+  if (docSnap.exists()) {
+    console.log('Document data:', docSnap.data())
+    return docSnap.data()
+  } else {
+    // doc.data() will be undefined in this case
+    console.log('No such document!')
+    throw Error('No such document!')
   }
 }
 
@@ -45,8 +73,9 @@ export const addDocument = async (
     ...(formatOptions.keywords.length > 0
       ? {
         keywords: generateKeywords(
-          formatOptions.keywords.map((keyword) => data[keyword] ?? '').join(' ') ??
-          'Hello world'
+          formatOptions.keywords
+            .map((keyword) => data[keyword] ?? '')
+            .join(' ') ?? 'Hello world'
         ),
       }
       : {}),
@@ -54,9 +83,8 @@ export const addDocument = async (
 
   let docRef
 
-  const collectionRef = collection(db, collectionName)
-
   if (formatOptions.generated) {
+    const collectionRef = collection(db, collectionName)
     docRef = await addDoc(formatOptions.ref ?? collectionRef, formatData)
   } else {
     const documentRef = doc(collection(db, collectionName))
