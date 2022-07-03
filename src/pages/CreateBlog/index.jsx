@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MDEditor from '@uiw/react-md-editor'
-import { addDoc, arrayUnion, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, arrayUnion, serverTimestamp } from 'firebase/firestore'
 
 import { BackButton } from '../../components'
 import { useAuth } from '../../context'
-import { getColRef } from '../../firebase/service'
 import { eventNames } from '../../constants'
+import { getColRef } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 
 const CreateBlog = () => {
@@ -33,14 +33,11 @@ const CreateBlog = () => {
       title,
       content: value,
       uid: user.uid,
-      relationship: arrayUnion(`${user.uid}_${user.uid}`),
+      relationship: arrayUnion(user.uid),
       createdAt: serverTimestamp()
     }
     const blogDocRef = getColRef('blogs')
     const createdBlogDocRef = await addDoc(blogDocRef, blogData)
-    // await updateDoc(createdBlogDocRef, {
-    //   relationship: arrayUnion(`${user.uid}_${createdBlogDocRef.id}`),
-    // })
 
     logAnalyticsEvent(eventNames.createBlog, {
       title,

@@ -50,7 +50,6 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
     })
   }, [])
 
-
   const fetchMoreData = useCallback(async () => {
     const limitNumber = LIMIT + 1
 
@@ -94,7 +93,7 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
   }, [fetchMoreData])
 
   useEffect(() => {
-    handleLoad
+    handleLoad()
   }, [handleLoad])
 
   return {
@@ -103,6 +102,6 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
     fetchData,
     moreLoading,
     loadedAll,
-    handleLoadMore
+    handleLoadMore,
   }
 }

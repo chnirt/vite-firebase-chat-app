@@ -45,8 +45,8 @@ const Blog = () => {
         ...docSnapshot.data(),
       }
     })
-    const followingRelationship = data.map((item) => `${user.uid}_${item.id}`)
-    const userRelationship = [`${user.uid}_${user.uid}`]
+    const followingRelationship = data.map((item) => item.uid)
+    const userRelationship = [user.uid]
     const relationship = []
       .concat(userRelationship)
       .concat(followingRelationship)

@@ -64,7 +64,7 @@ const Search = () => {
       querySnapshot.forEach((docSnapshot) => {
         const docRef = docSnapshot.ref
         batch.update(docRef, {
-          relationship: arrayUnion(`${user.uid}_${doc.uid}`),
+          relationship: arrayUnion(user.uid),
         })
       })
 
@@ -97,7 +97,7 @@ const Search = () => {
       querySnapshot.forEach((docSnapshot) => {
         const docRef = docSnapshot.ref
         batch.update(docRef, {
-          relationship: arrayRemove(`${user.uid}_${doc.uid}`),
+          relationship: arrayRemove(user.uid),
         })
       })
 
@@ -117,13 +117,6 @@ const Search = () => {
     const unsubscribe = onSnapshot(
       followerDocRef,
       async (querySnapshot) => {
-        // querySnapshot.docChanges().forEach((change) => {
-        //   console.log(change.doc.data())
-        //   if (change.type === 'added') {
-        //     const callRef = change.doc.ref
-        //     // setCurrentCallReference(callRef)
-        //   }
-        // })
         const data = querySnapshot.docs.map((docSnapshot) => {
           return {
             id: docSnapshot.id,
