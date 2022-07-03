@@ -1,8 +1,9 @@
-import { fetchAndActivate, getAll, getValue } from "firebase/remote-config"
+import { fetchAndActivate, getAll, getValue } from 'firebase/remote-config'
 
-import { remoteConfig } from "."
+import { remoteConfig } from '.'
 
-export const refreshRemote = async () => await fetchAndActivate(remoteConfig)
+export const fetchAndActivateRemote = async () =>
+  await fetchAndActivate(remoteConfig)
 
 export const getRemoteAll = () => getAll(remoteConfig)
 

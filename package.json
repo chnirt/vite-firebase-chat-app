@@ -19,7 +19,8 @@
     "react-firebase-hooks": "^5.0.3",
     "react-markdown": "^8.0.3",
     "react-router-dom": "^6.3.0",
-    "remark-gfm": "^3.0.1"
+    "remark-gfm": "^3.0.1",
+    "semver": "^7.3.7"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

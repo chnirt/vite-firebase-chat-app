@@ -1,14 +1,14 @@
 // https://gist.github.com/codediodeio/513bf77ee45be6d38d27868f5345a002
-import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
 
 import './App.css'
 import { Layout } from './layout'
 import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
-import { WebRTCProvider } from './context'
+import { useRemoteConfig, WebRTCProvider } from './context'
 import { analytics } from './firebase'
-import { getRemoteAll, getRemoteValue, refreshRemote } from './firebase/remoteConfig'
+import { getRemoteAll, getRemoteValue } from './firebase/remoteConfig'
 import { paths } from './constants'
 import { setUpBaseName } from './utils'
 
@@ -39,63 +39,21 @@ setUpBaseName()
 
 function App() {
   let location = useLocation()
-  const [enableTurnServer, setEnableTurnServer] = useState(false)
-
-  useLayoutEffect(() => {
-    const unsubscribed = refreshRemote();
-    const isTurnServer = getRemoteValue('vite_app_turn_server', 'boolean')
-
-    console.log('vite_app_turn_server', isTurnServer)
-
-    setEnableTurnServer(isTurnServer)
-    return () => {
-      unsubscribed;
-    };
-  }, [refreshRemote]);
-
+  const { vite_app_turn_server } = useRemoteConfig()
 
   useEffect(() => {
-    // const allRemoteValue = getRemoteAll()
-    // const appTitle = getRemoteValue('vite_app_title', 'string')
-    // const darkMode = getRemoteValue('dark_mode', 'boolean')
-    // const timeout = getRemoteValue('timeout', 'number')
-
-    // console.log(allRemoteValue)
-    // console.log(typeof appTitle, appTitle)
-    // console.log(typeof darkMode, darkMode)
-    // console.log(typeof timeout, timeout)
-
     if (typeof analytics === 'function') {
       const page_path = location.pathname + location.search
       analytics().setCurrentScreen(page_path)
       analytics().logEvent('page_view', { page_path })
     }
-  }, [location, refreshRemote, getRemoteAll, getRemoteValue])
+  }, [location, getRemoteAll, getRemoteValue])
 
   // We removed the <BrowserRouter> element from App because the
   // useRoutes hook needs to be in the context of a <BrowserRouter>
   // element. This is a common pattern with React Router apps that
   // are rendered in different environments. To render an <App>,
   // you'll need to wrap it in your own <BrowserRouter> element.
-  // let element1 = useRoutes([
-  //   {
-  //     path: '/',
-  //     element: <Navigate to="/👾/login" />,
-  //     children: [
-  //       {
-  //         path: paths.login,
-  //         element: (
-  //           <Suspense fallback={<Loading />}>
-  //             {/* <PublicRoute> */}
-  //             <LazySignInScreen />
-  //             {/* </PublicRoute> */}
-  //           </Suspense>
-  //         ),
-  //       },
-  //     ],
-  //   },
-  // ])
-  // return element1
   let element = useRoutes([
     // A route object has the same properties as a <Route>
     // element. The `children` is just an array of child routes.
@@ -160,7 +118,7 @@ function App() {
           path: paths.whatsapp,
           element: (
             <Suspense fallback={<Loading />}>
-              <WebRTCProvider enableTurnServer={enableTurnServer}>
+              <WebRTCProvider enableTurnServer={vite_app_turn_server}>
                 <LazyWhatsAppScreen />
               </WebRTCProvider>
             </Suspense>

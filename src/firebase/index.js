@@ -49,18 +49,10 @@ if (location.hostname === 'localhost') {
   connectFirestoreEmulator(db, 'localhost', FIRESTORE_PORT)
   connectStorageEmulator(storage, "localhost", STORAGE_PORT);
 
-  // remoteConfig.settings.minimumFetchIntervalMillis = 3600000
-  // remoteConfig.settings.minimumFetchIntervalMillis = 0
+  remoteConfig.settings.minimumFetchIntervalMillis = 0
   remoteConfig.defaultConfig = {
     vite_app_title: 'Vite firebase chat app from default',
-    dark_mode: false,
+    // dark_mode: false,
     timeout: 2000,
   }
-}
-
-remoteConfig.settings.minimumFetchIntervalMillis = 0
-remoteConfig.defaultConfig = {
-  vite_app_title: 'Vite firebase chat app from default',
-  dark_mode: false,
-  timeout: 2000,
 }
