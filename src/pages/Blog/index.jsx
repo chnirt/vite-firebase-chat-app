@@ -1,133 +1,146 @@
+// https://medium.com/firebase-tips-tricks/how-to-combined-two-firestore-queries-to-simulate-a-logical-or-query-27d28a43cb2d
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   // collection,
-  // query,
-  // orderBy,
-  // limit,
+  query,
+  orderBy,
+  limit,
   // getDocs,
-  // startAfter,
+  startAfter,
   onSnapshot,
-  // where,
+  where,
   getDoc,
   setDoc,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
+  getDocs,
 } from 'firebase/firestore'
 import moment from 'moment'
 
-// import { db } from '../../firebase'
 import { useAuth } from '../../context'
-import { useFetch } from '../../firebase/hooks'
 import { deleteDocument, getColRef, getDocRef } from '../../firebase/service'
 
-// const LIMIT = 3
+const LIMIT = 3
 
 const Blog = () => {
   let navigate = useNavigate()
   const { user } = useAuth()
-  const {
-    loading,
-    data: blogs,
-    moreLoading,
-    loadedAll,
-    handleLoadMore,
-  } = useFetch('blogs', 3)
+  const [loading, setLoading] = useState(false)
+  const [blogs, setBlogs] = useState([])
+  const [last, setLast] = useState(null)
+  const [moreLoading, setMoreLoading] = useState(false)
+  const [loadedAll, setLoadedAll] = useState(false)
+
   const [likeList, setLikeList] = useState([])
-  // const [loading, setLoading] = useState(false)
-  // const [blogs, setBlogs] = useState([])
-  // const [last, setLast] = useState(null)
-  // const [moreLoading, setMoreLoading] = useState(false)
-  // const [loadedAll, setLoadedAll] = useState(false)
 
-  // const fetchBlogs = useCallback(async () => {
-  //   if (user?.uid === null) return
+  const getRelationship = useCallback(async () => {
+    const followerDocRef = getColRef('users', user.uid, 'following')
+    const querySnapshot = await getDocs(followerDocRef)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    const followingRelationship = data.map((item) => `${user.uid}_${item.id}`)
+    const userRelationship = [`${user.uid}_${user.uid}`]
+    const relationship = []
+      .concat(userRelationship)
+      .concat(followingRelationship)
+    return relationship
+  }, [])
 
-  //   const currentLimit = LIMIT + 1
+  const fetchBlogs = useCallback(async () => {
+    if (user?.uid === null) return
 
-  //   // Query the first page of docs
-  //   const first = query(
-  //     collection(db, 'blogs'),
-  //     orderBy('createdAt', 'desc'),
-  //     limit(currentLimit)
-  //   )
+    const limitNumber = LIMIT + 1
 
-  //   // const documentSnapshots = await getDocs(first)
-  //   // const docs = documentSnapshots.docs
-  //   // setBlogs(docs.map((doc) => ({ id: doc.id, ...doc.data() })))
+    const relationship = await getRelationship()
 
-  //   // // Get the last visible document
-  //   // const lastVisible =
-  //   //   docs[docs.length - 1]
-  //   // setLast(lastVisible)
-  //   // if (docs.length < LIMIT) {
-  //   //   setLoadedAll(true)
-  //   // }
+    // Query the first page of docs
+    const first = query(
+      getColRef('blogs'),
+      ...(relationship.length > 0
+        ? [where('relationship', 'array-contains-any', relationship)]
+        : []),
+      orderBy('createdAt', 'desc'),
+      limit(limitNumber)
+    )
 
-  //   onSnapshot(first, (querySnapshot) => {
-  //     const docs = querySnapshot.docs.slice(0, LIMIT)
-  //     const data = docs.map((docSnapshot) => {
-  //       return {
-  //         id: docSnapshot.id,
-  //         ...docSnapshot.data(),
-  //       }
-  //     })
-  //     setBlogs(data)
+    onSnapshot(first, (querySnapshot) => {
+      const docs = querySnapshot.docs.slice(0, LIMIT)
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      setBlogs(data)
 
-  //     const lastVisible = docs[docs.length - 1]
-  //     setLast(lastVisible)
+      const lastVisible = docs[docs.length - 1]
+      setLast(lastVisible)
 
-  //     const size = querySnapshot.size
-  //     setLoadedAll(size < currentLimit)
-  //   })
-  // }, [])
+      const size = querySnapshot.size
+      setLoadedAll(size < limitNumber)
+    })
+  }, [getRelationship])
 
-  // const fetchMoreBlogs = useCallback(async () => {
-  //   if (user?.uid === null) return
+  const fetchMoreBlogs = useCallback(async () => {
+    if (user?.uid === null) return
 
-  //   const currentLimit = LIMIT + 1
+    const limitNumber = LIMIT + 1
 
-  //   const next = query(
-  //     collection(db, 'blogs'),
-  //     orderBy('createdAt', 'desc'),
-  //     limit(currentLimit),
-  //     startAfter(last)
-  //   )
+    const relationship = await getRelationship()
 
-  //   // const documentSnapshots = await getDocs(next)
-  //   // const nextDocs = documentSnapshots.docs
-  //   // const nextBlogs = nextDocs.map((doc) => ({ id: doc.id, ...doc.data() }))
-  //   // setBlogs((prevState) => [...prevState, ...nextBlogs])
 
-  //   // // Get the last visible document
-  //   // const lastVisible = nextDocs[nextDocs.length - 1]
-  //   // setLast(lastVisible)
-  //   // if (nextDocs.length < LIMIT) {
-  //   //   setLoadedAll(true)
-  //   // }
+    const next = query(
+      getColRef('blogs'),
+      ...(relationship.length > 0
+        ? [where('relationship', 'array-contains-any', relationship)]
+        : []),
+      orderBy('createdAt', 'desc'),
+      limit(limitNumber),
+      startAfter(last)
+    )
 
-  //   onSnapshot(next, (querySnapshot) => {
-  //     const docs = querySnapshot.docs.slice(0, LIMIT)
-  //     const data = docs.map((docSnapshot) => {
-  //       return {
-  //         id: docSnapshot.id,
-  //         ...docSnapshot.data(),
-  //       }
-  //     })
-  //     setBlogs((prevState) => [...prevState, ...data])
+    onSnapshot(next, (querySnapshot) => {
+      const docs = querySnapshot.docs.slice(0, LIMIT)
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      setBlogs((prevState) => [...prevState, ...data])
 
-  //     const lastVisible = docs[docs.length - 1]
-  //     setLast(lastVisible)
+      const lastVisible = docs[docs.length - 1]
+      setLast(lastVisible)
 
-  //     const size = querySnapshot.size
-  //     setLoadedAll(size < currentLimit)
-  //   })
-  // }, [last])
+      const size = querySnapshot.size
+      setLoadedAll(size < limitNumber)
+    })
+  }, [getRelationship, last])
 
-  // const handleLoadMore = useCallback(() => {
-  //   setMoreLoading(true)
-  //   fetchMoreBlogs().finally(() => {
-  //     setMoreLoading(false)
-  //   })
-  // }, [fetchMoreBlogs])
+  const handleLoad = useCallback(() => {
+    setLoading(true)
+    fetchBlogs().finally(() => {
+      setLoading(false)
+    })
+  }, [fetchBlogs])
+
+  const handleLoadMore = useCallback(() => {
+    setMoreLoading(true)
+    fetchMoreBlogs().finally(() => {
+      setMoreLoading(false)
+    })
+  }, [fetchMoreBlogs])
+
+  useEffect(() => {
+    handleLoad()
+  }, [handleLoad])
 
   const handleCreatePost = useCallback(() => {
     navigate('/create-blog')
@@ -140,6 +153,15 @@ const Blog = () => {
     }
     const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
     await setDoc(likeDocRef, likeData)
+
+    const blogDocRef = getDocRef('blogs', doc.id)
+    const blogDocSnap = await getDoc(blogDocRef)
+    const existed = blogDocSnap.exists()
+    if (existed) {
+      await updateDoc(blogDocRef, {
+        relationship: arrayUnion(`${user.uid}_${doc.id}`),
+      })
+    }
   }, [])
 
   const handleUnLike = useCallback(async (doc) => {
@@ -147,6 +169,15 @@ const Blog = () => {
     const likeDocSnap = await getDoc(likeDocRef)
     if (likeDocSnap.exists()) {
       await deleteDocument('users', user.uid, 'likes', doc.id)
+    }
+
+    const blogDocRef = getDocRef('blogs', doc.id)
+    const blogDocSnap = await getDoc(blogDocRef)
+    const existed = blogDocSnap.exists()
+    if (existed) {
+      await updateDoc(blogDocRef, {
+        relationship: arrayRemove(`${user.uid}_${doc.id}`),
+      })
     }
   }, [])
 
@@ -172,13 +203,6 @@ const Blog = () => {
       unsubscribe()
     }
   }, [user])
-
-  // useEffect(() => {
-  //   setLoading(true)
-  //   fetchBlogs().finally(() => {
-  //     setLoading(false)
-  //   })
-  // }, [fetchBlogs])
 
   return (
     <div>

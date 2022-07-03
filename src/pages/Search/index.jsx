@@ -1,10 +1,21 @@
 import { useCallback, useState, useEffect } from 'react'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
-import { getDoc, onSnapshot, setDoc } from 'firebase/firestore'
+import {
+  arrayRemove,
+  arrayUnion,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore'
 
 import { useFetch } from '../../firebase/hooks'
 import {
+  batch,
   deleteDocument,
   getColRef,
   getDocRef,
@@ -46,6 +57,18 @@ const Search = () => {
       // await addSubCollection(followeeDocRef, 'follower', followerData)
       const followeeDocRef = getDocRef('users', doc.uid, 'follower', user.uid)
       await setDoc(followeeDocRef, followerData)
+
+      // add relationship
+      const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
+      const querySnapshot = await getDocs(getQuery)
+      querySnapshot.forEach((docSnapshot) => {
+        const docRef = docSnapshot.ref
+        batch.update(docRef, {
+          relationship: arrayUnion(`${user.uid}_${doc.uid}`),
+        })
+      })
+
+      await batch.commit()
     },
     [user]
   )
@@ -67,6 +90,18 @@ const Search = () => {
       if (followeeDocSnap.exists()) {
         await deleteDocument('users', doc.uid, 'follower', user.uid)
       }
+
+      // remove relationship
+      const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
+      const querySnapshot = await getDocs(getQuery)
+      querySnapshot.forEach((docSnapshot) => {
+        const docRef = docSnapshot.ref
+        batch.update(docRef, {
+          relationship: arrayRemove(`${user.uid}_${doc.uid}`),
+        })
+      })
+
+      await batch.commit()
     },
     [user]
   )

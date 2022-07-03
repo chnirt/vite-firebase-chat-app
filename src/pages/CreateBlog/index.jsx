@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MDEditor from '@uiw/react-md-editor'
+import { addDoc, arrayUnion, serverTimestamp, updateDoc } from 'firebase/firestore'
 
 import { BackButton } from '../../components'
 import { useAuth } from '../../context'
-import { addDocument } from '../../firebase/service'
+import { getColRef } from '../../firebase/service'
 import { eventNames } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 
@@ -19,21 +20,34 @@ const CreateBlog = () => {
     if (title === '') return
     if (value === '') return
 
-    const options = {
-      generated: true
-    }
-    const docRef = await addDocument('blogs', {
+    // const options = {
+    //   generated: true
+    // }
+    // const docRef = await addDocument('blogs', {
+    //   title,
+    //   content: value,
+    //   uid: user.uid,
+    // }, options)
+
+    const blogData = {
       title,
       content: value,
       uid: user.uid,
-    }, options)
+      relationship: arrayUnion(`${user.uid}_${user.uid}`),
+      createdAt: serverTimestamp()
+    }
+    const blogDocRef = getColRef('blogs')
+    const createdBlogDocRef = await addDoc(blogDocRef, blogData)
+    // await updateDoc(createdBlogDocRef, {
+    //   relationship: arrayUnion(`${user.uid}_${createdBlogDocRef.id}`),
+    // })
 
     logAnalyticsEvent(eventNames.createBlog, {
       title,
       content: value,
     })
 
-    docRef && navigate(-1)
+    createdBlogDocRef && navigate(-1)
   }, [title, value, user, logAnalyticsEvent])
 
   return (

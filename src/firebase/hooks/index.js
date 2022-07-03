@@ -79,6 +79,13 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
     })
   }, [last])
 
+  const handleLoad = useCallback(() => {
+    setLoading(true)
+    fetchData().finally(() => {
+      setLoading(false)
+    })
+  }, [fetchData])
+
   const handleLoadMore = useCallback(() => {
     setMoreLoading(true)
     fetchMoreData().finally(() => {
@@ -87,11 +94,8 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
   }, [fetchMoreData])
 
   useEffect(() => {
-    setLoading(true)
-    fetchData().finally(() => {
-      setLoading(false)
-    })
-  }, [fetchData])
+    handleLoad
+  }, [handleLoad])
 
   return {
     loading,

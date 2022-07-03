@@ -1,6 +1,7 @@
 // https://www.javascripttutorial.net/javascript-apply-method/
 // https://bobbyhadz.com/blog/javascript-remove-null-values-from-array
 // https://stackoverflow.com/questions/70571720/firestore-query-snapshot-foreach-seems-to-be-overwriting-products-state
+// https://stackoverflow.com/questions/50807905/are-firestore-updates-charged-the-same-cost-as-writes
 import {
   doc,
   getDoc,
@@ -13,10 +14,14 @@ import {
   query,
   where,
   getDocs,
+  writeBatch,
+  arrayUnion,
 } from 'firebase/firestore'
 
-import { db } from '.'
+import { auth, db } from '.'
 import { generateKeywords } from './utils'
+
+export const batch = writeBatch(db);
 
 export const getDocuments = async (
   collectionName = 'todos',
@@ -77,6 +82,7 @@ export const addDocument = async (
   }
   const formatData = {
     ...data,
+    relationship: arrayUnion(`${auth.currentUser.uid}_${auth.currentUser.uid}`),
     createdAt: serverTimestamp(),
     ...(formatOptions.keywords.length > 0
       ? {
