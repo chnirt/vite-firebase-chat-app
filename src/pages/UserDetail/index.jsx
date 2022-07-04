@@ -1,8 +1,9 @@
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { getDocs, query, where } from 'firebase/firestore'
 
-import { getDocuments } from '../../firebase/service'
+import { getColRef } from '../../firebase/service'
 import { BackButton } from '../../components'
 
 const UserDetail = () => {
@@ -15,10 +16,18 @@ const UserDetail = () => {
     const fetchData = async (userId) => {
       try {
         setLoading(true)
-        const foundUsers = await getDocuments('users', [
-          ['where', 'uid', '==', userId],
-        ])
-        const foundUser = foundUsers[0]
+
+        const q = query(getColRef('users'), where("uid", "==", userId))
+        const querySnapshot = await getDocs(q)
+        const docs = querySnapshot.docs
+        const data = docs.map((docSnapshot) => {
+          return {
+            id: docSnapshot.id,
+            ...docSnapshot.data(),
+          }
+        })
+        const foundUser = data[0]
+
         // console.log(foundUser)
         setUser(foundUser)
       } catch (error) {

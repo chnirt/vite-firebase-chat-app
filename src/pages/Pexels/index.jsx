@@ -2,9 +2,16 @@ import { useState, useCallback } from 'react'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 
-import { deleteStorageFile, uploadStorageBytesResumable } from '../../firebase/storage'
+import {
+  deleteStorageFile,
+  uploadStorageBytesResumable,
+} from '../../firebase/storage'
 import { useAuth } from '../../context'
-import { addDocument, deleteDocument } from '../../firebase/service'
+import {
+  addDocument,
+  deleteDocument,
+  getColRef,
+} from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { eventNames } from '../../constants'
 import { useFetch } from '../../firebase/hooks'
@@ -21,7 +28,7 @@ const Pexels = () => {
     data: photos,
     moreLoading,
     loadedAll,
-    handleLoadMore
+    handleLoadMore,
   } = useFetch('photos', 3)
 
   const onProgress = useCallback(
@@ -33,14 +40,16 @@ const Pexels = () => {
   )
 
   const onComplete = useCallback(
-    ({ downloadURL, url }) => {
+    async ({ downloadURL, url }) => {
       setDownloadURL(downloadURL)
 
-      addDocument('photos', {
+      const photoColRef = getColRef('photos')
+      const photoData = {
         downloadURL,
         url,
         uid: user.uid,
-      })
+      }
+      await addDocument(photoColRef, photoData)
 
       logAnalyticsEvent(eventNames.addPhoto, {
         url,
@@ -138,7 +147,8 @@ const Pexels = () => {
                   alignItems: 'center',
                 }}
               >
-                <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link><br />
+                <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
+                <br />
                 <img src={doc.downloadURL} width={200} height={200} />
                 <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
                 <button onClick={() => handleDelete(doc)}>Delete</button>

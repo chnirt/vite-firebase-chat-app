@@ -11,53 +11,35 @@ import {
   addDoc,
   deleteDoc,
   updateDoc,
-  query,
-  where,
-  getDocs,
   writeBatch,
-  arrayUnion,
 } from 'firebase/firestore'
 
-import { auth, db } from '.'
-import { generateKeywords } from './utils'
+import { db } from '.'
 
-export const batch = writeBatch(db);
-
-export const getDocuments = async (
-  collectionName = 'todos',
-  pathSegments = []
-) => {
-  const queryConstraints = pathSegments
-    .map((segment) => {
-      const queryConstraint = segment[0]
-      const fieldPath = segment[1]
-      const opStr = segment[2]
-      const value = segment[3]
-      if (queryConstraint === 'where') {
-        return where(fieldPath, opStr, value)
-      }
-      return null
-    })
-    .filter((item) => item)
-
-  const q = query.apply(null, [
-    collection(db, collectionName),
-    ...queryConstraints,
-  ])
-  const querySnapshot = await getDocs(q)
-  const docs = querySnapshot.docs
-  const data = docs.map((docSnapshot) => {
-    return {
-      id: docSnapshot.id,
-      ...docSnapshot.data(),
+export const addDocument = async (ref, data = {}) => {
+  switch (ref.type) {
+    case 'document': {
+      const docRef = await setDoc(ref, {
+        ...data,
+        createdAt: serverTimestamp(),
+      })
+      return docRef
     }
-  })
-  return data
+    case 'collection': {
+      const docRef = await addDoc(ref, {
+        ...data,
+        createdAt: serverTimestamp(),
+      })
+      return docRef
+    }
+    default: {
+      return
+    }
+  }
 }
 
-export const getDocument = async (collectionName = 'todos', docId = '') => {
-  const docRef = doc(db, collectionName, docId)
-  const docSnap = await getDoc(docRef)
+export const getDocument = async (ref) => {
+  const docSnap = await getDoc(ref)
 
   if (docSnap.exists()) {
     console.log('Document data:', docSnap.data())
@@ -69,66 +51,8 @@ export const getDocument = async (collectionName = 'todos', docId = '') => {
   }
 }
 
-export const addDocument = async (
-  collectionName = 'todos',
-  data = {},
-  options = {}
-) => {
-  const formatOptions = {
-    generated: false,
-    ref: null,
-    keywords: [],
-    ...options,
-  }
-  const formatData = {
-    ...data,
-    relationship: arrayUnion(`${auth.currentUser.uid}_${auth.currentUser.uid}`),
-    createdAt: serverTimestamp(),
-    ...(formatOptions.keywords.length > 0
-      ? {
-        keywords: generateKeywords(
-          formatOptions.keywords
-            .map((keyword) => data[keyword] ?? '')
-            .join(' ') ?? 'Hello world'
-        ),
-      }
-      : {}),
-  }
-
-  let docRef
-
-  if (formatOptions.generated) {
-    const collectionRef = collection(db, collectionName)
-    docRef = await addDoc(formatOptions.ref ?? collectionRef, formatData)
-  } else {
-    const documentRef = doc(collection(db, collectionName))
-    docRef = await setDoc(formatOptions.ref ?? documentRef, formatData)
-  }
-
-  // const docRef = await setDoc(doc(db, 'users', userInput.uid), userData)
-
-  return docRef
-}
-
-export const addSubCollection = async (
-  docRef = doc(db, 'todos', '1234'),
-  collectionName = 'subTodos',
-  data = {}
-) => {
-  const colRef = collection(docRef, collectionName)
-  docRef = await addDoc(colRef, data)
-  return docRef
-}
-
-export const updateDocument = async (
-  collectionName = 'todos',
-  docId = '',
-  data = {}
-) => {
-  const docRef = doc(db, collectionName, docId)
-
-  // Update the timestamp field with the value from the server
-  await updateDoc(docRef, {
+export const updateDocument = async (ref, data = {}) => {
+  await updateDoc(ref, {
     ...data,
     updatedAt: serverTimestamp(),
   })
@@ -140,8 +64,12 @@ export const getDocRef = (collectionName = 'todos', ...pathSegments) =>
 export const getColRef = (collectionName = 'todos', ...pathSegments) =>
   collection(db, collectionName, ...pathSegments)
 
-export const deleteDocument = async (collectionName = 'todos', ...pathSegments) => {
+export const deleteDocument = async (
+  collectionName = 'todos',
+  ...pathSegments
+) => {
   const docRef = getDocRef(collectionName, ...pathSegments)
   await deleteDoc(docRef)
 }
 
+export const getBatch = () => writeBatch(db)

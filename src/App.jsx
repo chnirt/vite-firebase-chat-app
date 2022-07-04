@@ -21,7 +21,7 @@ const LazyCreateBlogScreen = lazy(() => import('./pages/CreateBlog'))
 const LazyBlogScreen = lazy(() => import('./pages/Blog'))
 const LazyBlogDetailScreen = lazy(() => import('./pages/BlogDetail'))
 
-const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp2'))
+const LazyWhatsAppScreen = lazy(() => import('./pages/WhatsApp'))
 
 const LazyPexelsScreen = lazy(() => import('./pages/Pexels'))
 

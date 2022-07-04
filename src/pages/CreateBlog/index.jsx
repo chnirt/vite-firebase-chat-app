@@ -20,15 +20,6 @@ const CreateBlog = () => {
     if (title === '') return
     if (value === '') return
 
-    // const options = {
-    //   generated: true
-    // }
-    // const docRef = await addDocument('blogs', {
-    //   title,
-    //   content: value,
-    //   uid: user.uid,
-    // }, options)
-
     const blogData = {
       title,
       content: value,

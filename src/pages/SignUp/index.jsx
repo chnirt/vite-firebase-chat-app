@@ -4,9 +4,14 @@ import { Link } from 'react-router-dom'
 
 import { auth } from '../../firebase'
 // import { Loading } from '../../components'
-import { addDocument, getDocRef } from '../../firebase/service'
+import {
+  addDocument,
+  addDocument,
+  getDocRef,
+} from '../../firebase/service'
 import { eventNames } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
+import { generateKeywords } from '../../firebase/utils'
 
 const SignUp = () => {
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
@@ -25,17 +30,13 @@ const SignUp = () => {
       )
 
       if (userCredential) {
-        await addDocument(
-          'users',
-          {
-            uid: userCredential.user.uid,
-            email,
-          },
-          {
-            ref: getDocRef('users', userCredential.user.uid),
-            keywords: ['email'],
-          }
-        )
+        const userDocRef = getDocRef('users', userCredential.user.uid)
+        const userData = {
+          uid: userCredential.user.uid,
+          email,
+          keywords: generateKeywords(email),
+        }
+        await addDocument(userDocRef, userData)
       }
 
       logAnalyticsEvent(eventNames.register, {

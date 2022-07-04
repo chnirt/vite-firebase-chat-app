@@ -10,13 +10,12 @@ import {
   query,
   setDoc,
   where,
-  writeBatch,
 } from 'firebase/firestore'
 
 import { useFetch } from '../../firebase/hooks'
 import {
-  batch,
   deleteDocument,
+  getBatch,
   getColRef,
   getDocRef,
 } from '../../firebase/service'
@@ -43,8 +42,6 @@ const Search = () => {
         email: doc.email,
         uid: doc.uid,
       }
-      // await addSubCollection(followerDocRef, 'following', followingData)
-
       const followerDocRef = getDocRef('users', user.uid, 'following', doc.uid)
       await setDoc(followerDocRef, followingData)
 
@@ -54,11 +51,11 @@ const Search = () => {
         email: user.email,
         uid: user.uid,
       }
-      // await addSubCollection(followeeDocRef, 'follower', followerData)
       const followeeDocRef = getDocRef('users', doc.uid, 'follower', user.uid)
       await setDoc(followeeDocRef, followerData)
 
       // add relationship
+      const batch = getBatch()
       const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
       const querySnapshot = await getDocs(getQuery)
       querySnapshot.forEach((docSnapshot) => {
@@ -92,6 +89,7 @@ const Search = () => {
       }
 
       // remove relationship
+      const batch = getBatch()
       const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
       const querySnapshot = await getDocs(getQuery)
       querySnapshot.forEach((docSnapshot) => {

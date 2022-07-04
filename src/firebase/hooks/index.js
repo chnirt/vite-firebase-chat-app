@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
-  collection,
   query,
   orderBy,
   limit,
@@ -9,7 +8,7 @@ import {
   where,
 } from 'firebase/firestore'
 
-import { db } from '../../firebase'
+import { getColRef } from '../service'
 
 export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
   const [loading, setLoading] = useState(false)
@@ -23,7 +22,7 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
 
     // Query the first page of docs
     const first = query(
-      collection(db, collectionName),
+      getColRef(collectionName),
       ...(keyword ? [where('keywords', 'array-contains', keyword)] : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)
@@ -54,7 +53,7 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
     const limitNumber = LIMIT + 1
 
     const next = query(
-      collection(db, collectionName),
+      getColRef(collectionName),
       orderBy('createdAt', 'desc'),
       limit(limitNumber),
       startAfter(last)

@@ -1,4 +1,5 @@
 // https://medium.com/firebase-tips-tricks/how-to-combined-two-firestore-queries-to-simulate-a-logical-or-query-27d28a43cb2d
+// https://firebase.blog/posts/2018/08/better-arrays-in-cloud-firestore
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -20,7 +21,7 @@ import {
 import moment from 'moment'
 
 import { useAuth } from '../../context'
-import { deleteDocument, getColRef, getDocRef } from '../../firebase/service'
+import { deleteDocument, getColRef, getDocRef, getDocument } from '../../firebase/service'
 
 const LIMIT = 3
 
@@ -155,9 +156,9 @@ const Blog = () => {
     await setDoc(likeDocRef, likeData)
 
     const blogDocRef = getDocRef('blogs', doc.id)
-    const blogDocSnap = await getDoc(blogDocRef)
-    const existed = blogDocSnap.exists()
-    if (existed) {
+    const blogDocData = await getDocument(blogDocRef)
+
+    if (blogDocData) {
       await updateDoc(blogDocRef, {
         relationship: arrayUnion(`${user.uid}_${doc.id}`),
       })
@@ -166,15 +167,16 @@ const Blog = () => {
 
   const handleUnLike = useCallback(async (doc) => {
     const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
-    const likeDocSnap = await getDoc(likeDocRef)
-    if (likeDocSnap.exists()) {
+    const likeDocData = await getDocument(likeDocRef)
+
+    if (likeDocData) {
       await deleteDocument('users', user.uid, 'likes', doc.id)
     }
 
     const blogDocRef = getDocRef('blogs', doc.id)
-    const blogDocSnap = await getDoc(blogDocRef)
-    const existed = blogDocSnap.exists()
-    if (existed) {
+    const blogDocData = await getDocument(blogDocRef)
+
+    if (blogDocData) {
       await updateDoc(blogDocRef, {
         relationship: arrayRemove(`${user.uid}_${doc.id}`),
       })

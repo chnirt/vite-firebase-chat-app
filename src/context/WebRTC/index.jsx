@@ -11,10 +11,9 @@ import React, {
   useState,
 } from 'react'
 import {
+  addDoc,
   collection,
   deleteDoc,
-  doc,
-  getDoc,
   getDocs,
   limit,
   onSnapshot,
@@ -23,10 +22,12 @@ import {
   Timestamp,
   where,
 } from 'firebase/firestore'
-import { auth, db } from '../../firebase'
+import { auth } from '../../firebase'
 import {
   addDocument,
-  addSubCollection,
+  getColRef,
+  getDocRef,
+  getDocument,
   updateDocument,
 } from '../../firebase/service'
 import { TURN_CREDENTIALS, TURN_URLS, TURN_USERNAME } from '../../env'
@@ -173,6 +174,7 @@ export const WebRTCProvider = ({
 
     const offerDescription = await pc.current.createOffer()
 
+    const callColRef = getColRef('calls')
     const callWithOffer = {
       offer: {
         type: offerDescription.type,
@@ -188,25 +190,20 @@ export const WebRTCProvider = ({
       },
       status: CALL_STATUS.CALLING,
     }
-    const options = {
-      generated: true,
-    }
-    const callReference = await addDocument('calls', callWithOffer, options)
+    const callReference = await addDocument(callColRef, callWithOffer)
+
     setCurrentCallReference(callReference)
 
     pc.current.onicecandidate = async (event) => {
       if (event.candidate) {
         const json = event.candidate.toJSON()
-        const docRef = doc(db, 'calls', callReference.id)
+        const docRef = getDocRef('calls', callReference.id)
         const offerICECandidatesData = {
           ...json,
           uid: user.uid,
         }
-        await addSubCollection(
-          docRef,
-          'offerICECandidates',
-          offerICECandidatesData
-        )
+        const colRef = collection(docRef, 'offerICECandidates')
+        await addDoc(colRef, offerICECandidatesData)
       }
     }
 
@@ -247,21 +244,17 @@ export const WebRTCProvider = ({
     pc.current.onicecandidate = async (event) => {
       if (event.candidate) {
         const json = event.candidate.toJSON()
-        const docRef = doc(db, 'calls', currentCallReference.id)
+        const docRef = getDocRef('calls', currentCallReference.id)
         const answerICECandidatesData = {
           ...json,
           uid: user.uid,
         }
-        await addSubCollection(
-          docRef,
-          'answerICECandidates',
-          answerICECandidatesData
-        )
+        const colRef = collection(docRef, 'answerICECandidates')
+        await addDoc(colRef, answerICECandidatesData)
       }
     }
 
-    const docSnap = await getDoc(currentCallReference)
-    const callData = docSnap.data()
+    const callData = await getDocument(currentCallReference)
 
     const offerDescription = callData.offer
     await pc.current.setRemoteDescription(
@@ -280,7 +273,9 @@ export const WebRTCProvider = ({
       },
       status: CALL_STATUS.ANSWER,
     }
-    await updateDocument('calls', currentCallReference.id, callWithAnswer)
+
+    const callDocRef = getDocRef('calls', currentCallReference.id)
+    await updateDocument(callDocRef, callWithAnswer)
 
     onSnapshot(
       collection(currentCallReference, 'offerICECandidates'),
@@ -304,8 +299,8 @@ export const WebRTCProvider = ({
     if (!auth.currentUser) return
     const user = auth.currentUser
 
-    const docSnap = await getDoc(currentCallReference)
-    const callData = docSnap.data()
+    const callData = await getDocument(currentCallReference)
+
     const isCaller = callData.caller.uid === user.uid
     const isCallee = callData.callee.uid === user.uid
 
@@ -340,7 +335,9 @@ export const WebRTCProvider = ({
     const updateCallData = {
       status: CALL_STATUS.DECLINE,
     }
-    await updateDocument('calls', currentCallReference.id, updateCallData)
+
+    const callDocRef = getDocRef('calls', currentCallReference.id)
+    await updateDocument(callDocRef, updateCallData)
     setCurrentCallReference(null)
     pc.current.close()
   }, [currentCallReference?.id])
@@ -349,7 +346,7 @@ export const WebRTCProvider = ({
     const user = auth.currentUser
     if (!user) return
     const incomingCallRef = query(
-      collection(db, 'calls'),
+      getColRef('calls'),
       where('status', '==', CALL_STATUS.CALLING),
       where('callee', '==', {
         uid: user?.uid,
