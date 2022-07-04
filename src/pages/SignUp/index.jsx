@@ -6,7 +6,6 @@ import { auth } from '../../firebase'
 // import { Loading } from '../../components'
 import {
   addDocument,
-  addDocument,
   getDocRef,
 } from '../../firebase/service'
 import { eventNames } from '../../constants'
