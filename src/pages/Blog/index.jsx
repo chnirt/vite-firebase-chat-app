@@ -22,6 +22,7 @@ import moment from 'moment'
 
 import { useAuth } from '../../context'
 import { deleteDocument, getColRef, getDocRef, getDocument } from '../../firebase/service'
+import { paths } from '../../constants'
 
 const LIMIT = 3
 
@@ -144,7 +145,7 @@ const Blog = () => {
   }, [handleLoad])
 
   const handleCreatePost = useCallback(() => {
-    navigate('/create-blog')
+    navigate(paths.createBlog)
   }, [navigate])
 
   const handleLike = useCallback(async (doc) => {

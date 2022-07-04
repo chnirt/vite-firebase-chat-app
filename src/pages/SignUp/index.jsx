@@ -13,12 +13,14 @@ import { logAnalyticsEvent } from '../../firebase/analytics'
 import { generateKeywords } from '../../firebase/utils'
 
 const SignUp = () => {
+  const [username, setUsername] = useState('trinhchinchin')
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
   const [error, setError] = useState(null)
 
   const handleRegister = useCallback(async () => {
     try {
+      if (username === '') return
       if (email === '') return
       if (password === '') return
 
@@ -33,6 +35,7 @@ const SignUp = () => {
         const userData = {
           uid: userCredential.user.uid,
           email,
+          username,
           keywords: generateKeywords(email),
         }
         await addDocument(userDocRef, userData)
@@ -55,6 +58,13 @@ const SignUp = () => {
   return (
     <div className="App">
       SignUp
+      <br />
+      <input
+        type="text"
+        placeholder="username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
       <br />
       <input
         type="email"

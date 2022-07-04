@@ -10,6 +10,7 @@ const Profile = ({ }) => {
   const { user } = useAuth()
   const [updateProfile, updating, error] = useUpdateProfile(auth)
   const [loading, setLoading] = useState(false)
+  const [username, setUsername] = useState(user?.username ?? '')
   const [displayName, setDisplayName] = useState(user?.displayName ?? '')
   const [photoURL, setPhotoURL] = useState(user?.photoURL ?? '')
   const [followingList, setFollowingList] = useState([])
@@ -89,22 +90,34 @@ const Profile = ({ }) => {
       {likeList.length} likes
       <br />
       <input
-        type="displayName"
+        type="text"
         placeholder="displayName"
         value={displayName}
         onChange={(e) => setDisplayName(e.target.value)}
       />
       <br />
       <input
-        type="photoURL"
+        type="text"
         placeholder="photoURL"
         value={photoURL}
         onChange={(e) => setPhotoURL(e.target.value)}
       />
       <br />
+      <input
+        type="text"
+        placeholder="username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <br />
       <button
         onClick={async () => {
-          await updateProfile({ displayName, photoURL })
+          if (displayName && photoURL) {
+            await updateProfile({ displayName, photoURL })
+          }
+          if (username) {
+
+          }
           alert('Updated profile')
         }}
       >

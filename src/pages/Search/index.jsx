@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect } from 'react'
 import moment from 'moment'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   arrayRemove,
   arrayUnion,
@@ -14,12 +14,14 @@ import {
 
 import { useFetch } from '../../firebase/hooks'
 import {
+  addDocument,
   deleteDocument,
   getBatch,
   getColRef,
   getDocRef,
 } from '../../firebase/service'
 import { useAuth } from '../../context'
+import { paths } from '../../constants'
 
 const Search = () => {
   const { user } = useAuth()
@@ -31,6 +33,7 @@ const Search = () => {
     loadedAll,
     handleLoadMore,
   } = useFetch('users', 3)
+  let navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [followList, setFollowList] = useState([])
 
@@ -103,6 +106,31 @@ const Search = () => {
     },
     [user]
   )
+
+  const handleMessage = useCallback(async (doc) => {
+    const chatData = {
+      members: [user.uid, doc.uid],
+      uid: user.uid,
+    }
+    const q = query(
+      getColRef('chats'),
+      where('members', 'in', [chatData.members]),
+    )
+    const querySnapshot = await getDocs(q)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    const foundChat = data[0]
+    if (!foundChat) {
+      const chatDocRef = getColRef('chats')
+      await addDocument(chatDocRef, chatData)
+    }
+    navigate(`../${paths.messenger}`)
+  }, [navigate])
 
   useEffect(() => {
     const formatSearch = search.trim().toLowerCase()
@@ -181,6 +209,9 @@ const Search = () => {
                           following
                         </button>
                       )}
+                      <button onClick={() => handleMessage(doc)}>
+                        message
+                      </button>
                     </div>
                   )}
                 </div>
