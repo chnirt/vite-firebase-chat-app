@@ -12,7 +12,7 @@ import './index.css'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <RemoteConfigProvider>
-      <ForkMe />
+      {/* <ForkMe /> */}
       <AuthProvider>
         <Router basename={basename}>
           <App />
