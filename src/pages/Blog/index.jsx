@@ -55,6 +55,17 @@ const Blog = () => {
     return data
   }, [user?.uid])
 
+  const findRelationship = useCallback(
+    (uid) => {
+      const foundRelationship = relationshipList.find(
+        (item) => item.uid === uid
+      )
+      if (!foundRelationship) return
+      return foundRelationship
+    },
+    [relationshipList]
+  )
+
   const fetchBlogs = useCallback(async () => {
     if (user?.uid === null) return
 
@@ -185,17 +196,6 @@ const Blog = () => {
     }
   }, [])
 
-  const findRelationship = useCallback(
-    (uid) => {
-      const foundRelationship = relationshipList.find(
-        (item) => item.uid === uid
-      )
-      if (!foundRelationship) return
-      return foundRelationship
-    },
-    [relationshipList]
-  )
-
   useEffect(() => {
     if (!user) return
     const likeDocRef = getColRef('users', user.uid, 'likes')
@@ -243,6 +243,7 @@ const Blog = () => {
               const isLiked = likeList.some((item) => item.postId === doc.id)
               const foundRelationship = findRelationship(doc.uid)
               const username = foundRelationship?.username
+              const avatar = foundRelationship?.avatar
               return (
                 <div
                   key={`blog-${id}`}
@@ -251,6 +252,7 @@ const Blog = () => {
                     margin: 8,
                   }}
                 >
+                  <img style={{ width: 50, height: 50 }} src={avatar} alt={`avatar-${doc.id}`} />
                   <h3>{title}</h3>
                   <p>{moment(createdAt?.toDate()).fromNow()}</p>
                   <Link to={`/user/${username}`}>@{username}</Link>

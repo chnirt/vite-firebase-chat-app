@@ -8,9 +8,16 @@ import {
   where,
 } from 'firebase/firestore'
 
-import { getColRef } from '../service'
+import { getColGroupRef, getColRef } from '../service'
 
-export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
+export const useFetch = (collectionName = 'todos', option) => {
+  const formatOption = {
+    type: 'collection',
+    limit: 10,
+    ...option,
+  }
+  const TYPE = formatOption.type
+  const LIMIT = formatOption.limit
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [last, setLast] = useState(null)
@@ -22,7 +29,7 @@ export const useFetch = (collectionName = 'todos', LIMIT = 10) => {
 
     // Query the first page of docs
     const first = query(
-      getColRef(collectionName),
+      ...(TYPE === 'collectionGroup' ? [getColGroupRef(collectionName)] : [getColRef(collectionName)]),
       ...(keyword ? [where('keywords', 'array-contains', keyword)] : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)

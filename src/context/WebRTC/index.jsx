@@ -11,7 +11,6 @@ import React, {
   useState,
 } from 'react'
 import {
-  addDoc,
   collection,
   deleteDoc,
   getDocs,
@@ -203,7 +202,7 @@ export const WebRTCProvider = ({
           uid: user.uid,
         }
         const colRef = collection(docRef, 'offerICECandidates')
-        await addDoc(colRef, offerICECandidatesData)
+        await addDocument(colRef, offerICECandidatesData)
       }
     }
 
@@ -250,7 +249,7 @@ export const WebRTCProvider = ({
           uid: user.uid,
         }
         const colRef = collection(docRef, 'answerICECandidates')
-        await addDoc(colRef, answerICECandidatesData)
+        await addDocument(colRef, answerICECandidatesData)
       }
     }
 

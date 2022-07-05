@@ -1,13 +1,11 @@
 import { useCallback, useState, useEffect } from 'react'
-import moment from 'moment'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   arrayRemove,
   arrayUnion,
   getDoc,
   getDocs,
   onSnapshot,
-  orderBy,
   query,
   where,
 } from 'firebase/firestore'
@@ -22,6 +20,7 @@ import {
 } from '../../firebase/service'
 import { useAuth } from '../../context'
 import { paths } from '../../constants'
+import { UserItem } from '../../components'
 
 const Search = () => {
   const { user } = useAuth()
@@ -32,37 +31,12 @@ const Search = () => {
     moreLoading,
     loadedAll,
     handleLoadMore,
-  } = useFetch('users', 3)
+  } = useFetch('users', {
+    limit: 3,
+  })
   let navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [followList, setFollowList] = useState([])
-  const [relationshipList, setRelationshipList] = useState([])
-
-  const getRelationship = useCallback(async () => {
-    const followerDocRef = getColRef('users', user.uid, 'following')
-    const q = query(followerDocRef, orderBy('createdAt', 'desc'))
-    const querySnapshot = await getDocs(q)
-    const docs = querySnapshot.docs
-    const data = docs.map((docSnapshot) => {
-      return {
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
-      }
-    })
-    setRelationshipList(data)
-    return data
-  }, [user?.uid])
-
-  const findRelationship = useCallback(
-    (uid) => {
-      const foundRelationship = relationshipList.find(
-        (item) => item.uid === uid
-      )
-      if (!foundRelationship) return
-      return foundRelationship
-    },
-    [relationshipList]
-  )
 
   const handleFollow = useCallback(
     async (doc) => {
@@ -70,8 +44,9 @@ const Search = () => {
       // const followerDocRef = getDocRef('users', user.uid)
       const followingData = {
         type: 'followee',
-        username: doc.username,
         uid: doc.uid,
+        avatar: doc.avatar,
+        username: doc.username,
       }
       const followerDocRef = getDocRef('users', user.uid, 'following', doc.uid)
       await addDocument(followerDocRef, followingData)
@@ -80,8 +55,9 @@ const Search = () => {
       // const followeeDocRef = doc.ref
       const followerData = {
         type: 'follower',
-        username: user.username,
         uid: user.uid,
+        avatar: user.avatar,
+        username: user.username,
       }
       const followeeDocRef = getDocRef('users', doc.uid, 'follower', user.uid)
       await addDocument(followeeDocRef, followerData)
@@ -193,10 +169,6 @@ const Search = () => {
     }
   }, [user])
 
-  useEffect(() => {
-    getRelationship()
-  }, [getRelationship])
-
   return (
     <div>
       Search
@@ -215,48 +187,21 @@ const Search = () => {
         {loading && <span>Collection: Loading...</span>}
         {users.length > 0 && (
           <div>
-            {users.map((doc) => {
+            {users.map((doc, di) => {
               const isOwner = doc.uid === user.uid
               const isFollowing = followList.some(
                 (item) => item.uid === doc.uid
               )
-              const id = doc.id
-              const email = doc.email
-              const createdAt = doc.createdAt
-              const foundRelationship = findRelationship(doc.uid)
-              const username = foundRelationship?.username
               return (
-                <div
-                  key={`user-${id}`}
-                  style={{
-                    border: 'solid 1px black',
-                    margin: 8,
-                    // display: 'flex',
-                    // flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Link to={`/user/${username}`}>@{username}</Link>
-                  <p>{email}</p>
-                  <p>{moment(createdAt?.toDate()).fromNow()}</p>
-                  {!isOwner && (
-                    <div>
-                      {!isFollowing ? (
-                        <button onClick={() => handleFollow(doc)}>
-                          follow
-                        </button>
-                      ) : (
-                        <button onClick={() => handleUnFollow(doc)}>
-                          following
-                        </button>
-                      )}
-                      <button onClick={() => handleMessage(doc)}>
-                        message
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <UserItem
+                  key={`user-${di}`}
+                  user={doc}
+                  isOwner={isOwner}
+                  isFollowing={isFollowing}
+                  handleFollow={handleFollow}
+                  handleUnFollow={handleUnFollow}
+                  handleMessage={handleMessage}
+                />
               )
             })}
           </div>

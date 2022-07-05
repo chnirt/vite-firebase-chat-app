@@ -11,6 +11,9 @@ import { logAnalyticsEvent } from '../../firebase/analytics'
 import { generateKeywords } from '../../firebase/utils'
 
 const SignUp = () => {
+  const [avatar, setAvatar] = useState(
+    'https://server-avatar.nimostatic.tv/201902231550916212700_1659511695712_avatar.png'
+  )
   const [username, setUsername] = useState('trinhchinchin')
   const [email, setEmail] = useState('trinhchinchin@gmail.com')
   const [password, setPassword] = useState('Admin@123')
@@ -48,6 +51,7 @@ const SignUp = () => {
         const userData = {
           uid,
           email,
+          avatar,
           username,
           keywords: generateKeywords(email),
         }
@@ -55,8 +59,9 @@ const SignUp = () => {
 
         const followingData = {
           type: 'owner',
-          username,
           uid,
+          avatar,
+          username,
         }
         const followerDocRef = getDocRef('users', uid, 'following', uid)
         await addDocument(followerDocRef, followingData)
@@ -71,6 +76,8 @@ const SignUp = () => {
   }, [
     email,
     password,
+    avatar,
+    username,
     createUserWithEmailAndPassword,
     addDocument,
     logAnalyticsEvent,
@@ -79,6 +86,22 @@ const SignUp = () => {
   return (
     <div className="App">
       SignUp
+      <br />
+      <input
+        type="text"
+        placeholder="avatar"
+        value={avatar}
+        onChange={(e) => setAvatar(e.target.value)}
+      />
+      <br />
+      <img
+        style={{
+          width: 100,
+          height: 100,
+        }}
+        src={avatar}
+        alt={'avatar'}
+      />
       <br />
       <input
         type="text"

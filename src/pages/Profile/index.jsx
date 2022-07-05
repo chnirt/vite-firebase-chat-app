@@ -17,6 +17,7 @@ const Profile = ({ }) => {
   const [updateProfile, updating, error] = useUpdateProfile(auth)
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState(user?.username ?? '')
+  const [avatar, setAvatar] = useState(user?.avatar ?? '')
   const [displayName, setDisplayName] = useState(user?.displayName ?? '')
   const [photoURL, setPhotoURL] = useState(user?.photoURL ?? '')
   const [followingList, setFollowingList] = useState([])
@@ -27,29 +28,30 @@ const Profile = ({ }) => {
     if (displayName && photoURL) {
       await updateProfile({ displayName, photoURL })
     }
-    if (username) {
-      const userDocRef = getDocRef('users', user.uid)
-      const userData = {
-        username,
-      }
-      await updateDocument(userDocRef, userData)
+    if (!username || !avatar) return
 
-      // update following
-      const batch = getBatch()
-      const followingDocRef = getColGroupRef('following')
-      const q = query(followingDocRef, where('uid', '==', user.uid))
-      const querySnapshot = await getDocs(q)
-      querySnapshot.forEach((docSnapshot) => {
-        const docRef = docSnapshot.ref
-        batch.update(docRef, userData)
-      })
-
-      await batch.commit()
-
-      await fetchUser(user)
+    const userDocRef = getDocRef('users', user.uid)
+    const userData = {
+      username,
+      avatar
     }
+    await updateDocument(userDocRef, userData)
+
+    // update following
+    const batch = getBatch()
+    const followingDocRef = getColGroupRef('following')
+    const q = query(followingDocRef, where('uid', '==', user.uid))
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((docSnapshot) => {
+      const docRef = docSnapshot.ref
+      batch.update(docRef, userData)
+    })
+
+    await batch.commit()
+
+    await fetchUser(user)
     alert('Updated profile')
-  }, [displayName, photoURL, username])
+  }, [displayName, photoURL, username, avatar])
 
   useEffect(() => {
     const fetchFollowingData = async () => {
@@ -124,7 +126,7 @@ const Profile = ({ }) => {
       {followingList.length} following{` - `}
       {likeList.length} likes
       <br />
-      <input
+      {/* <input
         type="text"
         placeholder="displayName"
         value={displayName}
@@ -136,6 +138,23 @@ const Profile = ({ }) => {
         placeholder="photoURL"
         value={photoURL}
         onChange={(e) => setPhotoURL(e.target.value)}
+      />
+      <br /> */}
+
+      <input
+        type="text"
+        placeholder="avatar"
+        value={avatar}
+        onChange={(e) => setAvatar(e.target.value)}
+      />
+      <br />
+      <img
+        style={{
+          width: 100,
+          height: 100,
+        }}
+        src={avatar}
+        alt={'avatar'}
       />
       <br />
       <input

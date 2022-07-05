@@ -6,7 +6,10 @@ import { useAuth } from '../../context'
 import { useFetch } from '../../firebase/hooks'
 import { getColRef } from '../../firebase/service'
 
-const ChatList = ({ handleJoinChat = () => { } }) => {
+export const ChatList = ({
+  handleJoinChat = () => { },
+  findRelationship = () => { },
+}) => {
   const { user } = useAuth()
   const {
     loading,
@@ -14,38 +17,40 @@ const ChatList = ({ handleJoinChat = () => { } }) => {
     moreLoading,
     loadedAll,
     handleLoadMore,
-  } = useFetch('chats', 3)
-  const [relationshipList, setRelationshipList] = useState([])
+  } = useFetch('chats', {
+    limit: 3,
+  })
+  // const [relationshipList, setRelationshipList] = useState([])
 
-  const getRelationship = useCallback(async () => {
-    const followerDocRef = getColRef('users', user.uid, 'following')
-    const q = query(followerDocRef, orderBy('createdAt', 'desc'))
-    const querySnapshot = await getDocs(q)
-    const docs = querySnapshot.docs
-    const data = docs.map((docSnapshot) => {
-      return {
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
-      }
-    })
-    setRelationshipList(data)
-    return data
-  }, [user?.uid])
+  // const getRelationship = useCallback(async () => {
+  //   const followerDocRef = getColRef('users', user.uid, 'following')
+  //   const q = query(followerDocRef, orderBy('createdAt', 'desc'))
+  //   const querySnapshot = await getDocs(q)
+  //   const docs = querySnapshot.docs
+  //   const data = docs.map((docSnapshot) => {
+  //     return {
+  //       id: docSnapshot.id,
+  //       ...docSnapshot.data(),
+  //     }
+  //   })
+  //   setRelationshipList(data)
+  //   return data
+  // }, [user?.uid])
 
-  const findRelationship = useCallback(
-    (uids) => {
-      const foundRelationship = relationshipList.filter((item) =>
-        uids.some((uou) => uou === item.uid)
-      )
-      if (foundRelationship.length === 0) return
-      return foundRelationship
-    },
-    [relationshipList]
-  )
+  // const findRelationship = useCallback(
+  //   (uids) => {
+  //     const foundRelationship = relationshipList.filter((item) =>
+  //       uids.some((uou) => uou === item.uid)
+  //     )
+  //     if (foundRelationship.length === 0) return
+  //     return foundRelationship
+  //   },
+  //   [relationshipList]
+  // )
 
-  useEffect(() => {
-    getRelationship()
-  }, [getRelationship])
+  // useEffect(() => {
+  //   getRelationship()
+  // }, [getRelationship])
 
   return (
     <div
@@ -66,6 +71,7 @@ const ChatList = ({ handleJoinChat = () => { } }) => {
             const id = doc.id
             const createdAt = doc.createdAt
             const foundRelationship = findRelationship(doc.members) ?? []
+            console.log(foundRelationship)
             const chatName = foundRelationship
               .map((item) => item.username)
               .join(', ')
@@ -108,5 +114,3 @@ const ChatList = ({ handleJoinChat = () => { } }) => {
     </div>
   )
 }
-
-export default ChatList

@@ -21,7 +21,9 @@ const Pexels = () => {
     moreLoading,
     loadedAll,
     handleLoadMore,
-  } = useFetch('photos', 3)
+  } = useFetch('photos', {
+    limit: 3,
+  })
   const [uploading, setUploading] = useState(false)
   const [state, setState] = useState(null)
   const [progress, setProgress] = useState(0)
