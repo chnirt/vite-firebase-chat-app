@@ -1,9 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { limit, onSnapshot, query } from 'firebase/firestore'
 
-import { addDocument, getColRef, getDocRef, updateDocument } from '../../firebase/service'
+import {
+  addDocument,
+  getColRef,
+  getDocRef,
+  updateDocument,
+} from '../../firebase/service'
 import { useAuth } from '../../context'
 import MessageBody from '../MessageBody'
+import { orderBy } from 'lodash'
 
 export const MessageList = ({ currentChat }) => {
   const { user } = useAuth()
@@ -24,7 +30,7 @@ export const MessageList = ({ currentChat }) => {
 
       const chatDocRef = getDocRef('chats', currentChat.id)
       const chatData = {
-        latestMessage: `${user?.username}: ${newMessage}`
+        latestMessage: `${user?.username}: ${newMessage}`,
       }
       await updateDocument(chatDocRef, chatData)
       setText('')
@@ -35,7 +41,7 @@ export const MessageList = ({ currentChat }) => {
   useEffect(() => {
     if (!currentChat) return
     const messageDocRef = getColRef('chats', currentChat.id, 'messages')
-    const q = query(messageDocRef, limit(10))
+    const q = query(messageDocRef, orderBy('createdAt', 'asc'), limit(10))
     const unsubscribe = onSnapshot(
       q,
       async (querySnapshot) => {
