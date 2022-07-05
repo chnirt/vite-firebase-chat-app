@@ -78,7 +78,7 @@ const Blog = () => {
     const first = query(
       getColRef('blogs'),
       ...(relationship.length > 0
-        ? [where('relationship', 'array-contains-any', relationshipIds)]
+        ? [where('relationship', 'in', [relationshipIds])]
         : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)
