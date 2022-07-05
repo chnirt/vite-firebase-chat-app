@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { limit, onSnapshot, query } from 'firebase/firestore'
+import { limit, onSnapshot, orderBy, query } from 'firebase/firestore'
 
 import {
   addDocument,
@@ -9,7 +9,6 @@ import {
 } from '../../firebase/service'
 import { useAuth } from '../../context'
 import MessageBody from '../MessageBody'
-import { orderBy } from 'lodash'
 
 export const MessageList = ({ currentChat }) => {
   const { user } = useAuth()
