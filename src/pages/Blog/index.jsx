@@ -78,7 +78,7 @@ const Blog = () => {
     const first = query(
       getColRef('blogs'),
       ...(relationship.length > 0
-        ? [where('relationship', 'in', [relationshipIds])]
+        ? [where('relationship', 'array-contains-any', relationshipIds)]
         : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)
@@ -173,7 +173,7 @@ const Blog = () => {
 
     if (blogDocData) {
       await updateDoc(blogDocRef, {
-        relationship: arrayUnion(`${user.uid}_${doc.id}`),
+        relationship: arrayUnion(user.uid),
       })
     }
   }, [])
@@ -191,7 +191,7 @@ const Blog = () => {
 
     if (blogDocData) {
       await updateDoc(blogDocRef, {
-        relationship: arrayRemove(`${user.uid}_${doc.id}`),
+        relationship: arrayRemove(user.uid),
       })
     }
   }, [])
