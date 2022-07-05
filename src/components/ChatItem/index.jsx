@@ -2,9 +2,11 @@ import { getDocs, query, where } from 'firebase/firestore'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 
+import { useAuth } from '../../context'
 import { getColRef } from '../../firebase/service'
 
 export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
+  const { user } = useAuth()
   const [chatDetail, setChatDetail] = useState(null)
 
   useEffect(() => {
@@ -30,8 +32,20 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
   if (!chatDetail) return null
 
   const id = chat.id
-  const createdAt = chat.createdAt
-  const chatName = chatDetail?.members?.map((item) => item.username).join(', ')
+  const latestMessage = chat.latestMessage
+  const updatedAt = chat.updatedAt
+  const members = chat?.members
+  const chatName =
+    members?.length <= 2
+      ? chatDetail?.members.find((member) => member.uid !== user.uid)?.username
+      : chatDetail?.members
+        ?.map((item) => item.username)
+        .sort((a, b) => {
+          if (a === user.username) return 1
+          if (b === user.username) return -1
+          return 0
+        })
+        .join(', ')
 
   return (
     <div
@@ -39,8 +53,8 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
       style={{
         border: 'solid 1px black',
         margin: 8,
-        display: 'flex',
-        flexDirection: 'row',
+        // display: 'flex',
+        // flexDirection: 'row',
         // justifyContent: 'center',
         alignItems: 'center',
       }}
@@ -50,12 +64,13 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
-          width: 100,
+          width: 200,
         }}
       >
         {chatName}
       </p>
-      <p>{moment(createdAt?.toDate()).fromNow()}</p>
+      <p>{latestMessage}</p>
+      <p>{moment(updatedAt?.toDate()).fromNow()}</p>
       <button onClick={() => handleJoinChat(chatDetail)}>Join</button>
     </div>
   )

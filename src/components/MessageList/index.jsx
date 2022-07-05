@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { limit, onSnapshot, query } from 'firebase/firestore'
 
-import { addDocument, getColRef } from '../../firebase/service'
+import { addDocument, getColRef, getDocRef, updateDocument } from '../../firebase/service'
 import { useAuth } from '../../context'
 import MessageBody from '../MessageBody'
-import { limit, onSnapshot, query } from 'firebase/firestore'
 
 export const MessageList = ({ currentChat }) => {
   const { user } = useAuth()
@@ -21,6 +21,12 @@ export const MessageList = ({ currentChat }) => {
         sender: user.uid,
       }
       await addDocument(messageColRef, messageData)
+
+      const chatDocRef = getDocRef('chats', currentChat.id)
+      const chatData = {
+        latestMessage: `${user?.username}: ${newMessage}`
+      }
+      await updateDocument(chatDocRef, chatData)
       setText('')
     },
     [currentChat]

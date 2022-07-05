@@ -18,19 +18,18 @@ import {
 import { db } from '.'
 
 export const addDocument = async (ref, data = {}) => {
+  const formatData = {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  }
   switch (ref.type) {
     case 'document': {
-      const docRef = await setDoc(ref, {
-        ...data,
-        createdAt: serverTimestamp(),
-      })
+      const docRef = await setDoc(ref, formatData)
       return docRef
     }
     case 'collection': {
-      const docRef = await addDoc(ref, {
-        ...data,
-        createdAt: serverTimestamp(),
-      })
+      const docRef = await addDoc(ref, formatData)
       return docRef
     }
     default: {
