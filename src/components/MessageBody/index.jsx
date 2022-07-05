@@ -3,20 +3,20 @@ import React from 'react'
 
 import { useAuth } from '../../context'
 
-const MessageBody = ({ messages = [] }) => {
+const MessageBody = ({ messageList = [], currentChat = {} }) => {
   const { user } = useAuth()
 
-  if (messages.length === 0) return <div>No messages</div>
-
+  if (messageList.length === 0) return <div>No messages</div>
   return (
     <div>
       MessageBody
-      {messages.length > 0 &&
-        messages.map((message, mi) => {
+      {messageList.length > 0 &&
+        messageList.map((message, mi) => {
           const sender = user.uid === message.sender
           const id = message.id
           const text = message.text
           const createdAt = message.createdAt
+          const avatar = currentChat?.members?.find(member => member.uid === message.sender)?.avatar
 
           return (
             <div
@@ -29,8 +29,8 @@ const MessageBody = ({ messages = [] }) => {
             >
               <div
                 style={{
-                  display: 'flex',
-                  flexDirection: sender ? 'row-reverse' : 'row',
+                  // display: 'flex',
+                  // flexDirection: sender ? 'row-reverse' : 'row',
                 }}
               >
                 <img
@@ -39,10 +39,10 @@ const MessageBody = ({ messages = [] }) => {
                     height: 20,
                     borderRadius: 20 / 2,
                   }}
-                  src={message.senderPhotoURL}
+                  src={avatar}
                   alt={id}
                 />
-                {/* <div
+                <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -64,7 +64,7 @@ const MessageBody = ({ messages = [] }) => {
                   >
                     {moment(createdAt?.toDate()).fromNow()}
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
           )

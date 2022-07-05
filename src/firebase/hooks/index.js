@@ -12,12 +12,16 @@ import { getColGroupRef, getColRef } from '../service'
 
 export const useFetch = (collectionName = 'todos', option) => {
   const formatOption = {
-    type: 'collection',
-    limit: 10,
+    // type: 'collection',
+    // limit: 10,
+    // orderBy: ['createdAt', 'asc'],
+    // where: ['members', 'array-contains', user.uid],
     ...option,
   }
   const TYPE = formatOption.type
   const LIMIT = formatOption.limit
+  const ORDERBY = formatOption.orderBy
+  const WHERE = formatOption.where
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [last, setLast] = useState(null)
@@ -31,7 +35,8 @@ export const useFetch = (collectionName = 'todos', option) => {
     const first = query(
       ...(TYPE === 'collectionGroup' ? [getColGroupRef(collectionName)] : [getColRef(collectionName)]),
       ...(keyword ? [where('keywords', 'array-contains', keyword)] : []),
-      orderBy('createdAt', 'desc'),
+      ...(WHERE ? [where(WHERE[0], WHERE[1], WHERE[2])] : []),
+      ...(ORDERBY ? [orderBy(ORDERBY[0], ORDERBY[1])] : [orderBy('createdAt', 'desc')]),
       limit(limitNumber)
     )
 

@@ -1,25 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { addDocument, getColRef } from '../../firebase/service'
-import { useFetch } from '../../firebase/hooks'
 import { useAuth } from '../../context'
 import MessageBody from '../MessageBody'
+import { limit, onSnapshot, query } from 'firebase/firestore'
 
 export const MessageList = ({ currentChat }) => {
   const { user } = useAuth()
   const scrollSpanRef = useRef(null)
   const [text, setText] = useState('')
   const [messageList, setMessageList] = useState([])
-  const {
-    loading,
-    data: messages,
-    moreLoading,
-    loadedAll,
-    handleLoadMore,
-  } = useFetch('messages', {
-    type: 'collectionGroup',
-    limit: 10,
-  })
 
   const handleSendMessage = useCallback(
     async (newMessage) => {
@@ -35,6 +25,30 @@ export const MessageList = ({ currentChat }) => {
     },
     [currentChat]
   )
+
+  useEffect(() => {
+    if (!currentChat) return
+    const messageDocRef = getColRef('chats', currentChat.id, 'messages')
+    const q = query(messageDocRef, limit(10))
+    const unsubscribe = onSnapshot(
+      q,
+      async (querySnapshot) => {
+        const data = querySnapshot.docs.map((docSnapshot) => {
+          return {
+            id: docSnapshot.id,
+            ...docSnapshot.data(),
+          }
+        })
+        setMessageList(data)
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+    return () => {
+      unsubscribe()
+    }
+  }, [currentChat])
 
   useEffect(() => {
     scrollSpanRef.current?.scrollIntoView({
@@ -79,7 +93,7 @@ export const MessageList = ({ currentChat }) => {
           flex: 1,
         }}
       >
-        <MessageBody messages={messages} />
+        <MessageBody messageList={messageList} currentChat={currentChat} />
         <span ref={scrollSpanRef} />
       </div>
       <input
