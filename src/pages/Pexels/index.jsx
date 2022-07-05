@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
+import { getDocs, orderBy, query } from 'firebase/firestore'
 
 import {
   deleteStorageFile,
@@ -11,7 +12,6 @@ import { addDocument, deleteDocument, getColRef } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { eventNames } from '../../constants'
 import { useFetch } from '../../firebase/hooks'
-import { getDocs } from 'firebase/firestore'
 
 const Pexels = () => {
   const { user } = useAuth()
@@ -30,7 +30,8 @@ const Pexels = () => {
 
   const getRelationship = useCallback(async () => {
     const followerDocRef = getColRef('users', user.uid, 'following')
-    const querySnapshot = await getDocs(followerDocRef)
+    const q = query(followerDocRef, orderBy('createdAt', 'desc'))
+    const querySnapshot = await getDocs(q)
     const docs = querySnapshot.docs
     const data = docs.map((docSnapshot) => {
       return {

@@ -3,15 +3,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  // collection,
   query,
   orderBy,
   limit,
-  // getDocs,
   startAfter,
   onSnapshot,
   where,
-  getDoc,
   setDoc,
   updateDoc,
   arrayRemove,
@@ -45,7 +42,8 @@ const Blog = () => {
 
   const getRelationship = useCallback(async () => {
     const followerDocRef = getColRef('users', user.uid, 'following')
-    const querySnapshot = await getDocs(followerDocRef)
+    const q = query(followerDocRef, orderBy('createdAt', 'desc'))
+    const querySnapshot = await getDocs(q)
     const docs = querySnapshot.docs
     const data = docs.map((docSnapshot) => {
       return {

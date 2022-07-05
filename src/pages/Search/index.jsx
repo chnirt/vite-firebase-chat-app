@@ -7,6 +7,7 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  orderBy,
   query,
   where,
 } from 'firebase/firestore'
@@ -39,7 +40,8 @@ const Search = () => {
 
   const getRelationship = useCallback(async () => {
     const followerDocRef = getColRef('users', user.uid, 'following')
-    const querySnapshot = await getDocs(followerDocRef)
+    const q = query(followerDocRef, orderBy('createdAt', 'desc'))
+    const querySnapshot = await getDocs(q)
     const docs = querySnapshot.docs
     const data = docs.map((docSnapshot) => {
       return {

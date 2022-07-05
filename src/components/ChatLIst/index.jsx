@@ -1,10 +1,13 @@
+import { getDocs, orderBy, query } from 'firebase/firestore'
 import moment from 'moment'
-import React, { useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useAuth } from '../../context'
 
 import { useFetch } from '../../firebase/hooks'
+import { getColRef } from '../../firebase/service'
 
-const ChatList = () => {
+const ChatList = ({ handleJoinChat = () => { } }) => {
+  const { user } = useAuth()
   const {
     loading,
     data: chats,
@@ -12,8 +15,37 @@ const ChatList = () => {
     loadedAll,
     handleLoadMore,
   } = useFetch('chats', 3)
+  const [relationshipList, setRelationshipList] = useState([])
 
-  const handleJoinChat = useCallback((doc) => { }, [])
+  const getRelationship = useCallback(async () => {
+    const followerDocRef = getColRef('users', user.uid, 'following')
+    const q = query(followerDocRef, orderBy('createdAt', 'desc'))
+    const querySnapshot = await getDocs(q)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    setRelationshipList(data)
+    return data
+  }, [user?.uid])
+
+  const findRelationship = useCallback(
+    (uids) => {
+      const foundRelationship = relationshipList.filter((item) =>
+        uids.some((uou) => uou === item.uid)
+      )
+      if (foundRelationship.length === 0) return
+      return foundRelationship
+    },
+    [relationshipList]
+  )
+
+  useEffect(() => {
+    getRelationship()
+  }, [getRelationship])
 
   return (
     <div
@@ -30,24 +62,40 @@ const ChatList = () => {
       {loading && <span>Collection: Loading...</span>}
       {chats.length > 0 && (
         <div>
-          {chats.map((doc) => (
-            <div
-              key={doc.id}
-              style={{
-                border: 'solid 1px black',
-                margin: 8,
-                display: 'flex',
-                flexDirection: 'row',
-                // justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
-              {/* <img src={doc.downloadURL} width={200} height={200} /> */}
-              <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
-              <button onClick={() => handleJoinChat(doc)}>Join</button>
-            </div>
-          ))}
+          {chats.map((doc) => {
+            const id = doc.id
+            const createdAt = doc.createdAt
+            const foundRelationship = findRelationship(doc.members) ?? []
+            const chatName = foundRelationship
+              .map((item) => item.username)
+              .join(', ')
+            return (
+              <div
+                key={`chat-${id}`}
+                style={{
+                  border: 'solid 1px black',
+                  margin: 8,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  // justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <p
+                  style={{
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    width: 100,
+                  }}
+                >
+                  {chatName}
+                </p>
+                <p>{moment(createdAt?.toDate()).fromNow()}</p>
+                <button onClick={() => handleJoinChat(doc)}>Join</button>
+              </div>
+            )
+          })}
         </div>
       )}
       {!loadedAll ? (
