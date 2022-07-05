@@ -1,13 +1,19 @@
-import { getDocs } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
+import { getDocs, query, where } from 'firebase/firestore'
+import { useCallback, useEffect, useState } from 'react'
 import { useUpdateProfile } from 'react-firebase-hooks/auth'
 
 import { useAuth } from '../../context'
 import { auth } from '../../firebase'
-import { getColRef } from '../../firebase/service'
+import {
+  getBatch,
+  getColGroupRef,
+  getColRef,
+  getDocRef,
+  updateDocument,
+} from '../../firebase/service'
 
 const Profile = ({ }) => {
-  const { user } = useAuth()
+  const { user, fetchUser } = useAuth()
   const [updateProfile, updating, error] = useUpdateProfile(auth)
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState(user?.username ?? '')
@@ -17,11 +23,40 @@ const Profile = ({ }) => {
   const [followerList, setFollowerList] = useState([])
   const [likeList, setLikeList] = useState([])
 
+  const handleUpdate = useCallback(async () => {
+    if (displayName && photoURL) {
+      await updateProfile({ displayName, photoURL })
+    }
+    if (username) {
+      const userDocRef = getDocRef('users', user.uid)
+      const userData = {
+        username,
+      }
+      await updateDocument(userDocRef, userData)
+
+      // update following
+      const batch = getBatch()
+      const followingDocRef = getColGroupRef('following')
+      const q = query(followingDocRef, where('uid', '==', user.uid))
+      const querySnapshot = await getDocs(q)
+      querySnapshot.forEach((docSnapshot) => {
+        const docRef = docSnapshot.ref
+        batch.update(docRef, userData)
+      })
+
+      await batch.commit()
+
+      await fetchUser(user)
+    }
+    alert('Updated profile')
+  }, [displayName, photoURL, username])
+
   useEffect(() => {
     const fetchFollowingData = async () => {
       setLoading(true)
       const followerDocRef = getColRef('users', user.uid, 'following')
-      const querySnapshot = await getDocs(followerDocRef)
+      const q = query(followerDocRef, where('uid', '!=', user.uid))
+      const querySnapshot = await getDocs(q)
       const docs = querySnapshot.docs
       const data = docs.map((docSnapshot) => {
         return {
@@ -110,19 +145,7 @@ const Profile = ({ }) => {
         onChange={(e) => setUsername(e.target.value)}
       />
       <br />
-      <button
-        onClick={async () => {
-          if (displayName && photoURL) {
-            await updateProfile({ displayName, photoURL })
-          }
-          if (username) {
-
-          }
-          alert('Updated profile')
-        }}
-      >
-        Update profile
-      </button>
+      <button onClick={handleUpdate}>Update profile</button>
       <br />
       <h4>{user?.displayName}</h4>
       {/* <h5>{user?.createdAt}</h5> */}

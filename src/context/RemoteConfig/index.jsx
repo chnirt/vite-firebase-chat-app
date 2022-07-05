@@ -29,7 +29,9 @@ export const RemoteConfigProvider = ({ children }) => {
     const setupRemoteConfig = async () => {
       try {
         const activated = await fetchAndActivateRemote()
-        if (!activated) console.log('not activated')
+        if (!activated) {
+          // console.log('not activated')
+        }
         const remoteFlags = getRemoteAll()
         // console.log(remoteFlags)
         const cloneFlags = {

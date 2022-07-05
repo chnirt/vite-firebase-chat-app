@@ -7,17 +7,17 @@ import { getColRef } from '../../firebase/service'
 import { BackButton } from '../../components'
 
 const UserDetail = () => {
-  let { userId } = useParams()
+  let { username } = useParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const fetchData = async (userId) => {
+    const fetchData = async (username) => {
       try {
         setLoading(true)
 
-        const q = query(getColRef('users'), where("uid", "==", userId))
+        const q = query(getColRef('users'), where("username", "==", username))
         const querySnapshot = await getDocs(q)
         const docs = querySnapshot.docs
         const data = docs.map((docSnapshot) => {
@@ -38,8 +38,8 @@ const UserDetail = () => {
       }
     }
 
-    fetchData(userId)
-  }, [userId])
+    fetchData(username)
+  }, [username])
 
   if (!user) return null
 

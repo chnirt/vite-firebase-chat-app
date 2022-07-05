@@ -1,13 +1,11 @@
 import { useCallback, useState } from 'react'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { Link } from 'react-router-dom'
+import { getDocs, query, where } from 'firebase/firestore'
 
 import { auth } from '../../firebase'
 // import { Loading } from '../../components'
-import {
-  addDocument,
-  getDocRef,
-} from '../../firebase/service'
+import { addDocument, getColRef, getDocRef } from '../../firebase/service'
 import { eventNames } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { generateKeywords } from '../../firebase/utils'
@@ -24,6 +22,20 @@ const SignUp = () => {
       if (email === '') return
       if (password === '') return
 
+      const q = query(getColRef('users'), where('username', '==', username))
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      const foundUser = data[0]
+      if (foundUser) {
+        throw Error('Username already exists!')
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -31,14 +43,23 @@ const SignUp = () => {
       )
 
       if (userCredential) {
-        const userDocRef = getDocRef('users', userCredential.user.uid)
+        const uid = userCredential.user.uid
+        const userDocRef = getDocRef('users', uid)
         const userData = {
-          uid: userCredential.user.uid,
+          uid,
           email,
           username,
           keywords: generateKeywords(email),
         }
         await addDocument(userDocRef, userData)
+
+        const followingData = {
+          type: 'owner',
+          username,
+          uid,
+        }
+        const followerDocRef = getDocRef('users', uid, 'following', uid)
+        await addDocument(followerDocRef, followingData)
       }
 
       logAnalyticsEvent(eventNames.register, {

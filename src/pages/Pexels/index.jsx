@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 
@@ -7,22 +7,14 @@ import {
   uploadStorageBytesResumable,
 } from '../../firebase/storage'
 import { useAuth } from '../../context'
-import {
-  addDocument,
-  deleteDocument,
-  getColRef,
-} from '../../firebase/service'
+import { addDocument, deleteDocument, getColRef } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { eventNames } from '../../constants'
 import { useFetch } from '../../firebase/hooks'
+import { getDocs } from 'firebase/firestore'
 
 const Pexels = () => {
   const { user } = useAuth()
-  const [uploading, setUploading] = useState(false)
-  const [state, setState] = useState(null)
-  const [progress, setProgress] = useState(0)
-  const [downloadURL, setDownloadURL] = useState(null)
-
   const {
     loading,
     data: photos,
@@ -30,6 +22,36 @@ const Pexels = () => {
     loadedAll,
     handleLoadMore,
   } = useFetch('photos', 3)
+  const [uploading, setUploading] = useState(false)
+  const [state, setState] = useState(null)
+  const [progress, setProgress] = useState(0)
+  const [downloadURL, setDownloadURL] = useState(null)
+  const [relationshipList, setRelationshipList] = useState([])
+
+  const getRelationship = useCallback(async () => {
+    const followerDocRef = getColRef('users', user.uid, 'following')
+    const querySnapshot = await getDocs(followerDocRef)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    setRelationshipList(data)
+    return data
+  }, [user?.uid])
+
+  const findRelationship = useCallback(
+    (uid) => {
+      const foundRelationship = relationshipList.find(
+        (item) => item.uid === uid
+      )
+      if (!foundRelationship) return
+      return foundRelationship
+    },
+    [relationshipList]
+  )
 
   const onProgress = useCallback(
     ({ state, progress }) => {
@@ -90,6 +112,10 @@ const Pexels = () => {
     await deleteStorageFile(doc.url)
   }, [])
 
+  useEffect(() => {
+    getRelationship()
+  }, [getRelationship])
+
   const Upload = () => {
     return (
       <div>
@@ -135,25 +161,32 @@ const Pexels = () => {
         {loading && <span>Collection: Loading...</span>}
         {photos.length > 0 && (
           <div>
-            {photos.map((doc) => (
-              <div
-                key={doc.id}
-                style={{
-                  border: 'solid 1px black',
-                  margin: 8,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
-                <br />
-                <img src={doc.downloadURL} width={200} height={200} />
-                <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
-                <button onClick={() => handleDelete(doc)}>Delete</button>
-              </div>
-            ))}
+            {photos.map((doc) => {
+              const id = doc.id
+              const downloadURL = doc.downloadURL
+              const createdAt = doc.createdAt
+              const foundRelationship = findRelationship(doc.uid)
+              const username = foundRelationship?.username
+              return (
+                <div
+                  key={`photo-${id}`}
+                  style={{
+                    border: 'solid 1px black',
+                    margin: 8,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Link to={`/user/${username}`}>@{username}</Link>
+                  <br />
+                  <img src={downloadURL} width={200} height={200} />
+                  <p>{moment(createdAt?.toDate()).fromNow()}</p>
+                  <button onClick={() => handleDelete(doc)}>Delete</button>
+                </div>
+              )
+            })}
           </div>
         )}
         {!loadedAll ? (

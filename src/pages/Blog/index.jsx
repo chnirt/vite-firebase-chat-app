@@ -21,7 +21,12 @@ import {
 import moment from 'moment'
 
 import { useAuth } from '../../context'
-import { deleteDocument, getColRef, getDocRef, getDocument } from '../../firebase/service'
+import {
+  deleteDocument,
+  getColRef,
+  getDocRef,
+  getDocument,
+} from '../../firebase/service'
 import { paths } from '../../constants'
 
 const LIMIT = 3
@@ -36,6 +41,7 @@ const Blog = () => {
   const [loadedAll, setLoadedAll] = useState(false)
 
   const [likeList, setLikeList] = useState([])
+  const [relationshipList, setRelationshipList] = useState([])
 
   const getRelationship = useCallback(async () => {
     const followerDocRef = getColRef('users', user.uid, 'following')
@@ -47,13 +53,9 @@ const Blog = () => {
         ...docSnapshot.data(),
       }
     })
-    const followingRelationship = data.map((item) => item.uid)
-    const userRelationship = [user.uid]
-    const relationship = []
-      .concat(userRelationship)
-      .concat(followingRelationship)
-    return relationship
-  }, [])
+    setRelationshipList(data)
+    return data
+  }, [user?.uid])
 
   const fetchBlogs = useCallback(async () => {
     if (user?.uid === null) return
@@ -61,12 +63,13 @@ const Blog = () => {
     const limitNumber = LIMIT + 1
 
     const relationship = await getRelationship()
+    const relationshipIds = relationship.map((item) => item.uid)
 
     // Query the first page of docs
     const first = query(
       getColRef('blogs'),
       ...(relationship.length > 0
-        ? [where('relationship', 'array-contains-any', relationship)]
+        ? [where('relationship', 'array-contains-any', relationshipIds)]
         : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)
@@ -96,12 +99,12 @@ const Blog = () => {
     const limitNumber = LIMIT + 1
 
     const relationship = await getRelationship()
-
+    const relationshipIds = relationship.map((item) => item.uid)
 
     const next = query(
       getColRef('blogs'),
       ...(relationship.length > 0
-        ? [where('relationship', 'array-contains-any', relationship)]
+        ? [where('relationship', 'array-contains-any', relationshipIds)]
         : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber),
@@ -145,7 +148,7 @@ const Blog = () => {
   }, [handleLoad])
 
   const handleCreatePost = useCallback(() => {
-    navigate(paths.createBlog)
+    navigate(`../${paths.createBlog}`)
   }, [navigate])
 
   const handleLike = useCallback(async (doc) => {
@@ -183,6 +186,17 @@ const Blog = () => {
       })
     }
   }, [])
+
+  const findRelationship = useCallback(
+    (uid) => {
+      const foundRelationship = relationshipList.find(
+        (item) => item.uid === uid
+      )
+      if (!foundRelationship) return
+      return foundRelationship
+    },
+    [relationshipList]
+  )
 
   useEffect(() => {
     if (!user) return
@@ -225,18 +239,23 @@ const Blog = () => {
         {blogs.length > 0 && (
           <div>
             {blogs.map((doc) => {
+              const id = doc.id
+              const title = doc.title
+              const createdAt = doc.createdAt
               const isLiked = likeList.some((item) => item.postId === doc.id)
+              const foundRelationship = findRelationship(doc.uid)
+              const username = foundRelationship?.username
               return (
                 <div
-                  key={doc.id}
+                  key={`blog-${id}`}
                   style={{
                     border: 'solid 1px black',
                     margin: 8,
                   }}
                 >
-                  <h3>{doc.title}</h3>
-                  <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
-                  <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
+                  <h3>{title}</h3>
+                  <p>{moment(createdAt?.toDate()).fromNow()}</p>
+                  <Link to={`/user/${username}`}>@{username}</Link>
                   <br />
                   {isLiked ? (
                     <button onClick={() => handleUnLike(doc)}>liked</button>

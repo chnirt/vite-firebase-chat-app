@@ -12,6 +12,7 @@ import {
   deleteDoc,
   updateDoc,
   writeBatch,
+  collectionGroup,
 } from 'firebase/firestore'
 
 import { db } from '.'
@@ -42,11 +43,11 @@ export const getDocument = async (ref) => {
   const docSnap = await getDoc(ref)
 
   if (docSnap.exists()) {
-    console.log('Document data:', docSnap.data())
+    // console.log('Document data:', docSnap.data())
     return docSnap.data()
   } else {
     // doc.data() will be undefined in this case
-    console.log('No such document!')
+    // console.log('No such document!')
     throw Error('No such document!')
   }
 }
@@ -63,6 +64,9 @@ export const getDocRef = (collectionName = 'todos', ...pathSegments) =>
 
 export const getColRef = (collectionName = 'todos', ...pathSegments) =>
   collection(db, collectionName, ...pathSegments)
+
+export const getColGroupRef = (collectionName = 'todos', ...pathSegments) =>
+  collectionGroup(db, collectionName, ...pathSegments)
 
 export const deleteDocument = async (
   collectionName = 'todos',

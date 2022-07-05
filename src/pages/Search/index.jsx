@@ -8,7 +8,6 @@ import {
   getDocs,
   onSnapshot,
   query,
-  setDoc,
   where,
 } from 'firebase/firestore'
 
@@ -36,30 +35,59 @@ const Search = () => {
   let navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [followList, setFollowList] = useState([])
+  const [relationshipList, setRelationshipList] = useState([])
+
+  const getRelationship = useCallback(async () => {
+    const followerDocRef = getColRef('users', user.uid, 'following')
+    const querySnapshot = await getDocs(followerDocRef)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    setRelationshipList(data)
+    return data
+  }, [user?.uid])
+
+  const findRelationship = useCallback(
+    (uid) => {
+      const foundRelationship = relationshipList.find(
+        (item) => item.uid === uid
+      )
+      if (!foundRelationship) return
+      return foundRelationship
+    },
+    [relationshipList]
+  )
 
   const handleFollow = useCallback(
     async (doc) => {
       // follower
       // const followerDocRef = getDocRef('users', user.uid)
       const followingData = {
-        email: doc.email,
+        type: 'followee',
+        username: doc.username,
         uid: doc.uid,
       }
       const followerDocRef = getDocRef('users', user.uid, 'following', doc.uid)
-      await setDoc(followerDocRef, followingData)
+      await addDocument(followerDocRef, followingData)
 
       // followee
       // const followeeDocRef = doc.ref
       const followerData = {
-        email: user.email,
+        type: 'follower',
+        username: user.username,
         uid: user.uid,
       }
       const followeeDocRef = getDocRef('users', doc.uid, 'follower', user.uid)
-      await setDoc(followeeDocRef, followerData)
+      await addDocument(followeeDocRef, followerData)
 
       // add relationship
       const batch = getBatch()
-      const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
+      const blogDocRef = getColRef('blogs')
+      const getQuery = query(blogDocRef, where('uid', '==', doc.uid))
       const querySnapshot = await getDocs(getQuery)
       querySnapshot.forEach((docSnapshot) => {
         const docRef = docSnapshot.ref
@@ -107,30 +135,33 @@ const Search = () => {
     [user]
   )
 
-  const handleMessage = useCallback(async (doc) => {
-    const chatData = {
-      members: [user.uid, doc.uid],
-      uid: user.uid,
-    }
-    const q = query(
-      getColRef('chats'),
-      where('members', 'in', [chatData.members]),
-    )
-    const querySnapshot = await getDocs(q)
-    const docs = querySnapshot.docs
-    const data = docs.map((docSnapshot) => {
-      return {
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
+  const handleMessage = useCallback(
+    async (doc) => {
+      const chatData = {
+        members: [user.uid, doc.uid],
+        uid: user.uid,
       }
-    })
-    const foundChat = data[0]
-    if (!foundChat) {
-      const chatDocRef = getColRef('chats')
-      await addDocument(chatDocRef, chatData)
-    }
-    navigate(`../${paths.messenger}`)
-  }, [navigate])
+      const q = query(
+        getColRef('chats'),
+        where('members', 'in', [chatData.members])
+      )
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      const foundChat = data[0]
+      if (!foundChat) {
+        const chatDocRef = getColRef('chats')
+        await addDocument(chatDocRef, chatData)
+      }
+      navigate(`../${paths.messenger}`)
+    },
+    [navigate]
+  )
 
   useEffect(() => {
     const formatSearch = search.trim().toLowerCase()
@@ -160,6 +191,10 @@ const Search = () => {
     }
   }, [user])
 
+  useEffect(() => {
+    getRelationship()
+  }, [getRelationship])
+
   return (
     <div>
       Search
@@ -183,9 +218,14 @@ const Search = () => {
               const isFollowing = followList.some(
                 (item) => item.uid === doc.uid
               )
+              const id = doc.id
+              const email = doc.email
+              const createdAt = doc.createdAt
+              const foundRelationship = findRelationship(doc.uid)
+              const username = foundRelationship?.username
               return (
                 <div
-                  key={doc.id}
+                  key={`user-${id}`}
                   style={{
                     border: 'solid 1px black',
                     margin: 8,
@@ -195,9 +235,9 @@ const Search = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <Link to={`/user/${doc.uid}`}>@{doc.uid}</Link>
-                  <p>{doc.email}</p>
-                  <p>{moment(doc.createdAt?.toDate()).fromNow()}</p>
+                  <Link to={`/user/${username}`}>@{username}</Link>
+                  <p>{email}</p>
+                  <p>{moment(createdAt?.toDate()).fromNow()}</p>
                   {!isOwner && (
                     <div>
                       {!isFollowing ? (

@@ -6,7 +6,7 @@ export const paths = {
   login: 'login',
   register: 'register',
   home: '/',
-  userDetail: '/user/:userId',
+  userDetail: '/user/:username',
   createBlog: 'create-blog',
   blog: 'blog',
   blogDetail: 'blog/:blogId',
