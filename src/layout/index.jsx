@@ -4,6 +4,7 @@ import { useAuth } from '../context'
 
 import { auth } from '../firebase'
 import { TITLE } from '../env'
+import { useCallback } from 'react'
 
 const LinkRoutes = [
   {
@@ -47,11 +48,16 @@ const LinkRoutes = [
 export const Layout = ({ children }) => {
   const { user } = useAuth()
 
+  const handleLogout = useCallback(() => {
+    signOut(auth)
+    localStorage.clear()
+  }, [])
+
   return (
     <div className="App">
       {TITLE}
       <p>Current User: {user.email}</p>
-      <button onClick={() => signOut(auth)}>Log out</button>
+      <button onClick={handleLogout}>Log out</button>
       <ul
         style={{
           overflow: 'hidden',

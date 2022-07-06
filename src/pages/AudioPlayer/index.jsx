@@ -1,5 +1,14 @@
+import axios from 'axios'
 import moment from 'moment'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import {
+  SPOTIFY_AUTH_ENDPOINT,
+  SPOTIFY_CLIENT_ID,
+  SPOTIFY_REDIRECT_URI,
+  SPOTIFY_RESPONSE_TYPE,
+} from '../../env'
+import { useLocalStorage } from '../../hooks'
 
 const urls = [
   'https://wallpaperaccess.com/full/2471317.gif',
@@ -10,18 +19,17 @@ const urls = [
   'https://i.pinimg.com/originals/1a/f6/89/1af689d42bdb7686df444f22925f9e89.gif',
   'https://i.pinimg.com/originals/12/0e/03/120e03442dc1d98f8a72407cddf53d5d.gif',
 ]
-const audioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
-const audioUrls = [
-  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-]
 
 const AudioPlayer = () => {
+  const [token] = useLocalStorage('token', '')
   const audioRef = useRef(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [isPlay, setPlay] = useState(false)
   const [audioIndex, setAudioIndex] = useState(0)
-  const length = 3
+
+  const [query, setQuery] = useState('')
+  const [audioList, setAudioList] = useState([])
 
   const handleLoadedData = useCallback(() => {
     setDuration(audioRef.current.duration)
@@ -50,18 +58,49 @@ const AudioPlayer = () => {
     [isPlay]
   )
 
+  const handleResetAudio = useCallback(() => {
+    // setCurrentTime(0)
+    // setPlay(false)
+  }, [])
+
   const handlePrev = useCallback(() => {
     setAudioIndex((prevState) => Math.max(prevState - 1, 0))
   }, [])
 
   const handleNext = useCallback(() => {
-    setAudioIndex((prevState) => Math.min(prevState + 1, length))
-  }, [])
+    setAudioIndex((prevState) => Math.min(prevState + 1, audioList.length - 1))
+  }, [audioList])
 
   const formatSecondToMMSS = useCallback(
     (second) => moment.utc(second * 1000).format('mm:ss'),
     []
   )
+
+  const handleSelect = useCallback(async (ii) => {
+    setAudioIndex(ii)
+    handleResetAudio()
+  }, [handleResetAudio])
+
+  useEffect(() => {
+    const searchArtists = async () => {
+      const { data } = await axios.get('https://api.spotify.com/v1/search', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          q: '2am',
+          type: 'track',
+          offset: 0,
+          limit: 10,
+        },
+      })
+      // console.log(JSON.stringify(data.tracks.items[0], null, 2))
+      setAudioList(data.tracks.items)
+    }
+    if (token) {
+      searchArtists()
+    }
+  }, [token])
 
   return (
     <div>
@@ -84,19 +123,19 @@ const AudioPlayer = () => {
         }}
       /> */}
       {/* <p className="neonText">AudioPlayer</p> */}
-      <p>{audioIndex}</p>
+      <p>{audioList[audioIndex]?.name}</p>
       <audio
         ref={audioRef}
-        src={audioUrl}
+        src={audioList[audioIndex]?.preview_url}
         onLoadedData={handleLoadedData}
         onTimeUpdate={() => setCurrentTime(audioRef.current.currentTime)}
         onEnded={() => setPlay(false)}
-        controls
+      // controls
       >
         Your browser does not support the
         <code> audio</code> element.
       </audio>
-      <br />
+      {/* <br /> */}
       <p>
         {formatSecondToMMSS(Math.floor(currentTime))}/
         {formatSecondToMMSS(Math.floor(duration))}
@@ -114,23 +153,39 @@ const AudioPlayer = () => {
         max={duration}
       // step={duration / 10}
       />
-      {/* {audioUrls.length > 0 &&
-        audioUrls.map((url) => (
-          <audio src={url} controls>
-            Your browser does not support the
-            <code code> audio</code> element.
-          </audio>
-        ))} */}
       <br />
-      {/* <iframe
-        width="853"
-        height="480"
-        src={'https://youtube.com/embed/kROrqp0Dx8o'}
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        title="Embedded youtube"
-      /> */}
+      <a
+        href={`${SPOTIFY_AUTH_ENDPOINT}?client_id=${SPOTIFY_CLIENT_ID}&redirect_uri=${SPOTIFY_REDIRECT_URI}&response_type=${SPOTIFY_RESPONSE_TYPE}`}
+      >
+        Login to Spotify
+      </a>
+      <br />
+      <div
+        style={{
+          height: 400,
+          overflowY: 'scroll',
+          paddingTop: 8,
+          paddingBottom: 8,
+        }}
+      >
+        {audioList.length > 0 &&
+          audioList.map((item, ii) => {
+            const name = item?.name
+            const artists = item?.artists
+            return (
+              <div
+                key={`audio-${ii}`}
+                style={{
+                  border: 'solid 1px black',
+                }}
+              >
+                <h2>{name}</h2>
+                <p>{artists.map((artist) => artist.name).join(' ')}</p>
+                <button onClick={() => handleSelect(ii)}>Select</button>
+              </div>
+            )
+          })}
+      </div>
     </div>
   )
 }

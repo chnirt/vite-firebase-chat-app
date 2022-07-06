@@ -1,5 +1,5 @@
 // https://gist.github.com/codediodeio/513bf77ee45be6d38d27868f5345a002
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
 
 import './App.css'
@@ -10,7 +10,8 @@ import { useRemoteConfig, WebRTCProvider } from './context'
 import { analytics } from './firebase'
 import { getRemoteAll, getRemoteValue } from './firebase/remoteConfig'
 import { paths } from './constants'
-import { setUpBaseName } from './utils'
+// import { setUpBaseName } from './utils'
+import { useLocalStorage } from './hooks'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -37,13 +38,25 @@ const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 
 const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 
-setUpBaseName()
+// setUpBaseName()
 
 function App() {
   let location = useLocation()
   const { vite_app_turn_server } = useRemoteConfig()
+  const [_, setToken] = useLocalStorage('token', '')
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
+    const hash = location.hash
+    if (hash) {
+      const newToken = hash
+        .substring(1)
+        .split('&')
+        .find((elem) => elem.startsWith('access_token'))
+        .split('=')[1]
+      setToken(newToken)
+    }
+
     if (typeof analytics === 'function') {
       const page_path = location.pathname + location.search
       analytics().setCurrentScreen(page_path)
