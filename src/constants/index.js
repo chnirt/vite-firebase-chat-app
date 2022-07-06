@@ -14,7 +14,7 @@ export const paths = {
   pexels: 'pexels',
   search: 'search',
   messenger: 'messenger',
-  youtube: 'youtube',
+  audioPlayer: 'audioPlayer',
   profile: 'profile',
   changePassword: 'change-password',
   notFound: '*',

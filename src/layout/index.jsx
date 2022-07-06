@@ -31,8 +31,8 @@ const LinkRoutes = [
     name: 'Messenger',
   },
   {
-    path: '/youtube',
-    name: 'Youtube',
+    path: '/audioPlayer',
+    name: 'Audio Player',
   },
   {
     path: '/profile',
@@ -52,9 +52,11 @@ export const Layout = ({ children }) => {
       {TITLE}
       <p>Current User: {user.email}</p>
       <button onClick={() => signOut(auth)}>Log out</button>
-      <ul style={{
-        overflow: "hidden"
-      }}>
+      <ul
+        style={{
+          overflow: 'hidden',
+        }}
+      >
         {LinkRoutes.length &&
           LinkRoutes.map((route, ri) => (
             <li
