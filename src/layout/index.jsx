@@ -31,6 +31,10 @@ const LinkRoutes = [
     name: 'Messenger',
   },
   {
+    path: '/youtube',
+    name: 'Youtube',
+  },
+  {
     path: '/profile',
     name: 'Profile',
   },

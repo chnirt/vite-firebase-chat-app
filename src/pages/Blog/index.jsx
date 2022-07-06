@@ -78,7 +78,7 @@ const Blog = () => {
     const first = query(
       getColRef('blogs'),
       ...(relationship.length > 0
-        ? [where('relationship', 'array-contains-any', relationshipIds)]
+        ? [where('uid', 'in', relationshipIds)]
         : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)
@@ -113,7 +113,7 @@ const Blog = () => {
     const next = query(
       getColRef('blogs'),
       ...(relationship.length > 0
-        ? [where('relationship', 'array-contains-any', relationshipIds)]
+        ? [where('uid', 'in', relationshipIds)]
         : []),
       orderBy('createdAt', 'desc'),
       limit(limitNumber),
@@ -168,14 +168,14 @@ const Blog = () => {
     const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
     await setDoc(likeDocRef, likeData)
 
-    const blogDocRef = getDocRef('blogs', doc.id)
-    const blogDocData = await getDocument(blogDocRef)
+    // const blogDocRef = getDocRef('blogs', doc.id)
+    // const blogDocData = await getDocument(blogDocRef)
 
-    if (blogDocData) {
-      await updateDoc(blogDocRef, {
-        relationship: arrayUnion(user.uid),
-      })
-    }
+    // if (blogDocData) {
+    //   await updateDoc(blogDocRef, {
+    //     relationship: arrayUnion(user.uid),
+    //   })
+    // }
   }, [])
 
   const handleUnLike = useCallback(async (doc) => {
@@ -186,14 +186,14 @@ const Blog = () => {
       await deleteDocument('users', user.uid, 'likes', doc.id)
     }
 
-    const blogDocRef = getDocRef('blogs', doc.id)
-    const blogDocData = await getDocument(blogDocRef)
+    // const blogDocRef = getDocRef('blogs', doc.id)
+    // const blogDocData = await getDocument(blogDocRef)
 
-    if (blogDocData) {
-      await updateDoc(blogDocRef, {
-        relationship: arrayRemove(user.uid),
-      })
-    }
+    // if (blogDocData) {
+    //   await updateDoc(blogDocRef, {
+    //     relationship: arrayRemove(user.uid),
+    //   })
+    // }
   }, [])
 
   useEffect(() => {
@@ -252,7 +252,11 @@ const Blog = () => {
                     margin: 8,
                   }}
                 >
-                  <img style={{ width: 50, height: 50 }} src={avatar} alt={`avatar-${doc.id}`} />
+                  <img
+                    style={{ width: 50, height: 50 }}
+                    src={avatar}
+                    alt={`avatar-${doc.id}`}
+                  />
                   <h3>{title}</h3>
                   <p>{moment(createdAt?.toDate()).fromNow()}</p>
                   <Link to={`/user/${username}`}>@{username}</Link>

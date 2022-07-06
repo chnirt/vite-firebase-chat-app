@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { limit, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { limitToLast, onSnapshot, orderBy, query } from 'firebase/firestore'
 
 import {
   addDocument,
@@ -40,7 +40,7 @@ export const MessageList = ({ currentChat }) => {
   useEffect(() => {
     if (!currentChat) return
     const messageDocRef = getColRef('chats', currentChat.id, 'messages')
-    const q = query(messageDocRef, orderBy('createdAt', 'asc'), limit(10))
+    const q = query(messageDocRef, orderBy('createdAt', 'asc'), limitToLast(10))
     const unsubscribe = onSnapshot(
       q,
       async (querySnapshot) => {

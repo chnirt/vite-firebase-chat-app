@@ -24,7 +24,7 @@ const CreateBlog = () => {
       title,
       content: value,
       uid: user.uid,
-      relationship: arrayUnion(user.uid),
+      // relationship: arrayUnion(user.uid),
       createdAt: serverTimestamp()
     }
     const blogDocRef = getColRef('blogs')

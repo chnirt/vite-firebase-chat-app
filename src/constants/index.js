@@ -12,8 +12,9 @@ export const paths = {
   blogDetail: 'blog/:blogId',
   whatsapp: 'whatsapp',
   pexels: 'pexels',
-  search: "search",
+  search: 'search',
   messenger: 'messenger',
+  youtube: 'youtube',
   profile: 'profile',
   changePassword: 'change-password',
   notFound: '*',
@@ -27,5 +28,5 @@ export const eventNames = {
   call: 'call',
   answer: 'answer',
   decline: 'decline',
-  createPhoto: 'create_photo'
+  createPhoto: 'create_photo',
 }

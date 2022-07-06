@@ -105,6 +105,8 @@ const Profile = ({ }) => {
     fetchLikeData()
   }, [])
 
+  // https://youtu.be/kROrqp0Dx8o
+
   if (loading) {
     return <p>Loading...</p>
   }

@@ -30,6 +30,8 @@ const LazyUserDetailScreen = lazy(() => import('./pages/UserDetail'))
 
 const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 
+const LazyYoutubeScreen = lazy(() => import('./pages/Youtube'))
+
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 
@@ -162,6 +164,16 @@ function App() {
             </Suspense>
           ),
         },
+
+        {
+          path: paths.youtube,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyYoutubeScreen />
+            </Suspense>
+          ),
+        },
+
         {
           path: paths.profile,
           element: (

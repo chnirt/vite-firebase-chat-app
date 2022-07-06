@@ -62,19 +62,19 @@ const Search = () => {
       const followeeDocRef = getDocRef('users', doc.uid, 'follower', user.uid)
       await addDocument(followeeDocRef, followerData)
 
-      // add relationship
-      const batch = getBatch()
-      const blogDocRef = getColRef('blogs')
-      const getQuery = query(blogDocRef, where('uid', '==', doc.uid))
-      const querySnapshot = await getDocs(getQuery)
-      querySnapshot.forEach((docSnapshot) => {
-        const docRef = docSnapshot.ref
-        batch.update(docRef, {
-          relationship: arrayUnion(user.uid),
-        })
-      })
+      // // add relationship
+      // const batch = getBatch()
+      // const blogDocRef = getColRef('blogs')
+      // const getQuery = query(blogDocRef, where('uid', '==', doc.uid))
+      // const querySnapshot = await getDocs(getQuery)
+      // querySnapshot.forEach((docSnapshot) => {
+      //   const docRef = docSnapshot.ref
+      //   batch.update(docRef, {
+      //     relationship: arrayUnion(user.uid),
+      //   })
+      // })
 
-      await batch.commit()
+      // await batch.commit()
     },
     [user]
   )
@@ -97,18 +97,18 @@ const Search = () => {
         await deleteDocument('users', doc.uid, 'follower', user.uid)
       }
 
-      // remove relationship
-      const batch = getBatch()
-      const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
-      const querySnapshot = await getDocs(getQuery)
-      querySnapshot.forEach((docSnapshot) => {
-        const docRef = docSnapshot.ref
-        batch.update(docRef, {
-          relationship: arrayRemove(user.uid),
-        })
-      })
+      // // remove relationship
+      // const batch = getBatch()
+      // const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
+      // const querySnapshot = await getDocs(getQuery)
+      // querySnapshot.forEach((docSnapshot) => {
+      //   const docRef = docSnapshot.ref
+      //   batch.update(docRef, {
+      //     relationship: arrayRemove(user.uid),
+      //   })
+      // })
 
-      await batch.commit()
+      // await batch.commit()
     },
     [user]
   )

@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 import App from './App'
 import { AuthProvider, RemoteConfigProvider } from './context'
-import { ForkMe } from './components'
+// import { ForkMe } from './components'
 import { basename } from './constants'
 
 import './index.css'
