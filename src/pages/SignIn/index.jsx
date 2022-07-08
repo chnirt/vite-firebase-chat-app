@@ -65,7 +65,7 @@ const SignIn = () => {
         >
           <Row
             style={{
-              height: 'calc(95vh)',
+              height: '95%',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -75,7 +75,7 @@ const SignIn = () => {
               style={{
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '10vh',
+                height: '10%',
               }}
             >
               {/* <FadeIn> */}
@@ -95,7 +95,7 @@ const SignIn = () => {
             <Row
               style={{
                 justifyContent: 'center',
-                height: '5vh',
+                height: '5%',
               }}
             >
               <Typography.Text>
