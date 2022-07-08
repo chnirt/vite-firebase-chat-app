@@ -46,7 +46,9 @@ export const CONSTRAINTS = {
   },
 }
 
-const WebRTCContext = createContext()
+const defaultState = {}
+
+const WebRTCContext = createContext(defaultState)
 
 export const WebRTCProvider = ({
   children,

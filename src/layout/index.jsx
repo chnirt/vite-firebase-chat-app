@@ -4,8 +4,9 @@ import { useAuth, useLoading } from '../context'
 
 import { auth } from '../firebase'
 import { TITLE } from '../env'
-import { useCallback } from 'react'
+import { Fragment, useCallback } from 'react'
 import { useLocalStorage } from '../hooks'
+import { Navbar } from '../components'
 
 const LinkRoutes = [
   {
@@ -51,7 +52,6 @@ export const Layout = ({ children }) => {
   const loading = useLoading()
   const [, , removeToken] = useLocalStorage('token', '')
 
-
   const handleLogout = useCallback(() => {
     loading.show()
     signOut(auth)
@@ -59,26 +59,29 @@ export const Layout = ({ children }) => {
   }, [])
 
   return (
-    <div className="App">
-      {TITLE}
-      <p>Current User: {user.email}</p>
-      <button onClick={handleLogout}>Log out</button>
-      <ul
-        style={{
-          overflow: 'hidden',
-        }}
-      >
-        {LinkRoutes.length &&
-          LinkRoutes.map((route, ri) => (
-            <li
-              style={{ float: 'left', listStyleType: 'none', padding: 8 }}
-              key={`route-${ri}`}
-            >
-              <Link to={route.path}>{route.name}</Link>
-            </li>
-          ))}
-      </ul>
-      {children}
-    </div>
+    <Fragment>
+      <Navbar />
+      <div className="App">
+        {TITLE}
+        <p>Current User: {user.email}</p>
+        <button onClick={handleLogout}>Log out</button>
+        <ul
+          style={{
+            overflow: 'hidden',
+          }}
+        >
+          {LinkRoutes.length &&
+            LinkRoutes.map((route, ri) => (
+              <li
+                style={{ float: 'left', listStyleType: 'none', padding: 8 }}
+                key={`route-${ri}`}
+              >
+                <Link to={route.path}>{route.name}</Link>
+              </li>
+            ))}
+        </ul>
+        {children}
+      </div>
+    </Fragment>
   )
 }

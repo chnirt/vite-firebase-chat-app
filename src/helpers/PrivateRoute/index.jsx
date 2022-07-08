@@ -5,9 +5,9 @@ import { useAuth } from '../../context'
 import { paths } from '../../constants'
 
 export function PrivateRoute({ children }) {
-  let { isAuth } = useAuth()
+  let auth = useAuth()
 
-  return !isAuth ? (
+  return !auth.isAuth ? (
     <Navigate
       to={{
         pathname: paths.login,

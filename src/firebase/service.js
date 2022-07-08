@@ -2,6 +2,7 @@
 // https://bobbyhadz.com/blog/javascript-remove-null-values-from-array
 // https://stackoverflow.com/questions/70571720/firestore-query-snapshot-foreach-seems-to-be-overwriting-products-state
 // https://stackoverflow.com/questions/50807905/are-firestore-updates-charged-the-same-cost-as-writes
+import { signOut } from 'firebase/auth'
 import {
   doc,
   getDoc,
@@ -15,7 +16,7 @@ import {
   collectionGroup,
 } from 'firebase/firestore'
 
-import { db } from '.'
+import { auth, db } from '.'
 
 export const addDocument = async (ref, data = {}) => {
   const formatData = {
@@ -76,3 +77,5 @@ export const deleteDocument = async (
 }
 
 export const getBatch = () => writeBatch(db)
+
+export const signOutFirebase = () => signOut(auth)

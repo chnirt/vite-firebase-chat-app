@@ -7,13 +7,20 @@ import {
   useState,
 } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
-import { debounce } from 'lodash'
+import { debounce, isEmpty } from 'lodash'
 
 import { auth } from '../../firebase'
 import { getDocRef, getDocument } from '../../firebase/service'
 import { useLoading } from '../Loading'
 
-const AuthContext = createContext()
+const defaultState = {
+  isAuth: false,
+  loaded: false,
+  user: null,
+  fetchUser: () => { },
+}
+
+const AuthContext = createContext(defaultState)
 
 export const AuthProvider = ({ children }) => {
   const loading = useLoading()
@@ -65,13 +72,15 @@ export const AuthProvider = ({ children }) => {
       },
       (error) => {
         // console.log(error)
-      },
+      }
     )
   }, [user])
 
+  const isAuth = !isEmpty(user) || false
+
   const value = useMemo(
     () => ({
-      isAuth: !!user ?? false,
+      isAuth,
       loaded,
       user,
       fetchUser,

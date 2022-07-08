@@ -17,8 +17,9 @@ const REMOTE_VALUE = {
   dark_mode: 'boolean',
   timeout: 'number',
 }
+const defaultState = {}
 
-const RemoteConfigContext = createContext()
+const RemoteConfigContext = createContext(defaultState)
 
 export const RemoteConfigProvider = ({ children }) => {
   const [flags, setFlags] = useState({})

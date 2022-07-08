@@ -36,7 +36,10 @@ i18n
     },
   })
 
-const defaultState = {}
+const defaultState = {
+  language: 'en',
+  changeLanguage: () => { },
+}
 
 const I18nContext = createContext(defaultState)
 
