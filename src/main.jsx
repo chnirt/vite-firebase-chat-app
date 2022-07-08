@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 import App from './App'
-import { AuthProvider, RemoteConfigProvider } from './context'
+import { AuthProvider, RemoteConfigProvider, I18nProvider } from './context'
 // import { ForkMe } from './components'
 import { basename } from './constants'
 
@@ -15,7 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       {/* <ForkMe /> */}
       <AuthProvider>
         <Router basename={basename}>
-          <App />
+          <I18nProvider>
+            <App />
+          </I18nProvider>
         </Router>
       </AuthProvider>
     </RemoteConfigProvider>

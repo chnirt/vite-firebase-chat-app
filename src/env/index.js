@@ -1,5 +1,7 @@
 import { env } from '../constants'
 
+export const APP_NAME = env?.VITE_APP_APP_NAME
+
 export const APP_VERSION = env?.VITE_APP_VERSION
 
 export const DEV = env?.DEV
