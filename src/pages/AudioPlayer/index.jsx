@@ -34,6 +34,10 @@ const AudioPlayer = () => {
   const handleLoadedData = useCallback(() => {
     setDuration(audioRef.current.duration)
     if (isPlay) audioRef.current.play()
+  }, [isPlay])
+
+  const handleTimeUpdate = useCallback(() => {
+    setCurrentTime(audioRef.current?.currentTime)
   }, [])
 
   const handlePausePlayClick = useCallback(() => {
@@ -50,36 +54,32 @@ const AudioPlayer = () => {
       audioRef.current.currentTime = value
       setCurrentTime(value)
 
-      // if (!isPlay) {
-      //   setPlay(true)
-      //   audioRef.current.play()
-      // }
+      if (!isPlay) {
+        setPlay(true)
+        audioRef.current.play()
+      }
     },
     [isPlay]
   )
 
   const handleResetAudio = useCallback(() => {
-    // setCurrentTime(0)
-    // setPlay(false)
+    setPlay(false)
   }, [])
 
   const handlePrev = useCallback(() => {
     setAudioIndex((prevState) => Math.max(prevState - 1, 0))
-  }, [])
+  }, [handleResetAudio])
 
   const handleNext = useCallback(() => {
     setAudioIndex((prevState) => Math.min(prevState + 1, audioList.length - 1))
-  }, [audioList])
+  }, [audioList, handleResetAudio])
 
   const formatSecondToMMSS = useCallback(
     (second) => moment.utc(second * 1000).format('mm:ss'),
     []
   )
 
-  const handleSelect = useCallback(async (ii) => {
-    setAudioIndex(ii)
-    handleResetAudio()
-  }, [handleResetAudio])
+  const handleSelect = useCallback(async (ii) => setAudioIndex(ii), [])
 
   useEffect(() => {
     const searchArtists = async () => {
@@ -128,7 +128,7 @@ const AudioPlayer = () => {
         ref={audioRef}
         src={audioList[audioIndex]?.preview_url}
         onLoadedData={handleLoadedData}
-        onTimeUpdate={() => setCurrentTime(audioRef.current.currentTime)}
+        onTimeUpdate={handleTimeUpdate}
         onEnded={() => setPlay(false)}
       // controls
       >

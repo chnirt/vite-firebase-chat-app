@@ -18,10 +18,12 @@ export const paths = {
   audioPlayer: 'audioPlayer',
   profile: 'profile',
   changePassword: 'change-password',
+  spotify: 'spotify',
   notFound: '*',
 }
 
 export const eventNames = {
+  pageView: 'page_view',
   login: 'login',
   register: 'register',
   createBlog: 'create_blog',

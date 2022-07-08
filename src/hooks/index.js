@@ -36,5 +36,19 @@ export function useLocalStorage(key, initialValue) {
       console.log(error);
     }
   };
-  return [storedValue, setValue];
+  const removeValue = () => {
+    console.log("removeValue")
+    try {
+      // Save state
+      setStoredValue(initialValue);
+      // Save to local storage
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(key);
+      }
+    } catch (error) {
+      // A more advanced implementation would handle the error case
+      console.log(error);
+    }
+  };
+  return [storedValue, setValue, removeValue];
 }

@@ -5,6 +5,7 @@ import { useAuth } from '../context'
 import { auth } from '../firebase'
 import { TITLE } from '../env'
 import { useCallback } from 'react'
+import { useLocalStorage } from '../hooks'
 
 const LinkRoutes = [
   {
@@ -47,10 +48,12 @@ const LinkRoutes = [
 
 export const Layout = ({ children }) => {
   const { user } = useAuth()
+  const [, , removeToken] = useLocalStorage('token', '')
+
 
   const handleLogout = useCallback(() => {
     signOut(auth)
-    localStorage.clear()
+    removeToken()
   }, [])
 
   return (

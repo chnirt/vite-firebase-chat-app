@@ -15,6 +15,7 @@ import { getDocRef, getDocument } from '../../firebase/service'
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
+  const [loaded, setLoaded] = useState(false)
   const [userDocReference, setUserDocReference] = useState(null)
   const [user, setUser] = useState(null)
 
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }) => {
         setUser({ ...fbUser, ...userDocData })
       } catch (error) {
       } finally {
+        setLoaded(true)
       }
     },
     [userDocReference]
@@ -65,10 +67,11 @@ export const AuthProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       isAuth: !!user ?? false,
+      loaded,
       user,
       fetchUser,
     }),
-    [user]
+    [user, loaded, fetchUser]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -1,5 +1,5 @@
 // https://gist.github.com/codediodeio/513bf77ee45be6d38d27868f5345a002
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
 
 import './App.css'
@@ -9,9 +9,9 @@ import { Loading } from './components'
 import { useRemoteConfig, WebRTCProvider } from './context'
 import { analytics } from './firebase'
 import { getRemoteAll, getRemoteValue } from './firebase/remoteConfig'
-import { paths } from './constants'
+import { eventNames, paths } from './constants'
 // import { setUpBaseName } from './utils'
-import { useLocalStorage } from './hooks'
+import { logAnalyticsEvent } from './firebase/analytics'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -32,6 +32,7 @@ const LazyUserDetailScreen = lazy(() => import('./pages/UserDetail'))
 const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 
 const LazyAudioPlayerScreen = lazy(() => import('./pages/AudioPlayer'))
+const LazySpotifyScreen = lazy(() => import('./pages/Spotify'))
 
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
@@ -43,24 +44,14 @@ const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 function App() {
   let location = useLocation()
   const { vite_app_turn_server } = useRemoteConfig()
-  const [_, setToken] = useLocalStorage('token', '')
-  const [query, setQuery] = useState('')
 
   useEffect(() => {
-    const hash = location.hash
-    if (hash) {
-      const newToken = hash
-        .substring(1)
-        .split('&')
-        .find((elem) => elem.startsWith('access_token'))
-        .split('=')[1]
-      setToken(newToken)
-    }
-
     if (typeof analytics === 'function') {
       const page_path = location.pathname + location.search
       analytics().setCurrentScreen(page_path)
-      analytics().logEvent('page_view', { page_path })
+      logAnalyticsEvent(eventNames.pageView, {
+        page_path,
+      })
     }
   }, [location, getRemoteAll, getRemoteValue])
 
@@ -204,6 +195,12 @@ function App() {
           ),
         },
       ],
+    },
+    {
+      path: paths.spotify,
+      element: (
+        <LazySpotifyScreen />
+      )
     },
     {
       path: paths.notFound,
