@@ -1,7 +1,16 @@
 import { Fragment, useCallback } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import { Button, Checkbox, Col, Form, Input, notification, Row, Typography } from 'antd'
+import {
+  Button,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  notification,
+  Row,
+  Typography,
+} from 'antd'
 import { t } from 'i18next'
 
 import { auth } from '../../firebase'
@@ -10,9 +19,11 @@ import { logAnalyticsEvent } from '../../firebase/analytics'
 import { APP_NAME } from '../../env'
 import { signInAccount } from '../../mock'
 import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
+import { useLoading } from '../../context'
 
 const SignIn = () => {
   let navigate = useNavigate()
+  const loading = useLoading()
   // const [email, setEmail] = useState('trinhchinchin@gmail.com')
   // const [password, setPassword] = useState('Admin@123')
   // const [error, setError] = useState(null)
@@ -31,6 +42,7 @@ const SignIn = () => {
   // }, [email, password, signInWithEmailAndPassword, logAnalyticsEvent])
 
   const onFinish = useCallback(async (values) => {
+    loading.show()
     // console.log('Success:', values)
     const { emailOrYourPhoneNumber, password } = values
     try {
@@ -47,6 +59,8 @@ const SignIn = () => {
         },
         placement: 'bottomRight',
       })
+      loading.hide()
+    } finally {
     }
   }, [])
 
@@ -56,7 +70,7 @@ const SignIn = () => {
 
   const navigateRegister = useCallback(() => {
     navigate(`../${paths.register}`)
-  }, [navigate])
+  }, [])
 
   return (
     <Fragment>
@@ -117,7 +131,7 @@ const SignIn = () => {
               initialValues={{
                 emailOrYourPhoneNumber: signInAccount.emailOrYourPhoneNumber,
                 password: signInAccount.password,
-                remember: signInAccount.remember,
+                // remember: signInAccount.remember,
               }}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
@@ -162,7 +176,7 @@ const SignIn = () => {
                 </div>
               </Form.Item>
 
-              <div
+              {/* <div
                 style={{
                   display: 'flex',
                   justifyContent: 'center',
@@ -179,7 +193,7 @@ const SignIn = () => {
                 >
                   <Checkbox>{t('src.screens.login.KMSI')}</Checkbox>
                 </Form.Item>
-              </div>
+              </div> */}
             </Form>
           </Row>
 

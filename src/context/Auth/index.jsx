@@ -11,10 +11,12 @@ import { debounce } from 'lodash'
 
 import { auth } from '../../firebase'
 import { getDocRef, getDocument } from '../../firebase/service'
+import { useLoading } from '../Loading'
 
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
+  const loading = useLoading()
   const [loaded, setLoaded] = useState(false)
   const [userDocReference, setUserDocReference] = useState(null)
   const [user, setUser] = useState(null)
@@ -32,6 +34,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
       } finally {
         setLoaded(true)
+        loading.hide()
       }
     },
     [userDocReference]
@@ -57,10 +60,12 @@ export const AuthProvider = ({ children }) => {
           // ...
           setUserDocReference(null)
           setUser(null)
+          loading.hide()
         }
       },
-      (error) => { },
-      () => { }
+      (error) => {
+        // console.log(error)
+      },
     )
   }, [user])
 

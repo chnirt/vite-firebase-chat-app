@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useCallback } from 'react'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { getDocs, query, where } from 'firebase/firestore'
@@ -14,9 +14,11 @@ import { generateKeywords } from '../../firebase/utils'
 import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
 import { APP_NAME } from '../../env'
 import { signUpAccount } from '../../mock'
+import { useLoading } from '../../context'
 
 const SignUp = () => {
   let navigate = useNavigate()
+  const loading = useLoading()
   // const [avatar, setAvatar] = useState(
   //   'https://server-avatar.nimostatic.tv/201902231550916212700_1659511695712_avatar.png'
   // )
@@ -89,9 +91,15 @@ const SignUp = () => {
   //   logAnalyticsEvent,
   // ])
 
-  const onFinish = async (values) => {
-    console.log('Success:', values)
-    const { fullName, emailOrYourPhoneNumber: email, username, password } = values
+  const onFinish = useCallback(async (values) => {
+    loading.show()
+    // console.log('Success:', values)
+    const {
+      fullName,
+      emailOrYourPhoneNumber: email,
+      username,
+      password,
+    } = values
     try {
       const q = query(getColRef('users'), where('username', '==', username))
       const querySnapshot = await getDocs(q)
@@ -121,7 +129,8 @@ const SignUp = () => {
           fullName,
           email,
           username,
-          avatar: 'https://o.dlf.pt/dfpng/smallpng/276-2761779_person-placeholder-image-transparent-hd-png-download.png',
+          avatar:
+            'https://o.dlf.pt/dfpng/smallpng/276-2761779_person-placeholder-image-transparent-hd-png-download.png',
           keywords: generateKeywords(email),
         }
         await addDocument(userDocRef, userData)
@@ -129,7 +138,8 @@ const SignUp = () => {
         const followingData = {
           type: 'owner',
           uid,
-          avatar: 'https://o.dlf.pt/dfpng/smallpng/276-2761779_person-placeholder-image-transparent-hd-png-download.png',
+          avatar:
+            'https://o.dlf.pt/dfpng/smallpng/276-2761779_person-placeholder-image-transparent-hd-png-download.png',
           username,
         }
         const followerDocRef = getDocRef('users', uid, 'following', uid)
@@ -149,16 +159,18 @@ const SignUp = () => {
         },
         placement: 'bottomRight',
       })
+      loading.hide()
+    } finally {
     }
-  }
+  }, [])
 
-  const onFinishFailed = (errorInfo) => {
+  const onFinishFailed = useCallback((errorInfo) => {
     // console.log('Failed:', errorInfo)
-  }
+  }, [])
 
-  const navigateLogin = () => {
+  const navigateLogin = useCallback(() => {
     navigate(`../${paths.login}`)
-  }
+  }, [])
 
   return (
     <Fragment>

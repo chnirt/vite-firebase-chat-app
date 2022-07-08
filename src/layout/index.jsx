@@ -1,6 +1,6 @@
 import { signOut } from 'firebase/auth'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../context'
+import { useAuth, useLoading } from '../context'
 
 import { auth } from '../firebase'
 import { TITLE } from '../env'
@@ -48,10 +48,12 @@ const LinkRoutes = [
 
 export const Layout = ({ children }) => {
   const { user } = useAuth()
+  const loading = useLoading()
   const [, , removeToken] = useLocalStorage('token', '')
 
 
   const handleLogout = useCallback(() => {
+    loading.show()
     signOut(auth)
     removeToken()
   }, [])
