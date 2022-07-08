@@ -8,7 +8,6 @@ import { getThemeVariables } from 'antd/dist/theme';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
     vitePluginImp({
       libList: [
         {
@@ -17,6 +16,7 @@ export default defineConfig({
         },
       ],
     }),
+    react(),
   ],
   resolve: {
     alias: [
