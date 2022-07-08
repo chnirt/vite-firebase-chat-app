@@ -29,26 +29,27 @@ const SignIn = () => {
     }
   }, [email, password, signInWithEmailAndPassword, logAnalyticsEvent])
 
-  const onFinish = useCallback(
-    (values) => {
-      console.log('Success:', values)
-      const { emailOrYourPhoneNumber, password } = values
-      try {
-        // auth.signIn({
-        //   email: emailOrYourPhoneNumber,
-        //   password,
-        // })
-      } catch (error) { }
-    },
-    []
-  )
+  const onFinish = useCallback(async (values) => {
+    console.log('Success:', values)
+    const { emailOrYourPhoneNumber, password } = values
+    try {
+      // auth.signIn({
+      //   email: emailOrYourPhoneNumber,
+      //   password,
+      // })
+
+      await signInWithEmailAndPassword(auth, emailOrYourPhoneNumber, password)
+
+      logAnalyticsEvent(eventNames, { email: emailOrYourPhoneNumber })
+    } catch (error) { }
+  }, [])
 
   const onFinishFailed = useCallback((errorInfo) => {
     // console.log('Failed:', errorInfo)
   }, [])
 
   const navigateRegister = useCallback(() => {
-    navigate(paths.register)
+    navigate(`../${paths.register}`)
   }, [navigate])
 
   return (
