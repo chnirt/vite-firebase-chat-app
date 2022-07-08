@@ -1,9 +1,10 @@
 // https://github.com/vitejs/vite/issues/2185#issuecomment-784637827
 // https://stackoverflow.com/questions/69039093/how-to-change-antd-theme-in-vite-config
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import vitePluginImp from 'vite-plugin-imp';
-import { getThemeVariables } from 'antd/dist/theme';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import vitePluginImp from 'vite-plugin-imp'
+import svgr from 'vite-plugin-svgr'
+import { getThemeVariables } from 'antd/dist/theme'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,7 +14,7 @@ export default defineConfig({
         {
           libName: 'lodash',
           libDirectory: '',
-          camel2DashComponentName: true
+          camel2DashComponentName: true,
         },
         {
           libName: 'antd',
@@ -21,6 +22,7 @@ export default defineConfig({
         },
       ],
     }),
+    svgr(),
     react(),
   ],
   resolve: {
@@ -43,4 +45,4 @@ export default defineConfig({
       },
     },
   },
-});
+})

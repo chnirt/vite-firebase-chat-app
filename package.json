@@ -24,7 +24,8 @@
     "react-markdown": "8.0.3",
     "react-router-dom": "6.3.0",
     "remark-gfm": "3.0.1",
-    "semver": "7.3.7"
+    "semver": "7.3.7",
+    "vite-plugin-svgr": "^2.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

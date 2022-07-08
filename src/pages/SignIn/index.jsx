@@ -9,6 +9,7 @@ import { eventNames, paths } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { APP_NAME } from '../../env'
 import { signInAccount } from '../../mock'
+import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
 
 const SignIn = () => {
   let navigate = useNavigate()
@@ -54,7 +55,7 @@ const SignIn = () => {
 
   return (
     <Fragment>
-      <Row>
+      <Row className='appName'>
         <Col
           xs={24}
           sm={{ span: 8, offset: 8 }}
@@ -64,7 +65,7 @@ const SignIn = () => {
         >
           <Row
             style={{
-              height: 'calc(100vh - 100px)',
+              height: 'calc(95vh)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -78,11 +79,11 @@ const SignIn = () => {
               }}
             >
               {/* <FadeIn> */}
-              {/* <Logo
+              <Logo
                 width={50}
                 height={68}
               // fill={PRIMARY_COLOR}
-              /> */}
+              />
               {/* </FadeIn> */}
             </Row>
             <Row style={{ justifyContent: 'center' }}>
