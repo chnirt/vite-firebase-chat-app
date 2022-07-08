@@ -7,7 +7,8 @@ import {
   useState,
 } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
-import { debounce, isEmpty } from 'lodash'
+import debounce from 'lodash/debounce'
+import isEmpty from 'lodash/isEmpty'
 
 import { auth } from '../../firebase'
 import { getDocRef, getDocument } from '../../firebase/service'
@@ -17,7 +18,7 @@ const defaultState = {
   isAuth: false,
   loaded: false,
   user: null,
-  fetchUser: () => { },
+  fetchUser: () => {},
 }
 
 const AuthContext = createContext(defaultState)
