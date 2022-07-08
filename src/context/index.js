@@ -1,5 +1,5 @@
 export * from './Auth'
 export * from './WebRTC'
 export * from './RemoteConfig'
-export * from './I18n'
+export * from './I18n1'
 export * from './Loading'
