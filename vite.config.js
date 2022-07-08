@@ -11,6 +11,11 @@ export default defineConfig({
     vitePluginImp({
       libList: [
         {
+          libName: 'lodash',
+          libDirectory: '',
+          camel2DashComponentName: true
+        },
+        {
           libName: 'antd',
           style: (name) => `antd/es/${name}/style`,
         },

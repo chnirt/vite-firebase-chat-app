@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
-import _ from 'lodash'
+import { debounce } from 'lodash'
 
 import { auth } from '../../firebase'
 import { getDocRef, getDocument } from '../../firebase/service'
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     [userDocReference]
   )
 
-  const debounceFetchUser = _.debounce(fetchUser, 1000)
+  const debounceFetchUser = debounce(fetchUser, 1000)
 
   useEffect(() => {
     onAuthStateChanged(
