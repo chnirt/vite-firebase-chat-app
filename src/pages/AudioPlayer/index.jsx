@@ -21,7 +21,7 @@ const urls = [
 ]
 
 const AudioPlayer = () => {
-  const [token] = useLocalStorage('token', '')
+  const [token, , removeToken] = useLocalStorage('token', '')
   const audioRef = useRef(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -80,6 +80,15 @@ const AudioPlayer = () => {
   )
 
   const handleSelect = useCallback(async (ii) => setAudioIndex(ii), [])
+
+  const handleUnconnectSpotify = useCallback(() => {
+    removeToken()
+    setAudioList([])
+    setAudioIndex(0)
+    setCurrentTime(0)
+    setDuration(0)
+    setPlay(false)
+  }, [])
 
   useEffect(() => {
     const searchArtists = async () => {
@@ -154,11 +163,15 @@ const AudioPlayer = () => {
       // step={duration / 10}
       />
       <br />
-      <a
-        href={`${SPOTIFY_AUTH_ENDPOINT}?client_id=${SPOTIFY_CLIENT_ID}&redirect_uri=${SPOTIFY_REDIRECT_URI}&response_type=${SPOTIFY_RESPONSE_TYPE}`}
-      >
-        Login to Spotify
-      </a>
+      {token ? (
+        <button onClick={handleUnconnectSpotify}>unconnect</button>
+      ) : (
+        <a
+          href={`${SPOTIFY_AUTH_ENDPOINT}?client_id=${SPOTIFY_CLIENT_ID}&redirect_uri=${SPOTIFY_REDIRECT_URI}&response_type=${SPOTIFY_RESPONSE_TYPE}`}
+        >
+          connect Spotify
+        </a>
+      )}
       <br />
       <div
         style={{
