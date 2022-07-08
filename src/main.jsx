@@ -7,7 +7,7 @@ import { AuthProvider, RemoteConfigProvider } from './context'
 // import { ForkMe } from './components'
 import { basename } from './constants'
 
-import './index.css'
+import './index.less'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

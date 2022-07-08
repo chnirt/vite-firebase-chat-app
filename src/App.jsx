@@ -2,7 +2,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
 
-import './App.css'
+import './App.less'
 import { Layout } from './layout'
 import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
