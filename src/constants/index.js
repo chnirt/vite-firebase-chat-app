@@ -19,6 +19,7 @@ export const paths = {
   profile: 'profile',
   changePassword: 'change-password',
   spotify: 'spotify',
+  setting: 'setting',
   notFound: '*',
 }
 

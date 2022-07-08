@@ -7,6 +7,7 @@ import { TITLE } from '../env'
 import { Fragment, useCallback } from 'react'
 import { useLocalStorage } from '../hooks'
 import { Navbar } from '../components'
+import { Col, Row } from 'antd'
 
 const LinkRoutes = [
   {
@@ -61,7 +62,7 @@ export const Layout = ({ children }) => {
   return (
     <Fragment>
       <Navbar />
-      <div className="App">
+      {/* <div className="App">
         {TITLE}
         <p>Current User: {user.email}</p>
         <button onClick={handleLogout}>Log out</button>
@@ -80,7 +81,39 @@ export const Layout = ({ children }) => {
               </li>
             ))}
         </ul>
-        {children}
+      </div> */}
+
+      <div
+        className="appHeight"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
+        <Row
+          style={{
+            width: '100%',
+            aspectRatio: 1,
+            maxWidth: 975,
+            paddingTop: '90px',
+          }}
+        >
+          <Col
+            style={{
+              alignItems: 'center',
+              margin: '0 auto',
+            }}
+            // span={18}
+            xs={24}
+            sm={24}
+          // md={18}
+          // lg={24}
+          // xl={24}
+          >
+            {children}
+          </Col>
+        </Row>
       </div>
     </Fragment>
   )

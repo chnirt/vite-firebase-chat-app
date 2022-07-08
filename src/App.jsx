@@ -37,6 +37,8 @@ const LazySpotifyScreen = lazy(() => import('./pages/Spotify'))
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 
+const LazySettingScreen = lazy(() => import('./pages/Setting'))
+
 const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 
 // setUpBaseName()
@@ -195,8 +197,18 @@ function App() {
             </Suspense>
           ),
         },
+
+        {
+          path: paths.setting,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazySettingScreen />
+            </Suspense>
+          ),
+        },
       ],
     },
+
     {
       path: paths.spotify,
       element: (

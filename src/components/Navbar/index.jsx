@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Avatar, Badge, Button, Col, Dropdown, Menu, Popover, Row } from 'antd'
+import { Avatar, Badge, Button, Col, Dropdown, Menu, Row } from 'antd'
 import { CgBookmark, CgProfile } from 'react-icons/cg'
 import {
   IoChatbubbleEllipsesOutline,
@@ -7,7 +7,7 @@ import {
   IoSettingsOutline,
 } from 'react-icons/io5'
 import { AiOutlineCompass, AiOutlinePlusSquare } from 'react-icons/ai'
-import { FiHeart, FiLogOut } from 'react-icons/fi'
+import { FiHeart } from 'react-icons/fi'
 import { UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 // import { useRecoilState } from 'recoil'
@@ -23,7 +23,7 @@ import { signOutFirebase } from '../../firebase/service'
 // import { savePostToFirestore } from '../../firebase'
 
 export const Navbar = () => {
-  const navigate = useNavigate()
+  let navigate = useNavigate()
   const loading = useLoading()
   const auth = useAuth()
   const modal = useModal()
@@ -41,7 +41,11 @@ export const Navbar = () => {
     (e) => {
       switch (e.key) {
         case '0':
-          return navigate(paths.profile)
+          return navigate(`user/${auth?.user?.username}`)
+        case '1':
+          return navigate(`user/${auth?.user?.username}`)
+        case '2':
+          return navigate(`../${paths.setting}`)
         case '4':
           return handleSignOut()
         default:
@@ -101,7 +105,6 @@ export const Navbar = () => {
     {
       key: '4',
       label: 'Log Out',
-      icon: <FiLogOut color="#767676" size={16} />,
     },
   ]
 
@@ -263,22 +266,6 @@ export const Navbar = () => {
               shape="circle"
               icon={<FiHeart size={24} color="#767676" />}
             />
-            {/* <Button
-              style={{
-                border: 0,
-                boxShadow: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              ghost
-              shape="circle"
-              icon={<FiLogOut size={24} color="#767676" />}
-              onClick={handleSignOut}
-            /> */}
-            {/* <Popover content={content} title="Title" trigger="hover">
-              <Button>Hover me</Button>
-            </Popover> */}
             <Dropdown
               overlay={menu}
               placement="bottomRight"
@@ -287,19 +274,7 @@ export const Navbar = () => {
               // arrow={false}
               onVisibleChange={handleVisibleChange}
             >
-              <Avatar
-                style={{
-                  border: '2px solid #767676',
-                }}
-                shape="circle"
-                size={24}
-                icon={<UserOutlined color="#eeeeee" />}
-                src={
-                  auth?.user?.avatar ??
-                  'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
-                }
-              />
-              {/* <Button
+              <Button
                 style={{
                   border: 0,
                   boxShadow: 'none',
@@ -315,10 +290,11 @@ export const Navbar = () => {
                   size={24}
                   icon={<UserOutlined color="#eeeeee" />}
                   src={
+                    auth?.user?.avatar ??
                     'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
                   }
                 />
-              </Button> */}
+              </Button>
             </Dropdown>
           </Col>
         </Col>
