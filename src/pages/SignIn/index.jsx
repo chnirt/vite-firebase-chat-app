@@ -1,7 +1,7 @@
-import { Fragment, useCallback, useState } from 'react'
+import { Fragment, useCallback } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import { Link, useNavigate } from 'react-router-dom'
-import { Button, Checkbox, Col, Form, Input, Row, Typography } from 'antd'
+import { useNavigate } from 'react-router-dom'
+import { Button, Checkbox, Col, Form, Input, notification, Row, Typography } from 'antd'
 import { t } from 'i18next'
 
 import { auth } from '../../firebase'
@@ -13,36 +13,41 @@ import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
 
 const SignIn = () => {
   let navigate = useNavigate()
-  const [email, setEmail] = useState('trinhchinchin@gmail.com')
-  const [password, setPassword] = useState('Admin@123')
-  const [error, setError] = useState(null)
+  // const [email, setEmail] = useState('trinhchinchin@gmail.com')
+  // const [password, setPassword] = useState('Admin@123')
+  // const [error, setError] = useState(null)
 
-  const handleLogin = useCallback(async () => {
-    try {
-      if (email === '') return
-      if (password === '') return
+  // const handleLogin = useCallback(async () => {
+  //   try {
+  //     if (email === '') return
+  //     if (password === '') return
 
-      await signInWithEmailAndPassword(auth, email, password)
+  //     await signInWithEmailAndPassword(auth, email, password)
 
-      logAnalyticsEvent(eventNames, { email })
-    } catch (err) {
-      setError(err.message)
-    }
-  }, [email, password, signInWithEmailAndPassword, logAnalyticsEvent])
+  //     logAnalyticsEvent(eventNames, { email })
+  //   } catch (err) {
+  //     setError(err.message)
+  //   }
+  // }, [email, password, signInWithEmailAndPassword, logAnalyticsEvent])
 
   const onFinish = useCallback(async (values) => {
-    console.log('Success:', values)
+    // console.log('Success:', values)
     const { emailOrYourPhoneNumber, password } = values
     try {
-      // auth.signIn({
-      //   email: emailOrYourPhoneNumber,
-      //   password,
-      // })
-
       await signInWithEmailAndPassword(auth, emailOrYourPhoneNumber, password)
 
       logAnalyticsEvent(eventNames, { email: emailOrYourPhoneNumber })
-    } catch (error) { }
+    } catch (error) {
+      // console.log(error.message)
+      notification['error']({
+        message: 'Register Error',
+        description: error.message,
+        onClick: () => {
+          // console.log('Notification Clicked!')
+        },
+        placement: 'bottomRight',
+      })
+    }
   }, [])
 
   const onFinishFailed = useCallback((errorInfo) => {
@@ -76,6 +81,7 @@ const SignIn = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '10%',
+                marginBottom: '1rem',
               }}
             >
               {/* <FadeIn> */}
@@ -195,32 +201,32 @@ const SignIn = () => {
     </Fragment>
   )
 
-  return (
-    <div className="App">
-      SignIn
-      <br />
-      <input
-        type="email"
-        placeholder="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <br />
-      <input
-        type="password"
-        placeholder="password"
-        security="true"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br />
-      {error && <p>{error}</p>}
-      <br />
-      <button onClick={handleLogin}>Sign In</button>
-      <br />
-      No account? <Link to="/register">Sign up</Link>
-    </div>
-  )
+  // return (
+  //   <div className="App">
+  //     SignIn
+  //     <br />
+  //     <input
+  //       type="email"
+  //       placeholder="email"
+  //       value={email}
+  //       onChange={(e) => setEmail(e.target.value)}
+  //     />
+  //     <br />
+  //     <input
+  //       type="password"
+  //       placeholder="password"
+  //       security="true"
+  //       value={password}
+  //       onChange={(e) => setPassword(e.target.value)}
+  //     />
+  //     <br />
+  //     {error && <p>{error}</p>}
+  //     <br />
+  //     <button onClick={handleLogin}>Sign In</button>
+  //     <br />
+  //     No account? <Link to="/register">Sign up</Link>
+  //   </div>
+  // )
 }
 
 export default SignIn
