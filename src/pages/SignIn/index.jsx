@@ -54,8 +54,19 @@ const SignIn = () => {
   }, [navigate])
 
   return (
+    <Row
+      className="appHeight"
+      style={{
+        border: '1px solid red',
+      }}
+    >
+      Hello
+    </Row>
+  )
+
+  return (
     <Fragment>
-      <Row className='appName'>
+      <Row className="appName">
         <Col
           xs={24}
           sm={{ span: 8, offset: 8 }}
