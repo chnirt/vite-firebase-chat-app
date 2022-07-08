@@ -33,10 +33,14 @@ export const useFetch = (collectionName = 'todos', option) => {
 
     // Query the first page of docs
     const first = query(
-      ...(TYPE === 'collectionGroup' ? [getColGroupRef(collectionName)] : [getColRef(collectionName)]),
+      ...(TYPE === 'collectionGroup'
+        ? [getColGroupRef(collectionName)]
+        : [getColRef(collectionName)]),
       ...(keyword ? [where('keywords', 'array-contains', keyword)] : []),
       ...(WHERE ? [where(WHERE[0], WHERE[1], WHERE[2])] : []),
-      ...(ORDERBY ? [orderBy(ORDERBY[0], ORDERBY[1])] : [orderBy('createdAt', 'desc')]),
+      ...(ORDERBY
+        ? [orderBy(ORDERBY[0], ORDERBY[1])]
+        : [orderBy('createdAt', 'desc')]),
       limit(limitNumber)
     )
 

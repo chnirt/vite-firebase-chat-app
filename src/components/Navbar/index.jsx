@@ -12,7 +12,7 @@ import { UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 // import { useRecoilState } from 'recoil'
 
-// import { MyAutoComplete } from '../AutoComplete'
+import { MyAutoComplete } from '../MyAutoComplete'
 import { useAuth, useLoading, useModal } from '../../context'
 import { ReactComponent as Logo } from '../../assets/logo/logo-standard.svg'
 import { paths } from '../../constants'
@@ -183,7 +183,7 @@ export const Navbar = () => {
           </Col>
 
           <Col xs={0} sm={8}>
-            {/* <MyAutoComplete /> */}
+            <MyAutoComplete />
           </Col>
 
           <Col
@@ -282,12 +282,15 @@ export const Navbar = () => {
             <Dropdown
               overlay={menu}
               placement="bottomRight"
-              // arrow={{ pointAtCenter: true }}
+              arrow={{ pointAtCenter: true }}
               trigger={['click']}
-              arrow={false}
+              // arrow={false}
               onVisibleChange={handleVisibleChange}
             >
               <Avatar
+                style={{
+                  border: '2px solid #767676',
+                }}
                 shape="circle"
                 size={24}
                 icon={<UserOutlined color="#eeeeee" />}
