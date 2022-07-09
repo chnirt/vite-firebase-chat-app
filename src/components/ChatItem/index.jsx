@@ -1,6 +1,6 @@
 import { getDocs, query, where } from 'firebase/firestore'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useAuth } from '../../context'
 import { getColRef } from '../../firebase/service'

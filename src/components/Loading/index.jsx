@@ -11,9 +11,10 @@ export const Loading = ({
   if (typeof children === 'undefined')
     return (
       <div
+        className='appHeight'
         style={{
           width: '100vw',
-          height: '100vh',
+          // height: '100vh',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',

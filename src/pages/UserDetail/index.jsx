@@ -1,7 +1,6 @@
-import moment from 'moment'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getDocs, query, where } from 'firebase/firestore'
+import { getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore'
 import { Avatar, Button, Col, Row, Tabs, Typography } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { IoSettingsOutline } from 'react-icons/io5'
@@ -9,8 +8,13 @@ import { MdGridOn } from 'react-icons/md'
 import { CgBookmark } from 'react-icons/cg'
 import { BiUserPin } from 'react-icons/bi'
 
-import { getColRef } from '../../firebase/service'
-import { BackButton, PostList } from '../../components'
+import {
+  addDocument,
+  deleteDocument,
+  getColRef,
+  getDocRef,
+} from '../../firebase/service'
+import { PostList } from '../../components'
 import { useAuth } from '../../context'
 import { paths } from '../../constants'
 
@@ -18,9 +22,16 @@ const UserDetail = () => {
   let { username } = useParams()
   let navigate = useNavigate()
   const auth = useAuth()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [user, setUser] = useState(null)
+
+  const [blogList, setBlogList] = useState([])
+  const [followingList, setFollowingList] = useState([])
+  const [followerList, setFollowerList] = useState([])
+
+  const isOwner = auth.user.username === username
+  const isFollowing = followerList.some((item) => item.uid === auth.user.uid)
 
   const navigateProfile = useCallback(() => {
     navigate(`../${paths.profile}`)
@@ -28,6 +39,95 @@ const UserDetail = () => {
 
   const navigateSetting = useCallback(() => {
     navigate(`../${paths.setting}`)
+  }, [])
+
+  const handleFollow = useCallback(async (doc) => {
+    // follower
+    // const followerDocRef = getDocRef('users', user.uid)
+    const followingData = {
+      type: 'followee',
+      uid: doc.uid,
+      avatar: doc.avatar,
+      username: doc.username,
+    }
+    const followerDocRef = getDocRef(
+      'users',
+      auth.user.uid,
+      'following',
+      doc.uid
+    )
+    await addDocument(followerDocRef, followingData)
+
+    // followee
+    // const followeeDocRef = doc.ref
+    const followerData = {
+      type: 'follower',
+      uid: auth.user.uid,
+      avatar: auth.user.avatar,
+      username: auth.user.username,
+    }
+    const followeeDocRef = getDocRef(
+      'users',
+      doc.uid,
+      'follower',
+      auth.user.uid
+    )
+    await addDocument(followeeDocRef, followerData)
+
+    // // add relationship
+    // const batch = getBatch()
+    // const blogDocRef = getColRef('blogs')
+    // const getQuery = query(blogDocRef, where('uid', '==', doc.uid))
+    // const querySnapshot = await getDocs(getQuery)
+    // querySnapshot.forEach((docSnapshot) => {
+    //   const docRef = docSnapshot.ref
+    //   batch.update(docRef, {
+    //     relationship: arrayUnion(user.uid),
+    //   })
+    // })
+
+    // await batch.commit()
+  }, [])
+
+  const handleUnfollow = useCallback(async (doc) => {
+    // follower
+    const followerDocRef = getDocRef(
+      'users',
+      auth.user.uid,
+      'following',
+      doc.uid
+    )
+    const followerDocSnap = await getDoc(followerDocRef)
+    // console.log(followerDocSnap.data())
+    if (followerDocSnap.exists()) {
+      await deleteDocument('users', auth.user.uid, 'following', doc.uid)
+    }
+
+    // followee
+    const followeeDocRef = getDocRef(
+      'users',
+      doc.uid,
+      'follower',
+      auth.user.uid
+    )
+    const followeeDocSnap = await getDoc(followeeDocRef)
+    // console.log(followeeDocSnap.data())
+    if (followeeDocSnap.exists()) {
+      await deleteDocument('users', doc.uid, 'follower', auth.user.uid)
+    }
+
+    // // remove relationship
+    // const batch = getBatch()
+    // const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
+    // const querySnapshot = await getDocs(getQuery)
+    // querySnapshot.forEach((docSnapshot) => {
+    //   const docRef = docSnapshot.ref
+    //   batch.update(docRef, {
+    //     relationship: arrayRemove(user.uid),
+    //   })
+    // })
+
+    // await batch.commit()
   }, [])
 
   useEffect(() => {
@@ -58,6 +158,97 @@ const UserDetail = () => {
 
     fetchData(username)
   }, [username])
+
+  useEffect(() => {
+    if (!user) return
+
+    const fetchBlogData = async () => {
+      const blogDocRef = getColRef('blogs')
+      const q = query(blogDocRef, where('uid', '==', user.uid))
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setBlogList(data)
+    }
+    const fetchFollowingData = async () => {
+      const followingDocRef = getColRef('users', user.uid, 'following')
+      const q = query(followingDocRef, where('uid', '!=', user.uid))
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setFollowingList(data)
+    }
+    const fetchFollowerData = async () => {
+      const followerDocRef = getColRef('users', user.uid, 'follower')
+      const querySnapshot = await getDocs(followerDocRef)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setFollowerList(data)
+    }
+    // const fetchLikeData = async () => {
+    //   const likeDocRef = getColRef('users', user.uid, 'likes')
+    //   const querySnapshot = await getDocs(likeDocRef)
+    //   const docs = querySnapshot.docs
+    //   const data = docs.map((docSnapshot) => {
+    //     return {
+    //       id: docSnapshot.id,
+    //       ...docSnapshot.data(),
+    //     }
+    //   })
+    //   // console.log(data)
+    //   setLikeList(data)
+    // }
+    Promise.all([
+      fetchBlogData(),
+      fetchFollowingData(),
+      fetchFollowerData(),
+      // fetchLikeData(),
+    ]).then(() => {
+      setLoading(false)
+    })
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    const followerDocRef = getColRef('users', user.uid, 'follower')
+    const q = query(followerDocRef, where('uid', '!=', user.uid))
+    const unsubscribeFollowing = onSnapshot(
+      q,
+      async (querySnapshot) => {
+        const data = querySnapshot.docs.map((docSnapshot) => {
+          return {
+            id: docSnapshot.id,
+            ...docSnapshot.data(),
+          }
+        })
+        setFollowerList(data)
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+    return () => {
+      unsubscribeFollowing()
+    }
+  }, [user])
 
   if (!user) return null
 
@@ -95,7 +286,7 @@ const UserDetail = () => {
             }}
             icon={<UserOutlined color="#eeeeee" />}
             src={
-              auth?.user?.avatar ??
+              user?.avatar ??
               'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
             }
           />
@@ -112,11 +303,44 @@ const UserDetail = () => {
             style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}
           >
             <Typography.Title style={{ marginBottom: 0 }} level={2}>
-              trinhchinchin
+              {user.username}
             </Typography.Title>
-            <Button style={{ marginLeft: 20 }} onClick={navigateProfile}>
-              Edit profile
-            </Button>
+            {isOwner ? (
+              <Button
+                style={{
+                  // border: 0,
+                  // boxShadow: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 20,
+                }}
+                onClick={navigateProfile}
+              >
+                Edit profile
+              </Button>
+            ) : (
+              <Button
+                style={{
+                  backgroundColor: '#0095F6',
+                  borderColor: '#0095F6',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 20,
+                  borderRadius: 3,
+                  paddingLeft: 24,
+                  paddingRight: 24,
+                }}
+                type="primary"
+                onClick={() =>
+                  isFollowing ? handleUnfollow(user) : handleFollow(user)
+                }
+              >
+                {isFollowing ? 'Following' : 'Follow'}
+              </Button>
+            )}
+
             <Button
               style={{
                 border: 0,
@@ -134,13 +358,15 @@ const UserDetail = () => {
           </Row>
           <Row style={{ marginBottom: 20 }}>
             <Typography.Text style={{ marginRight: 40 }}>
-              <Typography.Text strong>0</Typography.Text> posts
+              <Typography.Text strong>{blogList.length}</Typography.Text> posts
             </Typography.Text>
             <Typography.Text style={{ marginRight: 40 }}>
-              <Typography.Text strong>165</Typography.Text> followers
+              <Typography.Text strong>{followerList.length}</Typography.Text>{' '}
+              followers
             </Typography.Text>
             <Typography.Text>
-              <Typography.Text strong>241</Typography.Text> following
+              <Typography.Text strong>{followingList.length}</Typography.Text>{' '}
+              following
             </Typography.Text>
           </Row>
           <Row>
@@ -212,21 +438,26 @@ const UserDetail = () => {
           <PostList />
         </Tabs.TabPane>
       </Tabs>
-      UserDetail
-      <br />
-      <BackButton />
-      <div>
-        {error && <strong>Error: {JSON.stringify(error)}</strong>}
-        {loading && <span>Document: Loading...</span>}
-        {user && (
-          <div>
-            <h3>{user?.email}</h3>
-            <p>{moment(user?.createdAt?.toDate()).fromNow()}</p>
-          </div>
-        )}
-      </div>
     </div>
   )
+
+  // return (
+  //   <div>
+  //     UserDetail
+  //     <br />
+  //     <BackButton />
+  //     <div>
+  //       {error && <strong>Error: {JSON.stringify(error)}</strong>}
+  //       {loading && <span>Document: Loading...</span>}
+  //       {user && (
+  //         <div>
+  //           <h3>{user?.email}</h3>
+  //           <p>{moment(user?.createdAt?.toDate()).fromNow()}</p>
+  //         </div>
+  //       )}
+  //     </div>
+  //   </div>
+  // )
 }
 
 export default UserDetail

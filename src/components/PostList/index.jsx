@@ -1,4 +1,3 @@
-import React from 'react'
 import { Col, Image, Row } from 'antd'
 
 export const PostList = () => {

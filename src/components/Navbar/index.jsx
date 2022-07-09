@@ -78,6 +78,10 @@ export const Navbar = () => {
     navigate(paths.home)
   }, [navigate])
 
+  const navigateBlog = useCallback(() => {
+    navigate(paths.blog)
+  }, [navigate])
+
   const navigateChat = useCallback(() => {
     navigate(paths.messenger)
   }, [navigate])
@@ -129,7 +133,7 @@ export const Navbar = () => {
         position: 'fixed',
         top: 0,
         background: '#fff',
-        zIndex: 1,
+        zIndex: 20,
       }}
     >
       <Row
@@ -210,7 +214,7 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<IoHomeOutline size={24} color="#767676" />}
-              onClick={navigateHome}
+              onClick={navigateBlog}
             />
             <Button
               style={{

@@ -1,6 +1,6 @@
 // https://medium.com/firebase-tips-tricks/how-to-combined-two-firestore-queries-to-simulate-a-logical-or-query-27d28a43cb2d
 // https://firebase.blog/posts/2018/08/better-arrays-in-cloud-firestore
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   query,
@@ -25,6 +25,7 @@ import {
   getDocument,
 } from '../../firebase/service'
 import { paths } from '../../constants'
+import { BlogList } from '../../components'
 
 const LIMIT = 3
 
@@ -220,68 +221,75 @@ const Blog = () => {
   }, [user])
 
   return (
-    <div>
-      Blog
-      <br />
+    <Fragment>
+      <BlogList blogs={blogs} notFoundContent={<div>Suggestions</div>} />
       <button onClick={handleCreatePost}>Create Post</button>
-      <div
-        style={{
-          height: 500,
-          overflowY: 'scroll',
-          paddingTop: 8,
-          paddingBottom: 8,
-          border: 'solid 1px black',
-        }}
-      >
-        {loading && <span>Collection: Loading...</span>}
-        {blogs.length > 0 && (
-          <div>
-            {blogs.map((doc) => {
-              const id = doc.id
-              const title = doc.title
-              const createdAt = doc.createdAt
-              const isLiked = likeList.some((item) => item.postId === doc.id)
-              const foundRelationship = findRelationship(doc.uid)
-              const username = foundRelationship?.username
-              const avatar = foundRelationship?.avatar
-              return (
-                <div
-                  key={`blog-${id}`}
-                  style={{
-                    border: 'solid 1px black',
-                    margin: 8,
-                  }}
-                >
-                  <img
-                    style={{ width: 50, height: 50 }}
-                    src={avatar}
-                    alt={`avatar-${doc.id}`}
-                  />
-                  <h3>{title}</h3>
-                  <p>{moment(createdAt?.toDate()).fromNow()}</p>
-                  <Link to={`/user/${username}`}>@{username}</Link>
-                  <br />
-                  {isLiked ? (
-                    <button onClick={() => handleUnLike(doc)}>liked</button>
-                  ) : (
-                    <button onClick={() => handleLike(doc)}>like</button>
-                  )}
-                  <Link to={`/blog/${doc.id}`}>See more</Link>
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {!loadedAll ? (
-          moreLoading ? (
-            <span>Collection: Loading...</span>
-          ) : (
-            <button onClick={handleLoadMore}>Load more</button>
-          )
-        ) : null}
-      </div>
-    </div>
+    </Fragment>
   )
+
+  // return (
+  //   <div>
+  //     Blog
+  //     <br />
+  //     <button onClick={handleCreatePost}>Create Post</button>
+  //     <div
+  //       style={{
+  //         height: 500,
+  //         overflowY: 'scroll',
+  //         paddingTop: 8,
+  //         paddingBottom: 8,
+  //         border: 'solid 1px black',
+  //       }}
+  //     >
+  //       {loading && <span>Collection: Loading...</span>}
+  //       {blogs.length > 0 && (
+  //         <div>
+  //           {blogs.map((doc) => {
+  //             const id = doc.id
+  //             const title = doc.title
+  //             const createdAt = doc.createdAt
+  //             const isLiked = likeList.some((item) => item.postId === doc.id)
+  //             const foundRelationship = findRelationship(doc.uid)
+  //             const username = foundRelationship?.username
+  //             const avatar = foundRelationship?.avatar
+  //             return (
+  //               <div
+  //                 key={`blog-${id}`}
+  //                 style={{
+  //                   border: 'solid 1px black',
+  //                   margin: 8,
+  //                 }}
+  //               >
+  //                 <img
+  //                   style={{ width: 50, height: 50 }}
+  //                   src={avatar}
+  //                   alt={`avatar-${doc.id}`}
+  //                 />
+  //                 <h3>{title}</h3>
+  //                 <p>{moment(createdAt?.toDate()).fromNow()}</p>
+  //                 <Link to={`/user/${username}`}>@{username}</Link>
+  //                 <br />
+  //                 {isLiked ? (
+  //                   <button onClick={() => handleUnLike(doc)}>liked</button>
+  //                 ) : (
+  //                   <button onClick={() => handleLike(doc)}>like</button>
+  //                 )}
+  //                 <Link to={`/blog/${doc.id}`}>See more</Link>
+  //               </div>
+  //             )
+  //           })}
+  //         </div>
+  //       )}
+  //       {!loadedAll ? (
+  //         moreLoading ? (
+  //           <span>Collection: Loading...</span>
+  //         ) : (
+  //           <button onClick={handleLoadMore}>Load more</button>
+  //         )
+  //       ) : null}
+  //     </div>
+  //   </div>
+  // )
 }
 
 export default Blog

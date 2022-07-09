@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { useAuth } from '../../context'
 import { useFetch } from '../../firebase/hooks'
 import { ChatItem } from '../ChatItem'

@@ -37,7 +37,6 @@ export function useLocalStorage(key, initialValue) {
     }
   };
   const removeValue = () => {
-    console.log("removeValue")
     try {
       // Save state
       setStoredValue(initialValue);
