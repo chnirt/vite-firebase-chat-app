@@ -221,10 +221,11 @@ export const BlogList = () => {
     <div
       id="scrollableDiv"
       style={{
-        height: 'calc(var(--app-height) - 118px)',
+        height: 'calc(var(--app-height) - 90px)',
         overflow: 'auto',
         padding: '0 16px',
         border: '1px solid rgba(140, 140, 140, 0.35)',
+        borderRadius: 3
       }}
     >
       <InfiniteScroll

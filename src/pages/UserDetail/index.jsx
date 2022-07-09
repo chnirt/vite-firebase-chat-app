@@ -458,7 +458,7 @@ const UserDetail = () => {
                 flexDirection: 'column',
               }}
             >
-              <Typography.Text strong>TrinhChinChin 🦦</Typography.Text>
+              <Typography.Text strong>{user.fullName}</Typography.Text>
               <Typography.Text>Hate me first, ❤️ later</Typography.Text>
             </div>
           </Row>

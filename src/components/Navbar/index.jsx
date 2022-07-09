@@ -82,6 +82,10 @@ export const Navbar = () => {
     navigate(paths.blog)
   }, [navigate])
 
+  const navigateProfile = useCallback(() => {
+    navigate(paths.profile)
+  }, [navigate])
+
   const navigateCreatePost = useCallback(() => {
     navigate(paths.createBlog)
   }, [navigate])
@@ -273,6 +277,7 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<FiHeart size={24} color="#767676" />}
+              onClick={navigateProfile}
             />
             <Dropdown
               overlay={menu}

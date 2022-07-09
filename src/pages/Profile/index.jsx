@@ -1,6 +1,8 @@
+import { Radio, Space, Tabs } from 'antd'
 import { getDocs, query, where } from 'firebase/firestore'
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useUpdateProfile } from 'react-firebase-hooks/auth'
+import { ChangePassword, EditProfile } from '../../components'
 
 import { useAuth } from '../../context'
 import { auth } from '../../firebase'
@@ -24,6 +26,12 @@ const Profile = ({ }) => {
   const [followerList, setFollowerList] = useState([])
   const [likeList, setLikeList] = useState([])
 
+  const [tabPosition, setTabPosition] = useState('left')
+
+  const changeTabPosition = useCallback((e) => {
+    setTabPosition(e.target.value)
+  }, [])
+
   const handleUpdate = useCallback(async () => {
     if (displayName && photoURL) {
       await updateProfile({ displayName, photoURL })
@@ -33,7 +41,7 @@ const Profile = ({ }) => {
     const userDocRef = getDocRef('users', user.uid)
     const userData = {
       username,
-      avatar
+      avatar,
     }
     await updateDocument(userDocRef, userData)
 
@@ -120,6 +128,41 @@ const Profile = ({ }) => {
   if (updating) {
     return <p>Updating...</p>
   }
+
+  return (
+    <Fragment>
+      <div
+        style={{
+          height: 'calc(var(--app-height) - 90px)',
+          overflow: 'auto',
+          padding: '0 16px',
+          border: '1px solid rgba(140, 140, 140, 0.35)',
+          borderRadius: 3
+        }}
+      >
+        {/* <Space style={{ marginBottom: 24, flex: 1 }}>
+          Tab position:
+          <Radio.Group value={tabPosition} onChange={changeTabPosition}>
+            <Radio.Button value="top">top</Radio.Button>
+            <Radio.Button value="bottom">bottom</Radio.Button>
+            <Radio.Button value="left">left</Radio.Button>
+            <Radio.Button value="right">right</Radio.Button>
+          </Radio.Group>
+        </Space> */}
+        <Tabs tabPosition={tabPosition} style={{
+          height: "100%"
+        }}>
+          <Tabs.TabPane tab="Edit Profile" key="1">
+            <ChangePassword />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Change Password" key="2">
+            <EditProfile />
+          </Tabs.TabPane>
+        </Tabs>
+      </div>
+    </Fragment>
+  )
+
   return (
     <div>
       Profile
@@ -142,7 +185,6 @@ const Profile = ({ }) => {
         onChange={(e) => setPhotoURL(e.target.value)}
       />
       <br /> */}
-
       <input
         type="text"
         placeholder="avatar"
