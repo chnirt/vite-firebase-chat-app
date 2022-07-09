@@ -32,9 +32,13 @@ export const Navbar = () => {
   const handleSignOut = useCallback(async () => {
     try {
       loading.show()
-      signOutFirebase()
       removeToken()
-    } catch (error) { }
+      await signOutFirebase()
+    } catch (error) {
+      setTimeout(() => {
+        loading.hide()
+      }, 1000)
+    }
   }, [])
 
   const handleMenuClick = useCallback(

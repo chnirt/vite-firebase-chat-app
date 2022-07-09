@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Avatar, Button, Divider, List, Skeleton, Space } from 'antd'
 import {
@@ -12,7 +12,7 @@ import {
 } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
-import { FiBookmark, FiHeart, FiMoreHorizontal } from 'react-icons/fi'
+import { FiHeart } from 'react-icons/fi'
 import { IoChatbubbleOutline, IoPaperPlaneOutline } from 'react-icons/io5'
 
 import {
@@ -24,7 +24,7 @@ import {
 } from '../../firebase/service'
 import { useAuth } from '../../context'
 
-const LIMIT = 5
+const LIMIT = 10
 
 export const BlogList = () => {
   const { user } = useAuth()
@@ -225,7 +225,7 @@ export const BlogList = () => {
         overflow: 'auto',
         padding: '0 16px',
         border: '1px solid rgba(140, 140, 140, 0.35)',
-        borderRadius: 3
+        borderRadius: 3,
       }}
     >
       <InfiniteScroll

@@ -33,4 +33,7 @@ export const eventNames = {
   answer: 'answer',
   decline: 'decline',
   createPhoto: 'create_photo',
+  editAvatar: 'edit_avatar',
+  editProfile: 'edit_profile',
+  changePassword: 'change_password',
 }

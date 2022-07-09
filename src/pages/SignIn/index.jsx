@@ -3,7 +3,6 @@ import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import {
   Button,
-  Checkbox,
   Col,
   Form,
   Input,
@@ -44,11 +43,11 @@ const SignIn = () => {
   const onFinish = useCallback(async (values) => {
     loading.show()
     // console.log('Success:', values)
-    const { emailOrYourPhoneNumber, password } = values
+    const { emailOrYourPhoneNumber: email, password } = values
     try {
-      await signInWithEmailAndPassword(auth, emailOrYourPhoneNumber, password)
+      await signInWithEmailAndPassword(auth, email, password)
 
-      logAnalyticsEvent(eventNames, { email: emailOrYourPhoneNumber })
+      logAnalyticsEvent(eventNames.login, { email })
     } catch (error) {
       // console.log(error.message)
       notification['error']({
@@ -59,8 +58,10 @@ const SignIn = () => {
         },
         placement: 'bottomRight',
       })
-      loading.hide()
     } finally {
+      setTimeout(() => {
+        loading.hide()
+      }, 1000)
     }
   }, [])
 
@@ -126,7 +127,7 @@ const SignIn = () => {
             </Row>
             <Form
               style={{ padding: '0 5vw' }}
-              name="normal_login"
+              name="login-basic"
               className="login-form"
               initialValues={{
                 emailOrYourPhoneNumber: signInAccount.emailOrYourPhoneNumber,

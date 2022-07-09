@@ -138,9 +138,7 @@ function App() {
           path: paths.pexels,
           element: (
             <Suspense fallback={<Loading />}>
-              <WebRTCProvider>
-                <LazyPexelsScreen />
-              </WebRTCProvider>
+              <LazyPexelsScreen />
             </Suspense>
           ),
         },
@@ -212,8 +210,10 @@ function App() {
     {
       path: paths.spotify,
       element: (
-        <LazySpotifyScreen />
-      )
+        <Suspense fallback={<Loading />}>
+          <LazySpotifyScreen />
+        </Suspense>
+      ),
     },
     {
       path: paths.notFound,

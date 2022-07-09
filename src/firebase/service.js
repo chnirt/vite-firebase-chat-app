@@ -2,7 +2,8 @@
 // https://bobbyhadz.com/blog/javascript-remove-null-values-from-array
 // https://stackoverflow.com/questions/70571720/firestore-query-snapshot-foreach-seems-to-be-overwriting-products-state
 // https://stackoverflow.com/questions/50807905/are-firestore-updates-charged-the-same-cost-as-writes
-import { signOut } from 'firebase/auth'
+// https://stackoverflow.com/questions/37811684/how-to-create-credential-object-needed-by-firebase-web-user-reauthenticatewith
+import { EmailAuthProvider, reauthenticateWithCredential, signOut, updatePassword } from 'firebase/auth'
 import {
   doc,
   getDoc,
@@ -79,3 +80,18 @@ export const deleteDocument = async (
 export const getBatch = () => writeBatch(db)
 
 export const signOutFirebase = () => signOut(auth)
+
+export const reauthenticateWithCredentialFirebase = async (currentPassword) => {
+  // TODO(you): prompt the user to re-provide their sign-in credentials
+  const credential = EmailAuthProvider.credential(
+    auth.currentUser.email,
+    currentPassword
+  )
+  const user = auth.currentUser;
+  return await reauthenticateWithCredential(user, credential)
+}
+
+export const updatePasswordFirebase = async (newPassword) => {
+  const user = auth.currentUser;
+  return await updatePassword(user, newPassword)
+}

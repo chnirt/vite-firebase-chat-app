@@ -224,7 +224,7 @@ const SignUp = () => {
             </Row>
             <Form
               style={{ padding: '0 5vw' }}
-              name="normal_login"
+              name="register-basic"
               className="login-form"
               initialValues={{
                 fullName: signUpAccount.fullName,

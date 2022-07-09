@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore'
-import { Avatar, Button, Col, Row, Tabs, Typography } from 'antd'
+import { Avatar, Button, Col, message, Row, Tabs, Typography } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { MdGridOn } from 'react-icons/md'
@@ -44,112 +44,106 @@ const UserDetail = () => {
   }, [])
 
   const handleFollow = useCallback(async (doc) => {
-    appLoading.show()
-    delay(
-      function (content) {
-        console.log(content)
-      },
-      3000,
-      'GeeksforGeeks!'
-    )
-    // follower
-    // const followerDocRef = getDocRef('users', user.uid)
-    const followingData = {
-      type: 'followee',
-      uid: doc.uid,
-      avatar: doc.avatar,
-      username: doc.username,
+    try {
+      // follower
+      // const followerDocRef = getDocRef('users', user.uid)
+      const followingData = {
+        type: 'followee',
+        uid: doc.uid,
+        avatar: doc.avatar,
+        username: doc.username,
+      }
+      const followerDocRef = getDocRef(
+        'users',
+        auth.user.uid,
+        'following',
+        doc.uid
+      )
+      await addDocument(followerDocRef, followingData)
+
+      // followee
+      // const followeeDocRef = doc.ref
+      const followerData = {
+        type: 'follower',
+        uid: auth.user.uid,
+        avatar: auth.user.avatar,
+        username: auth.user.username,
+      }
+      const followeeDocRef = getDocRef(
+        'users',
+        doc.uid,
+        'follower',
+        auth.user.uid
+      )
+      await addDocument(followeeDocRef, followerData)
+
+      // // add relationship
+      // const batch = getBatch()
+      // const blogDocRef = getColRef('blogs')
+      // const getQuery = query(blogDocRef, where('uid', '==', doc.uid))
+      // const querySnapshot = await getDocs(getQuery)
+      // querySnapshot.forEach((docSnapshot) => {
+      //   const docRef = docSnapshot.ref
+      //   batch.update(docRef, {
+      //     relationship: arrayUnion(user.uid),
+      //   })
+      // })
+
+      // await batch.commit()
+    } catch (error) {
+      message.error(error.message)
+    } finally {
     }
-    const followerDocRef = getDocRef(
-      'users',
-      auth.user.uid,
-      'following',
-      doc.uid
-    )
-    await addDocument(followerDocRef, followingData)
-
-    // followee
-    // const followeeDocRef = doc.ref
-    const followerData = {
-      type: 'follower',
-      uid: auth.user.uid,
-      avatar: auth.user.avatar,
-      username: auth.user.username,
-    }
-    const followeeDocRef = getDocRef(
-      'users',
-      doc.uid,
-      'follower',
-      auth.user.uid
-    )
-    await addDocument(followeeDocRef, followerData)
-
-    // // add relationship
-    // const batch = getBatch()
-    // const blogDocRef = getColRef('blogs')
-    // const getQuery = query(blogDocRef, where('uid', '==', doc.uid))
-    // const querySnapshot = await getDocs(getQuery)
-    // querySnapshot.forEach((docSnapshot) => {
-    //   const docRef = docSnapshot.ref
-    //   batch.update(docRef, {
-    //     relationship: arrayUnion(user.uid),
-    //   })
-    // })
-
-    // await batch.commit()
-
-    setTimeout(() => {
-      appLoading.hide()
-    }, 1000)
   }, [])
 
   const handleUnfollow = useCallback(async (doc) => {
-    appLoading.show()
-    // follower
-    const followerDocRef = getDocRef(
-      'users',
-      auth.user.uid,
-      'following',
-      doc.uid
-    )
-    const followerDocSnap = await getDoc(followerDocRef)
-    // console.log(followerDocSnap.data())
-    if (followerDocSnap.exists()) {
-      await deleteDocument('users', auth.user.uid, 'following', doc.uid)
+    try {
+      // follower
+      const followerDocRef = getDocRef(
+        'users',
+        auth.user.uid,
+        'following',
+        doc.uid
+      )
+      const followerDocSnap = await getDoc(followerDocRef)
+      // console.log(followerDocSnap.data())
+      if (followerDocSnap.exists()) {
+        await deleteDocument('users', auth.user.uid, 'following', doc.uid)
+      }
+
+      // followee
+      const followeeDocRef = getDocRef(
+        'users',
+        doc.uid,
+        'follower',
+        auth.user.uid
+      )
+      const followeeDocSnap = await getDoc(followeeDocRef)
+      // console.log(followeeDocSnap.data())
+      if (followeeDocSnap.exists()) {
+        await deleteDocument('users', doc.uid, 'follower', auth.user.uid)
+      }
+
+      // // remove relationship
+      // const batch = getBatch()
+      // const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
+      // const querySnapshot = await getDocs(getQuery)
+      // querySnapshot.forEach((docSnapshot) => {
+      //   const docRef = docSnapshot.ref
+      //   batch.update(docRef, {
+      //     relationship: arrayRemove(user.uid),
+      //   })
+      // })
+
+      // await batch.commit()
+    } catch (error) {
+      message.error(error.message)
+    } finally {
     }
-
-    // followee
-    const followeeDocRef = getDocRef(
-      'users',
-      doc.uid,
-      'follower',
-      auth.user.uid
-    )
-    const followeeDocSnap = await getDoc(followeeDocRef)
-    // console.log(followeeDocSnap.data())
-    if (followeeDocSnap.exists()) {
-      await deleteDocument('users', doc.uid, 'follower', auth.user.uid)
-    }
-
-    // // remove relationship
-    // const batch = getBatch()
-    // const getQuery = query(getColRef('blogs'), where('uid', '==', doc.uid))
-    // const querySnapshot = await getDocs(getQuery)
-    // querySnapshot.forEach((docSnapshot) => {
-    //   const docRef = docSnapshot.ref
-    //   batch.update(docRef, {
-    //     relationship: arrayRemove(user.uid),
-    //   })
-    // })
-
-    // await batch.commit()
-    setTimeout(() => {
-      appLoading.hide()
-    }, 1000)
   }, [])
 
-  const handleMessage = useCallback(
-    async (doc) => {
+  const handleMessage = useCallback(async (doc) => {
+    try {
       const chatData = {
         members: [auth.user.uid, doc.uid],
         uid: auth.user.uid,
@@ -172,13 +166,17 @@ const UserDetail = () => {
         await addDocument(chatDocRef, chatData)
       }
       navigate(`../${paths.messenger}`)
-    },
-    []
-  )
+    } catch (error) {
+      message.error(error.message)
+    } finally {
+    }
+  }, [])
 
   useEffect(() => {
     const fetchData = async (username) => {
       try {
+        appLoading.show()
+
         setLoading(true)
 
         const q = query(getColRef('users'), where('username', '==', username))
@@ -204,7 +202,6 @@ const UserDetail = () => {
       }
     }
 
-    appLoading.show()
     fetchData(username)
   }, [username])
 
@@ -322,9 +319,9 @@ const UserDetail = () => {
           // span={18}
           xs={8}
           sm={8}
-        // md={18}
-        // lg={24}
-        // xl={24}
+          // md={18}
+          // lg={24}
+          // xl={24}
         >
           <Avatar
             shape="circle"
@@ -347,9 +344,9 @@ const UserDetail = () => {
           // span={18}
           xs={16}
           sm={16}
-        // md={18}
-        // lg={24}
-        // xl={24}
+          // md={18}
+          // lg={24}
+          // xl={24}
         >
           <Row
             style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}
@@ -361,7 +358,7 @@ const UserDetail = () => {
               <Button
                 style={{
                   borderColor: '#767676',
-                  color: "#767676",
+                  color: '#767676',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -376,7 +373,7 @@ const UserDetail = () => {
                 <Button
                   style={{
                     borderColor: '#767676',
-                    color: "#767676",
+                    color: '#767676',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -389,7 +386,7 @@ const UserDetail = () => {
                 <Button
                   style={{
                     borderColor: '#767676',
-                    color: "#767676",
+                    color: '#767676',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',

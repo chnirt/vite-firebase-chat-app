@@ -87,8 +87,10 @@ const Pexels = () => {
   const handleUploadFile = useCallback(
     (e) => {
       try {
+        const file = Array.from(e.target.files)[0]
+
         const uploadTask = uploadStorageBytesResumable(
-          e,
+          file,
           onProgress,
           null,
           onComplete
