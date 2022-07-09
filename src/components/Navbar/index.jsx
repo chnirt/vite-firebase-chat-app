@@ -257,7 +257,7 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<AiOutlinePlusSquare size={24} color="#767676" />}
-              onClick={navigateCreatePost}
+            // onClick={navigateCreatePost}
             />
             <Button
               style={{
@@ -282,7 +282,6 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<FiHeart size={24} color="#767676" />}
-              onClick={navigateProfile}
             />
             <Dropdown
               overlay={menu}

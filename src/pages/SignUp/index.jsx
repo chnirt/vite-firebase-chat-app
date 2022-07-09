@@ -159,8 +159,10 @@ const SignUp = () => {
         },
         placement: 'bottomRight',
       })
-      loading.hide()
     } finally {
+      setTimeout(() => {
+        loading.hide()
+      }, 1000)
     }
   }, [])
 
@@ -202,7 +204,7 @@ const SignUp = () => {
               <Logo
                 width={50}
                 height={68}
-              // fill={PRIMARY_COLOR}
+                // fill={PRIMARY_COLOR}
               />
               {/* </FadeIn> */}
             </Row>
