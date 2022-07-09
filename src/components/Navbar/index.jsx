@@ -35,6 +35,7 @@ export const Navbar = () => {
       removeToken()
       await signOutFirebase()
     } catch (error) {
+    } finally {
       setTimeout(() => {
         loading.hide()
       }, 1000)

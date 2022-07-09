@@ -79,7 +79,7 @@ export const deleteDocument = async (
 
 export const getBatch = () => writeBatch(db)
 
-export const signOutFirebase = () => signOut(auth)
+export const signOutFirebase = async () => await signOut(auth)
 
 export const reauthenticateWithCredentialFirebase = async (currentPassword) => {
   // TODO(you): prompt the user to re-provide their sign-in credentials
