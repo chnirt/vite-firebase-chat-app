@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { Avatar, Divider, List, Skeleton, Space } from 'antd'
+import { Avatar, Button, Divider, List, Skeleton, Space } from 'antd'
 import {
   getDocs,
   limit,
@@ -12,9 +12,16 @@ import {
 } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
+import { FiBookmark, FiHeart, FiMoreHorizontal } from 'react-icons/fi'
+import { IoChatbubbleOutline, IoPaperPlaneOutline } from 'react-icons/io5'
 
-import { getColRef } from '../../firebase/service'
+import {
+  addDocument,
+  deleteDocument,
+  getColRef,
+  getDocRef,
+  getDocument,
+} from '../../firebase/service'
 import { useAuth } from '../../context'
 
 const LIMIT = 5
@@ -27,6 +34,43 @@ export const BlogList = () => {
   const [last, setLast] = useState(null)
   const [moreLoading, setMoreLoading] = useState(false)
   const [loadedAll, setLoadedAll] = useState(false)
+  const [likeList, setLikeList] = useState([])
+
+  const handleLike = useCallback(async (doc) => {
+    const likeData = {
+      postId: doc.id,
+      uid: doc.uid,
+    }
+    const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
+    await addDocument(likeDocRef, likeData)
+
+    // const blogDocRef = getDocRef('blogs', doc.id)
+    // const blogDocData = await getDocument(blogDocRef)
+
+    // if (blogDocData) {
+    //   await updateDoc(blogDocRef, {
+    //     relationship: arrayUnion(user.uid),
+    //   })
+    // }
+  }, [])
+
+  const handleUnlike = useCallback(async (doc) => {
+    const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
+    const likeDocData = await getDocument(likeDocRef)
+
+    if (likeDocData) {
+      await deleteDocument('users', user.uid, 'likes', doc.id)
+    }
+
+    // const blogDocRef = getDocRef('blogs', doc.id)
+    // const blogDocData = await getDocument(blogDocRef)
+
+    // if (blogDocData) {
+    //   await updateDoc(blogDocRef, {
+    //     relationship: arrayRemove(user.uid),
+    //   })
+    // }
+  }, [])
 
   const getRelationship = useCallback(async () => {
     const followerDocRef = getColRef('users', user.uid, 'following')
@@ -55,14 +99,13 @@ export const BlogList = () => {
   )
 
   const fetchData = useCallback(async () => {
-    if (loading || loadedAll) {
+    // console.log('fetchData')
+
+    if (loading) {
       return
     }
-    if (last) {
-      setMoreLoading(true)
-    } else {
-      setLoading(true)
-    }
+
+    setLoading(true)
 
     const limitNumber = LIMIT + 1
 
@@ -70,8 +113,49 @@ export const BlogList = () => {
     const relationshipIds = relationship.map((item) => item.uid)
 
     // Query the first page of docs
-    // Query the first page of docs
     const first = query(
+      getColRef('blogs'),
+      ...(relationship.length > 0 ? [where('uid', 'in', relationshipIds)] : []),
+      orderBy('createdAt', 'desc'),
+      limit(limitNumber)
+    )
+
+    const querySnapshot = await getDocs(first)
+    const docs = querySnapshot.docs.slice(0, LIMIT)
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+
+    setData(data)
+
+    const lastVisible = docs[docs.length - 1]
+    setLast(lastVisible)
+
+    const size = querySnapshot.size
+    setLoadedAll(size < limitNumber)
+
+    setLoading(false)
+  }, [getRelationship, loading])
+
+  const fetchMoreData = useCallback(async () => {
+    // console.log('fetchMoreData')
+
+    if (moreLoading || loadedAll) {
+      return
+    }
+
+    setMoreLoading(true)
+
+    const limitNumber = LIMIT + 1
+
+    const relationship = await getRelationship()
+    const relationshipIds = relationship.map((item) => item.uid)
+
+    // Query the next page of docs
+    const next = query(
       getColRef('blogs'),
       ...(relationship.length > 0 ? [where('uid', 'in', relationshipIds)] : []),
       orderBy('createdAt', 'desc'),
@@ -79,40 +163,52 @@ export const BlogList = () => {
       ...(last ? [startAfter(last)] : [])
     )
 
-    onSnapshot(first, (querySnapshot) => {
-      // querySnapshot.docs.map(a => a.ref)
-      const docs = querySnapshot.docs.slice(0, LIMIT)
-      const data = docs.map((docSnapshot) => {
-        // console.log(docSnapshot)
-        return {
-          // ...docSnapshot,
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
-      if (last) {
-        setData((prevState) => [...prevState, ...data])
-      } else {
-        setData(data)
+    const querySnapshot = await getDocs(next)
+    const docs = querySnapshot.docs.slice(0, LIMIT)
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
       }
-
-      const lastVisible = docs[docs.length - 1]
-      setLast(lastVisible)
-
-      const size = querySnapshot.size
-      setLoadedAll(size < limitNumber)
     })
 
-    if (last) {
-      setMoreLoading(false)
-    } else {
-      setLoading(false)
-    }
-  }, [getRelationship, loading, last, loadedAll])
+    setData((prevState) => [...prevState, ...data])
+
+    const lastVisible = docs[docs.length - 1]
+    setLast(lastVisible)
+
+    const size = querySnapshot.size
+    setLoadedAll(size < limitNumber)
+
+    setMoreLoading(false)
+  }, [getRelationship, last, moreLoading])
 
   useEffect(() => {
     fetchData()
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    const likeDocRef = getColRef('users', user.uid, 'likes')
+    const unsubscribeLike = onSnapshot(
+      likeDocRef,
+      async (querySnapshot) => {
+        const data = querySnapshot.docs.map((docSnapshot) => {
+          return {
+            id: docSnapshot.id,
+            ...docSnapshot.data(),
+          }
+        })
+        setLikeList(data)
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+    return () => {
+      unsubscribeLike()
+    }
+  }, [user])
 
   const IconText = ({ icon, text }) => (
     <Space>
@@ -125,7 +221,7 @@ export const BlogList = () => {
     <div
       id="scrollableDiv"
       style={{
-        height: 400,
+        height: 'calc(var(--app-height) - 118px)',
         overflow: 'auto',
         padding: '0 16px',
         border: '1px solid rgba(140, 140, 140, 0.35)',
@@ -135,7 +231,7 @@ export const BlogList = () => {
         dataLength={data.length}
         // next={loadMoreData}
         // hasMore={data.length < 50}
-        next={fetchData}
+        next={fetchMoreData}
         hasMore={!loadedAll}
         loader={
           <Skeleton
@@ -168,28 +264,58 @@ export const BlogList = () => {
             const id = item.id
             const title = item.title
             const createdAt = moment(item.createdAt?.toDate()).fromNow()
-            // const isLiked = likeList.some((item) => item.postId === doc.id)
+            const isLiked = likeList.some((like) => like.postId === item.id)
             const foundRelationship = findRelationship(item.uid)
             const username = foundRelationship?.username
             const avatar = foundRelationship?.avatar
             return (
               <List.Item
-                key={id}
+                key={`item-${id}`}
                 actions={[
-                  <IconText
-                    icon={StarOutlined}
-                    text="156"
-                    key="list-vertical-star-o"
+                  <Button
+                    style={{
+                      border: 0,
+                      boxShadow: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    ghost
+                    shape="circle"
+                    icon={
+                      isLiked ? (
+                        <FiHeart size={18} color="#ff4d4f" fill="#ff4d4f" />
+                      ) : (
+                        <FiHeart size={18} color="#767676" />
+                      )
+                    }
+                    onClick={() =>
+                      isLiked ? handleUnlike(item) : handleLike(item)
+                    }
                   />,
-                  <IconText
-                    icon={LikeOutlined}
-                    text="156"
-                    key="list-vertical-like-o"
+                  <Button
+                    style={{
+                      border: 0,
+                      boxShadow: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    ghost
+                    shape="circle"
+                    icon={<IoChatbubbleOutline size={18} color="#767676" />}
                   />,
-                  <IconText
-                    icon={MessageOutlined}
-                    text="2"
-                    key="list-vertical-message"
+                  <Button
+                    style={{
+                      border: 0,
+                      boxShadow: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    ghost
+                    shape="circle"
+                    icon={<IoPaperPlaneOutline size={18} color="#767676" />}
                   />,
                 ]}
                 extra={

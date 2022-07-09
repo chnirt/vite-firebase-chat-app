@@ -57,7 +57,7 @@ export const Navbar = () => {
 
   const handleVisibleChange = useCallback(() => { }, [])
 
-  const handleCreatePost = useCallback(() => modal.show(), [])
+  // const handleCreatePost = useCallback(() => modal.show(), [])
 
   const onCreate = useCallback(async (values) => {
     loading.show()
@@ -80,6 +80,10 @@ export const Navbar = () => {
 
   const navigateBlog = useCallback(() => {
     navigate(paths.blog)
+  }, [navigate])
+
+  const navigateCreatePost = useCallback(() => {
+    navigate(paths.createBlog)
   }, [navigate])
 
   const navigateChat = useCallback(() => {
@@ -244,7 +248,7 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<AiOutlinePlusSquare size={24} color="#767676" />}
-              onClick={handleCreatePost}
+              onClick={navigateCreatePost}
             />
             <Button
               style={{

@@ -7,6 +7,7 @@ import { IoSettingsOutline } from 'react-icons/io5'
 import { MdGridOn } from 'react-icons/md'
 import { CgBookmark } from 'react-icons/cg'
 import { BiUserPin } from 'react-icons/bi'
+import delay from 'lodash/delay'
 
 import {
   addDocument,
@@ -15,13 +16,14 @@ import {
   getDocRef,
 } from '../../firebase/service'
 import { PostList } from '../../components'
-import { useAuth } from '../../context'
+import { useAuth, useLoading } from '../../context'
 import { paths } from '../../constants'
 
 const UserDetail = () => {
   let { username } = useParams()
   let navigate = useNavigate()
   const auth = useAuth()
+  const appLoading = useLoading()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [user, setUser] = useState(null)
@@ -42,6 +44,14 @@ const UserDetail = () => {
   }, [])
 
   const handleFollow = useCallback(async (doc) => {
+    appLoading.show()
+    delay(
+      function (content) {
+        console.log(content)
+      },
+      3000,
+      'GeeksforGeeks!'
+    )
     // follower
     // const followerDocRef = getDocRef('users', user.uid)
     const followingData = {
@@ -87,9 +97,14 @@ const UserDetail = () => {
     // })
 
     // await batch.commit()
+
+    setTimeout(() => {
+      appLoading.hide()
+    }, 1000)
   }, [])
 
   const handleUnfollow = useCallback(async (doc) => {
+    appLoading.show()
     // follower
     const followerDocRef = getDocRef(
       'users',
@@ -128,7 +143,38 @@ const UserDetail = () => {
     // })
 
     // await batch.commit()
+    setTimeout(() => {
+      appLoading.hide()
+    }, 1000)
   }, [])
+
+  const handleMessage = useCallback(
+    async (doc) => {
+      const chatData = {
+        members: [auth.user.uid, doc.uid],
+        uid: auth.user.uid,
+      }
+      const q = query(
+        getColRef('chats'),
+        where('members', 'in', [chatData.members])
+      )
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      const foundChat = data[0]
+      if (!foundChat) {
+        const chatDocRef = getColRef('chats')
+        await addDocument(chatDocRef, chatData)
+      }
+      navigate(`../${paths.messenger}`)
+    },
+    []
+  )
 
   useEffect(() => {
     const fetchData = async (username) => {
@@ -152,10 +198,13 @@ const UserDetail = () => {
         // console.log(error.message)
         setError(error.message)
       } finally {
-        setLoading(false)
+        setTimeout(() => {
+          appLoading.hide()
+        }, 1000)
       }
     }
 
+    appLoading.show()
     fetchData(username)
   }, [username])
 
@@ -216,13 +265,16 @@ const UserDetail = () => {
     //   // console.log(data)
     //   setLikeList(data)
     // }
+    appLoading.show()
     Promise.all([
       fetchBlogData(),
       fetchFollowingData(),
       fetchFollowerData(),
       // fetchLikeData(),
     ]).then(() => {
-      setLoading(false)
+      setTimeout(() => {
+        appLoading.hide()
+      }, 1000)
     })
   }, [user])
 
@@ -287,7 +339,7 @@ const UserDetail = () => {
             icon={<UserOutlined color="#eeeeee" />}
             src={
               user?.avatar ??
-              'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
+              'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'
             }
           />
         </Col>
@@ -308,8 +360,8 @@ const UserDetail = () => {
             {isOwner ? (
               <Button
                 style={{
-                  // border: 0,
-                  // boxShadow: 'none',
+                  borderColor: '#767676',
+                  color: "#767676",
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -319,6 +371,38 @@ const UserDetail = () => {
               >
                 Edit profile
               </Button>
+            ) : isFollowing ? (
+              <div>
+                <Button
+                  style={{
+                    borderColor: '#767676',
+                    color: "#767676",
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 20,
+                  }}
+                  onClick={() => handleMessage(user)}
+                >
+                  Message
+                </Button>
+                <Button
+                  style={{
+                    borderColor: '#767676',
+                    color: "#767676",
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 20,
+                    borderRadius: 3,
+                    paddingLeft: 24,
+                    paddingRight: 24,
+                  }}
+                  onClick={() => handleUnfollow(user)}
+                >
+                  Following
+                </Button>
+              </div>
             ) : (
               <Button
                 style={{
@@ -333,11 +417,9 @@ const UserDetail = () => {
                   paddingRight: 24,
                 }}
                 type="primary"
-                onClick={() =>
-                  isFollowing ? handleUnfollow(user) : handleFollow(user)
-                }
+                onClick={() => handleFollow(user)}
               >
-                {isFollowing ? 'Following' : 'Follow'}
+                Follow
               </Button>
             )}
 

@@ -62,7 +62,7 @@ export const Layout = ({ children }) => {
   return (
     <Fragment>
       <Navbar />
-      <div className="App">
+      {/* <div className="App">
         {TITLE}
         <p>Current User: {user.email}</p>
         <button onClick={handleLogout}>Log out</button>
@@ -81,7 +81,7 @@ export const Layout = ({ children }) => {
               </li>
             ))}
         </ul>
-      </div>
+      </div> */}
 
       <div
         className="appHeight"
