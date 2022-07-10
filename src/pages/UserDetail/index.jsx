@@ -453,7 +453,7 @@ const UserDetail = () => {
               }}
             >
               <Typography.Text strong>{user.fullName}</Typography.Text>
-              <Typography.Text>Hate me first, ❤️ later</Typography.Text>
+              <Typography.Text>{user.bio}</Typography.Text>
             </div>
           </Row>
         </Col>

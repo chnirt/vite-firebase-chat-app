@@ -19,7 +19,7 @@ import { UserOutlined } from '@ant-design/icons'
 import { arrayUnion } from 'firebase/firestore'
 
 import { avatarPlaceholder, eventNames } from '../../constants'
-import { useAuth } from '../../context'
+import { useAuth, useLoading } from '../../context'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
 import { addDocument, getColRef } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
@@ -27,6 +27,7 @@ import { logAnalyticsEvent } from '../../firebase/analytics'
 
 export const CreateBlogModal = forwardRef((props, ref) => {
   const auth = useAuth()
+  const appLoading = useLoading()
   const [form] = Form.useForm()
   const [isModalVisible, setIsModalVisible] = useState(false)
 
@@ -36,6 +37,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
 
   const handleOk = useCallback(async () => {
     try {
+      appLoading.show()
       const values = await form.validateFields()
       const { caption, files } = values
       const file = files[0].originFileObj
@@ -57,6 +59,10 @@ export const CreateBlogModal = forwardRef((props, ref) => {
 
           const blogDocRef = getColRef('blogs')
           await addDocument(blogDocRef, blogData)
+
+          setTimeout(() => {
+            appLoading.hide()
+          }, 1000)
 
           handleCancel()
 

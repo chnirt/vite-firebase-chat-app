@@ -106,35 +106,35 @@ export const BlogList = () => {
     )
 
     // getDocs
-    // const querySnapshot = await getDocs(first)
-    // const docs = querySnapshot.docs.slice(0, LIMIT)
-    // const data = docs.map((docSnapshot) => {
-    //   return {
-    //     id: docSnapshot.id,
-    //     ...docSnapshot.data(),
-    //   }
-    // })
-    // setData(data)
-    // const lastVisible = docs[docs.length - 1]
-    // setLast(lastVisible)
-    // const size = querySnapshot.size
-    // setLoadedAll(size < limitNumber)
+    const querySnapshot = await getDocs(first)
+    const docs = querySnapshot.docs.slice(0, LIMIT)
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    setData(data)
+    const lastVisible = docs[docs.length - 1]
+    setLast(lastVisible)
+    const size = querySnapshot.size
+    setLoadedAll(size < limitNumber)
 
     // onSnapshot
-    onSnapshot(first, (querySnapshot) => {
-      const docs = querySnapshot.docs.slice(0, LIMIT)
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
-      setData(data)
-      const lastVisible = docs[docs.length - 1]
-      setLast(lastVisible)
-      const size = querySnapshot.size
-      setLoadedAll(size < limitNumber)
-    })
+    // onSnapshot(first, (querySnapshot) => {
+    //   const docs = querySnapshot.docs.slice(0, LIMIT)
+    //   const data = docs.map((docSnapshot) => {
+    //     return {
+    //       id: docSnapshot.id,
+    //       ...docSnapshot.data(),
+    //     }
+    //   })
+    //   setData(data)
+    //   const lastVisible = docs[docs.length - 1]
+    //   setLast(lastVisible)
+    //   const size = querySnapshot.size
+    //   setLoadedAll(size < limitNumber)
+    // })
 
     setLoading(false)
     setTimeout(() => {
@@ -166,35 +166,35 @@ export const BlogList = () => {
     )
 
     // getDocs
-    // const querySnapshot = await getDocs(next)
-    // const docs = querySnapshot.docs.slice(0, LIMIT)
-    // const data = docs.map((docSnapshot) => {
-    //   return {
-    //     id: docSnapshot.id,
-    //     ...docSnapshot.data(),
-    //   }
-    // })
-    // setData((prevState) => [...prevState, ...data])
-    // const lastVisible = docs[docs.length - 1]
-    // setLast(lastVisible)
-    // const size = querySnapshot.size
-    // setLoadedAll(size < limitNumber)
+    const querySnapshot = await getDocs(next)
+    const docs = querySnapshot.docs.slice(0, LIMIT)
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    setData((prevState) => [...prevState, ...data])
+    const lastVisible = docs[docs.length - 1]
+    setLast(lastVisible)
+    const size = querySnapshot.size
+    setLoadedAll(size < limitNumber)
 
     // onSnapshot
-    onSnapshot(next, (querySnapshot) => {
-      const docs = querySnapshot.docs.slice(0, LIMIT)
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
-      setData((prevState) => [...prevState, ...data])
-      const lastVisible = docs[docs.length - 1]
-      setLast(lastVisible)
-      const size = querySnapshot.size
-      setLoadedAll(size < limitNumber)
-    })
+    // onSnapshot(next, (querySnapshot) => {
+    //   const docs = querySnapshot.docs.slice(0, LIMIT)
+    //   const data = docs.map((docSnapshot) => {
+    //     return {
+    //       id: docSnapshot.id,
+    //       ...docSnapshot.data(),
+    //     }
+    //   })
+    //   setData((prevState) => [...prevState, ...data])
+    //   const lastVisible = docs[docs.length - 1]
+    //   setLast(lastVisible)
+    //   const size = querySnapshot.size
+    //   setLoadedAll(size < limitNumber)
+    // })
 
     setMoreLoading(false)
   }, [getRelationship, last, moreLoading])

@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react'
+import { Row } from 'antd'
+import { Fragment, useCallback, useState } from 'react'
 
 import { ChatList, MessageList } from '../../components'
 
@@ -8,6 +9,29 @@ const Messenger = () => {
   const joinChat = useCallback((doc) => setCurrentChat(doc), [])
 
   const leaveChat = useCallback(() => setCurrentChat(null), [])
+
+  return (
+    <Fragment>
+      <div
+        style={{
+          height: 'calc(var(--app-height) - 90px)',
+          overflow: 'auto',
+          padding: '0 16px',
+          border: '1px solid rgba(140, 140, 140, 0.35)',
+          borderRadius: 3,
+        }}
+      >
+        <Row
+          style={{
+            height: '100%',
+          }}
+        >
+          <ChatList handleJoinChat={joinChat} />
+          <MessageList currentChat={currentChat} />
+        </Row>
+      </div>
+    </Fragment>
+  )
 
   return (
     <div>

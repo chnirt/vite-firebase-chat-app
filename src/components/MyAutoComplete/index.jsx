@@ -29,8 +29,9 @@ export const MyAutoComplete = () => {
       const data = docs.map((docSnapshot) => {
         const dataItem = docSnapshot.data()
         return {
-          id: docSnapshot.id,
           ...dataItem,
+          id: docSnapshot.id,
+          key: docSnapshot.id,
           label: dataItem.username,
           value: dataItem.username,
         }

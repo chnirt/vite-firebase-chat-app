@@ -11,3 +11,5 @@ https://www.blazemeter.com/blog/import-lodash-libraries
 https://medium.com/quick-code/100vh-problem-with-ios-safari-92ab23c852a8#:~:text=The%20web%20content%20it's%20outside,opacity%20box%20with%20100vh%20text).&text=The%20problem%20you%20have%20been,Safari%20and%20Chrome%20are%20using.
 
 https://www.freecodecamp.org/news/how-to-import-svgs-in-react-and-vite/
+
+https://www.google.com/search?q=avatar%20waifu&tbm=isch&hl=en&tbs=rimg:Cb6FabYVlXIzYaS5wbmjdmuT8AEAsgIMCgIIABAAOgQIABAA&sa=X&ved=0CAIQrnZqFwoTCKCqrcz87fgCFQAAAAAdAAAAABAP&biw=1680&bih=882#imgrc=vx-W9NJZUv-oTM
