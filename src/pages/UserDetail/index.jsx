@@ -17,7 +17,7 @@ import {
 } from '../../firebase/service'
 import { PostList } from '../../components'
 import { useAuth, useLoading } from '../../context'
-import { paths } from '../../constants'
+import { avatarPlaceholder, paths } from '../../constants'
 
 const UserDetail = () => {
   let { username } = useParams()
@@ -319,9 +319,9 @@ const UserDetail = () => {
           // span={18}
           xs={8}
           sm={8}
-          // md={18}
-          // lg={24}
-          // xl={24}
+        // md={18}
+        // lg={24}
+        // xl={24}
         >
           <Avatar
             shape="circle"
@@ -334,19 +334,16 @@ const UserDetail = () => {
               xxl: 150,
             }}
             icon={<UserOutlined color="#eeeeee" />}
-            src={
-              user?.avatar ??
-              'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'
-            }
+            src={user?.avatar ?? avatarPlaceholder}
           />
         </Col>
         <Col
           // span={18}
           xs={16}
           sm={16}
-          // md={18}
-          // lg={24}
-          // xl={24}
+        // md={18}
+        // lg={24}
+        // xl={24}
         >
           <Row
             style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}

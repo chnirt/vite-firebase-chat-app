@@ -23,6 +23,7 @@ import {
   getDocument,
 } from '../../firebase/service'
 import { useAuth } from '../../context'
+import { avatarPlaceholder } from '../../constants'
 
 const LIMIT = 10
 
@@ -328,7 +329,7 @@ export const BlogList = () => {
                 }
               >
                 <List.Item.Meta
-                  avatar={<Avatar src={avatar} />}
+                  avatar={<Avatar src={avatar ?? avatarPlaceholder} />}
                   title={<Link to={`/user/${username}`}>@{username}</Link>}
                   description={createdAt}
                 />

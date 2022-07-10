@@ -18,7 +18,7 @@ import {
   updatePasswordFirebase,
 } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
-import { eventNames } from '../../constants'
+import { avatarPlaceholder, eventNames } from '../../constants'
 
 export const ChangePassword = () => {
   const auth = useAuth()
@@ -99,10 +99,7 @@ export const ChangePassword = () => {
               xxl: 38,
             }}
             icon={<UserOutlined color="#eeeeee" />}
-            src={
-              auth?.user?.avatar ??
-              'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'
-            }
+            src={auth?.user?.avatar ?? avatarPlaceholder}
           />
         </Col>
         <Col span={16} offset={1}>

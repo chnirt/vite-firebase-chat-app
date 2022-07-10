@@ -37,3 +37,5 @@ export const eventNames = {
   editProfile: 'edit_profile',
   changePassword: 'change_password',
 }
+
+export const avatarPlaceholder = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl5Q6_xZ46DYo8CxlI7v-NyYi7KGCzG59GcOIU9XOFngbJ0S2te7CnU9vYiGHi5pWyvYk&usqp=CAU'

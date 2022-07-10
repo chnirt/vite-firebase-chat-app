@@ -15,9 +15,10 @@ import { useNavigate } from 'react-router-dom'
 import { MyAutoComplete } from '../MyAutoComplete'
 import { useAuth, useLoading, useModal } from '../../context'
 import { ReactComponent as Logo } from '../../assets/logo/logo-standard.svg'
-import { paths } from '../../constants'
+import { avatarPlaceholder, paths } from '../../constants'
 import { useLocalStorage } from '../../hooks'
 import { signOutFirebase } from '../../firebase/service'
+import { Global } from '../../global'
 // import { modalState } from '../../atoms'
 // import { PostCreateForm } from '../PostCreateForm'
 // import { savePostToFirestore } from '../../firebase'
@@ -62,7 +63,7 @@ export const Navbar = () => {
 
   const handleVisibleChange = useCallback(() => { }, [])
 
-  // const handleCreatePost = useCallback(() => modal.show(), [])
+  const handleCreatePost = useCallback(() => Global.CreateBlogModal.show(), [])
 
   const onCreate = useCallback(async (values) => {
     loading.show()
@@ -257,7 +258,7 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<AiOutlinePlusSquare size={24} color="#767676" />}
-            // onClick={navigateCreatePost}
+              onClick={handleCreatePost}
             />
             <Button
               style={{
@@ -306,10 +307,7 @@ export const Navbar = () => {
                   shape="circle"
                   size={24}
                   icon={<UserOutlined color="#eeeeee" />}
-                  src={
-                    auth?.user?.avatar ??
-                    'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
-                  }
+                  src={auth?.user?.avatar ?? avatarPlaceholder}
                 />
               </Button>
             </Dropdown>

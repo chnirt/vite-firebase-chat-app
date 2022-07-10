@@ -22,7 +22,7 @@ import {
   getDocRef,
   updateDocument,
 } from '../../firebase/service'
-import { eventNames } from '../../constants'
+import { avatarPlaceholder, eventNames } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 
 export const EditProfile = () => {
@@ -45,12 +45,12 @@ export const EditProfile = () => {
       const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
       if (!isJpgOrPng) {
         message.error('You can only upload JPG/PNG file!')
-        return
+        return false
       }
       const isLt2M = file.size / 1024 / 1024 < 2
       if (!isLt2M) {
         message.error('Image must smaller than 2MB!')
-        return
+        return false
       }
 
       uploadStorageBytesResumable(
@@ -92,6 +92,7 @@ export const EditProfile = () => {
           })
         }
       )
+      return false
     } catch (error) {
       message.error(error.message)
     } finally {
@@ -172,7 +173,7 @@ export const EditProfile = () => {
             icon={<UserOutlined color="#eeeeee" />}
             src={
               auth?.user?.avatar ??
-              'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'
+              avatarPlaceholder
             }
           />
         </Col>
@@ -190,6 +191,7 @@ export const EditProfile = () => {
                 // border: 0,
                 // display: 'inline-block',
                 // cursor: 'pointer',
+                color: "#0095f6",
                 padding: 0,
               }}
               // type="ghost"

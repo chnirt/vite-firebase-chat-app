@@ -8,7 +8,7 @@ import { t } from 'i18next'
 import { auth } from '../../firebase'
 // import { Loading } from '../../components'
 import { addDocument, getColRef, getDocRef } from '../../firebase/service'
-import { eventNames, paths } from '../../constants'
+import { avatarPlaceholder, eventNames, paths } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { generateKeywords } from '../../firebase/utils'
 import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
@@ -129,8 +129,7 @@ const SignUp = () => {
           fullName,
           email,
           username,
-          avatar:
-            'https://o.dlf.pt/dfpng/smallpng/276-2761779_person-placeholder-image-transparent-hd-png-download.png',
+          avatar: avatarPlaceholder,
           keywords: generateKeywords(email),
         }
         await addDocument(userDocRef, userData)
@@ -138,8 +137,7 @@ const SignUp = () => {
         const followingData = {
           type: 'owner',
           uid,
-          avatar:
-            'https://o.dlf.pt/dfpng/smallpng/276-2761779_person-placeholder-image-transparent-hd-png-download.png',
+          avatar: avatarPlaceholder,
           username,
         }
         const followerDocRef = getDocRef('users', uid, 'following', uid)
