@@ -22,13 +22,14 @@ import {
   getDocRef,
   getDocument,
 } from '../../firebase/service'
-import { useAuth } from '../../context'
+import { useAuth, useLoading } from '../../context'
 import { avatarPlaceholder } from '../../constants'
 
 const LIMIT = 10
 
 export const BlogList = () => {
   const { user } = useAuth()
+  const appLoading = useLoading()
   const [relationshipList, setRelationshipList] = useState([])
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
@@ -88,6 +89,7 @@ export const BlogList = () => {
       return
     }
 
+    appLoading.show()
     setLoading(true)
 
     const limitNumber = LIMIT + 1
@@ -135,6 +137,9 @@ export const BlogList = () => {
     })
 
     setLoading(false)
+    setTimeout(() => {
+      appLoading.hide()
+    }, 1000)
   }, [getRelationship, loading])
 
   const fetchMoreData = useCallback(async () => {

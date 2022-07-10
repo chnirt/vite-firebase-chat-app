@@ -8,7 +8,13 @@ import {
   Typography,
   Upload,
 } from 'antd'
-import { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
+import {
+  forwardRef,
+  Fragment,
+  useCallback,
+  useImperativeHandle,
+  useState,
+} from 'react'
 import { UserOutlined } from '@ant-design/icons'
 import { arrayUnion } from 'firebase/firestore'
 
@@ -65,7 +71,6 @@ export const CreateBlogModal = forwardRef((props, ref) => {
   }, [])
 
   const handleCancel = useCallback(() => {
-    form.resetFields()
     setIsModalVisible(false)
   }, [])
 
@@ -77,12 +82,20 @@ export const CreateBlogModal = forwardRef((props, ref) => {
     return e && e.fileList
   }, [])
 
-  useImperativeHandle(ref, () => ({
-    show: showModal,
-  }))
+  const handleAfterClose = useCallback(() => {
+    form.resetFields()
+  }, [])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      show: showModal,
+    }),
+    []
+  )
 
   return (
-    <>
+    <Fragment>
       <Modal
         title="Create new post"
         visible={isModalVisible}
@@ -101,6 +114,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           </Button>,
         ]}
         centered
+        afterClose={handleAfterClose}
       >
         <Row
           style={{
@@ -224,6 +238,6 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           </Form.Item>
         </Form>
       </Modal>
-    </>
+    </Fragment>
   )
 })

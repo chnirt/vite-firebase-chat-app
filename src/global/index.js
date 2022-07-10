@@ -1,3 +1,4 @@
 export const Global = {
-  CreateBlogModal: null
+  CreateBlogModal: null,
+  SettingModal: null
 }

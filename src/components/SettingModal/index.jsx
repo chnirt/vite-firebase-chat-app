@@ -1,60 +1,108 @@
-import { Button, Modal } from "antd";
-import { useState } from "react";
+import { Button, Modal } from 'antd'
+import {
+  forwardRef,
+  Fragment,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react'
+import { useNavigate } from 'react-router-dom'
 
-export const SettingModal = () => {
-  const [loading, setLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
+import { useLoading } from '../../context'
+import { signOutFirebase } from '../../firebase/service'
+import { useLocalStorage } from '../../hooks'
+import { paths } from '../../constants'
 
-  const showModal = () => {
-    setVisible(true);
-  };
+export const SettingModal = forwardRef((props, ref) => {
+  const appLoading = useLoading()
+  const [, , removeToken] = useLocalStorage('token', '')
+  let navigate = useNavigate()
 
-  const handleOk = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setVisible(false);
-    }, 3000);
-  };
+  const [visible, setVisible] = useState(false)
 
-  const handleCancel = () => {
-    setVisible(false);
-  };
+  const showModal = useCallback(() => {
+    setVisible(true)
+  }, [])
+
+  const handleOk = useCallback(() => { }, [])
+
+  const handleCancel = useCallback(() => {
+    setVisible(false)
+  }, [])
+
+  const handleSignOut = useCallback(async () => {
+    try {
+      appLoading.show()
+      removeToken()
+      await signOutFirebase()
+    } catch (error) {
+    } finally {
+      setTimeout(() => {
+        appLoading.hide()
+        handleCancel()
+      }, 1000)
+    }
+  }, [])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      show: showModal,
+    }),
+    []
+  )
+
+  const menuList = useMemo(
+    () => [
+      {
+        title: 'Change password',
+        onClick: () => {
+          handleCancel()
+          navigate(`../${paths.profile}`)
+        },
+      },
+      {
+        title: 'Log out',
+        onClick: handleSignOut,
+      },
+      {
+        title: 'Cancel',
+        onClick: handleCancel,
+      },
+    ],
+    []
+  )
 
   return (
-    <>
-      <Button type="primary" onClick={showModal}>
-        Open Modal with customized footer
-      </Button>
+    <Fragment>
       <Modal
         visible={visible}
-        title="Title"
         onOk={handleOk}
         onCancel={handleCancel}
-        footer={[
-          <Button key="back" onClick={handleCancel}>
-            Return
-          </Button>,
-          <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-            Submit
-          </Button>,
-          <Button
-            key="link"
-            href="https://google.com"
-            type="primary"
-            loading={loading}
-            onClick={handleOk}
-          >
-            Search on Google
-          </Button>,
-        ]}
+        footer={null}
+        closable={false}
+        centered
+        bodyStyle={{
+          padding: 0,
+        }}
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        {menuList.length > 0 &&
+          menuList.map((menu, mi) => (
+            <Button
+              key={`menu-${mi}`}
+              style={{
+                color: '#262626',
+                height: 48,
+              }}
+              type="link"
+              block
+              onClick={menu.onClick}
+            >
+              {menu.title}
+            </Button>
+          ))}
       </Modal>
-    </>
-  );
-};
+    </Fragment>
+  )
+})

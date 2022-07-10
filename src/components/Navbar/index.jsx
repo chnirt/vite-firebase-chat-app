@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Avatar, Badge, Button, Col, Dropdown, Menu, Row } from 'antd'
 import { CgBookmark, CgProfile } from 'react-icons/cg'
 import {
@@ -10,24 +10,19 @@ import { AiOutlineCompass, AiOutlinePlusSquare } from 'react-icons/ai'
 import { FiHeart } from 'react-icons/fi'
 import { UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-// import { useRecoilState } from 'recoil'
 
 import { MyAutoComplete } from '../MyAutoComplete'
-import { useAuth, useLoading, useModal } from '../../context'
+import { useAuth, useLoading } from '../../context'
 import { ReactComponent as Logo } from '../../assets/logo/logo-standard.svg'
 import { avatarPlaceholder, paths } from '../../constants'
 import { useLocalStorage } from '../../hooks'
 import { signOutFirebase } from '../../firebase/service'
 import { Global } from '../../global'
-// import { modalState } from '../../atoms'
-// import { PostCreateForm } from '../PostCreateForm'
-// import { savePostToFirestore } from '../../firebase'
 
 export const Navbar = () => {
   let navigate = useNavigate()
   const loading = useLoading()
   const auth = useAuth()
-  const modal = useModal()
   const [, , removeToken] = useLocalStorage('token', '')
 
   const handleSignOut = useCallback(async () => {
@@ -51,7 +46,7 @@ export const Navbar = () => {
         case '1':
           return navigate(`user/${auth?.user?.username}`)
         case '2':
-          return navigate(`../${paths.setting}`)
+          return navigate(`../${paths.profile}`)
         case '4':
           return handleSignOut()
         default:
@@ -65,66 +60,46 @@ export const Navbar = () => {
 
   const handleCreatePost = useCallback(() => Global.CreateBlogModal.show(), [])
 
-  const onCreate = useCallback(async (values) => {
-    loading.show()
-    // console.log('Received values of form: ', values)
-    try {
-      // await savePostToFirestore(values)
-    } catch (error) {
-    } finally {
-      modal.hide()
-      modal.form.resetFields()
-      loading.hide()
-    }
-  }, [])
-
-  const onCancel = useCallback(() => modal.hide(), [])
-
   const navigateHome = useCallback(() => {
-    navigate(paths.home)
-  }, [navigate])
+    navigate(paths.blog)
+  }, [])
 
   const navigateBlog = useCallback(() => {
     navigate(paths.blog)
-  }, [navigate])
-
-  const navigateProfile = useCallback(() => {
-    navigate(paths.profile)
-  }, [navigate])
-
-  const navigateCreatePost = useCallback(() => {
-    navigate(paths.createBlog)
-  }, [navigate])
+  }, [])
 
   const navigateChat = useCallback(() => {
     navigate(paths.messenger)
-  }, [navigate])
+  }, [])
 
-  const items = [
-    {
-      key: '0',
-      label: 'Profile',
-      icon: <CgProfile color="#767676" size={16} />,
-    },
-    {
-      key: '1',
-      label: 'Saved',
-      icon: <CgBookmark color="#767676" size={16} />,
-    },
-    {
-      key: '2',
-      label: 'Setting',
-      icon: <IoSettingsOutline color="#767676" size={16} />,
-    },
-    {
-      key: '3',
-      type: 'divider',
-    },
-    {
-      key: '4',
-      label: 'Log Out',
-    },
-  ]
+  const items = useMemo(
+    () => [
+      {
+        key: '0',
+        label: 'Profile',
+        icon: <CgProfile color="#767676" size={16} />,
+      },
+      {
+        key: '1',
+        label: 'Saved',
+        icon: <CgBookmark color="#767676" size={16} />,
+      },
+      {
+        key: '2',
+        label: 'Setting',
+        icon: <IoSettingsOutline color="#767676" size={16} />,
+      },
+      {
+        key: '3',
+        type: 'divider',
+      },
+      {
+        key: '4',
+        label: 'Log Out',
+      },
+    ],
+    []
+  )
 
   const menu = (
     <Menu

@@ -10,7 +10,10 @@ import { useRemoteConfig, WebRTCProvider } from './context'
 import { analytics } from './firebase'
 import { getRemoteAll, getRemoteValue } from './firebase/remoteConfig'
 import { eventNames, paths } from './constants'
-import { setUpBaseName, setUpAppHeight } from './utils'
+import {
+  // setUpBaseName,
+  setUpAppHeight,
+} from './utils'
 import { logAnalyticsEvent } from './firebase/analytics'
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
@@ -36,8 +39,6 @@ const LazySpotifyScreen = lazy(() => import('./pages/Spotify'))
 
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
-
-const LazySettingScreen = lazy(() => import('./pages/Setting'))
 
 const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 
@@ -192,15 +193,6 @@ function App() {
           element: (
             <Suspense fallback={<Loading />}>
               <LazyChangePasswordScreen />
-            </Suspense>
-          ),
-        },
-
-        {
-          path: paths.setting,
-          element: (
-            <Suspense fallback={<Loading />}>
-              <LazySettingScreen />
             </Suspense>
           ),
         },

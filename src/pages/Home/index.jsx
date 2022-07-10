@@ -1,18 +1,31 @@
+import { Fragment, useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
 
-import { Fragment, useRef } from 'react';
-import { Outlet } from 'react-router-dom'
-
-import { CreateBlogModal } from '../../components/CreateBlogModal';
-import { Global } from '../../global';
+import { paths } from '../../constants'
+import { Global } from '../../global'
+import { SettingModal, CreateBlogModal } from '../../components'
 
 const Home = () => {
-  const modalRef = useRef()
+  let navigate = useNavigate()
+
+  useEffect(() => {
+    navigate(paths.blog)
+  }, [])
 
   return (
     <Fragment>
       {/* Home */}
       <Outlet />
-      <CreateBlogModal ref={ref => { Global.CreateBlogModal = ref }} />
+      <CreateBlogModal
+        ref={(ref) => {
+          Global.CreateBlogModal = ref
+        }}
+      />
+      <SettingModal
+        ref={(ref) => {
+          Global.SettingModal = ref
+        }}
+      />
     </Fragment>
   )
 }

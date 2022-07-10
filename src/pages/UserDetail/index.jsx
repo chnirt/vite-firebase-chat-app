@@ -7,7 +7,6 @@ import { IoSettingsOutline } from 'react-icons/io5'
 import { MdGridOn } from 'react-icons/md'
 import { CgBookmark } from 'react-icons/cg'
 import { BiUserPin } from 'react-icons/bi'
-import delay from 'lodash/delay'
 
 import {
   addDocument,
@@ -18,6 +17,7 @@ import {
 import { PostList } from '../../components'
 import { useAuth, useLoading } from '../../context'
 import { avatarPlaceholder, paths } from '../../constants'
+import { Global } from '../../global'
 
 const UserDetail = () => {
   let { username } = useParams()
@@ -40,7 +40,7 @@ const UserDetail = () => {
   }, [])
 
   const navigateSetting = useCallback(() => {
-    navigate(`../${paths.setting}`)
+    Global.SettingModal.show()
   }, [])
 
   const handleFollow = useCallback(async (doc) => {
