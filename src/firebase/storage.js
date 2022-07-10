@@ -27,10 +27,11 @@ export const uploadStorageBytesResumable = (
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
       // console.log('Upload is ' + progress + '% done')
-      onProgress({
-        state: snapshot.state,
-        progress,
-      })
+      typeof onProgress === 'function' &&
+        onProgress({
+          state: snapshot.state,
+          progress,
+        })
       switch (snapshot.state) {
         case 'paused':
         // console.log('Upload is paused')
@@ -42,7 +43,7 @@ export const uploadStorageBytesResumable = (
     (error) => {
       // A full list of error codes is available at
       // https://firebase.google.com/docs/storage/web/handle-errors
-      onError(error)
+      typeof onError === 'function' && onError(error)
       switch (error.code) {
         case 'storage/unauthorized':
           // User doesn't have permission to access the object
@@ -62,7 +63,7 @@ export const uploadStorageBytesResumable = (
       // Upload completed successfully, now we can get the download URL
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
         // console.log('File available at', downloadURL)
-        onComplete({ downloadURL, url })
+        typeof onComplete === 'function' && onComplete({ downloadURL, url })
       })
     }
   )

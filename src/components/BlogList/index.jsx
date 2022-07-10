@@ -44,15 +44,6 @@ export const BlogList = () => {
     }
     const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
     await addDocument(likeDocRef, likeData)
-
-    // const blogDocRef = getDocRef('blogs', doc.id)
-    // const blogDocData = await getDocument(blogDocRef)
-
-    // if (blogDocData) {
-    //   await updateDoc(blogDocRef, {
-    //     relationship: arrayUnion(user.uid),
-    //   })
-    // }
   }, [])
 
   const handleUnlike = useCallback(async (doc) => {
@@ -62,15 +53,6 @@ export const BlogList = () => {
     if (likeDocData) {
       await deleteDocument('users', user.uid, 'likes', doc.id)
     }
-
-    // const blogDocRef = getDocRef('blogs', doc.id)
-    // const blogDocData = await getDocument(blogDocRef)
-
-    // if (blogDocData) {
-    //   await updateDoc(blogDocRef, {
-    //     relationship: arrayRemove(user.uid),
-    //   })
-    // }
   }, [])
 
   const getRelationship = useCallback(async () => {
@@ -121,22 +103,36 @@ export const BlogList = () => {
       limit(limitNumber)
     )
 
-    const querySnapshot = await getDocs(first)
-    const docs = querySnapshot.docs.slice(0, LIMIT)
-    const data = docs.map((docSnapshot) => {
-      return {
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
-      }
+    // getDocs
+    // const querySnapshot = await getDocs(first)
+    // const docs = querySnapshot.docs.slice(0, LIMIT)
+    // const data = docs.map((docSnapshot) => {
+    //   return {
+    //     id: docSnapshot.id,
+    //     ...docSnapshot.data(),
+    //   }
+    // })
+    // setData(data)
+    // const lastVisible = docs[docs.length - 1]
+    // setLast(lastVisible)
+    // const size = querySnapshot.size
+    // setLoadedAll(size < limitNumber)
+
+    // onSnapshot
+    onSnapshot(first, (querySnapshot) => {
+      const docs = querySnapshot.docs.slice(0, LIMIT)
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      setData(data)
+      const lastVisible = docs[docs.length - 1]
+      setLast(lastVisible)
+      const size = querySnapshot.size
+      setLoadedAll(size < limitNumber)
     })
-
-    setData(data)
-
-    const lastVisible = docs[docs.length - 1]
-    setLast(lastVisible)
-
-    const size = querySnapshot.size
-    setLoadedAll(size < limitNumber)
 
     setLoading(false)
   }, [getRelationship, loading])
@@ -164,22 +160,36 @@ export const BlogList = () => {
       ...(last ? [startAfter(last)] : [])
     )
 
-    const querySnapshot = await getDocs(next)
-    const docs = querySnapshot.docs.slice(0, LIMIT)
-    const data = docs.map((docSnapshot) => {
-      return {
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
-      }
+    // getDocs
+    // const querySnapshot = await getDocs(next)
+    // const docs = querySnapshot.docs.slice(0, LIMIT)
+    // const data = docs.map((docSnapshot) => {
+    //   return {
+    //     id: docSnapshot.id,
+    //     ...docSnapshot.data(),
+    //   }
+    // })
+    // setData((prevState) => [...prevState, ...data])
+    // const lastVisible = docs[docs.length - 1]
+    // setLast(lastVisible)
+    // const size = querySnapshot.size
+    // setLoadedAll(size < limitNumber)
+
+    // onSnapshot
+    onSnapshot(next, (querySnapshot) => {
+      const docs = querySnapshot.docs.slice(0, LIMIT)
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      setData((prevState) => [...prevState, ...data])
+      const lastVisible = docs[docs.length - 1]
+      setLast(lastVisible)
+      const size = querySnapshot.size
+      setLoadedAll(size < limitNumber)
     })
-
-    setData((prevState) => [...prevState, ...data])
-
-    const lastVisible = docs[docs.length - 1]
-    setLast(lastVisible)
-
-    const size = querySnapshot.size
-    setLoadedAll(size < limitNumber)
 
     setMoreLoading(false)
   }, [getRelationship, last, moreLoading])
@@ -264,7 +274,8 @@ export const BlogList = () => {
           // }
           renderItem={(item) => {
             const id = item.id
-            const title = item.title
+            const caption = item.caption
+            const file = item.files[0].file
             const createdAt = moment(item.createdAt?.toDate()).fromNow()
             const isLiked = likeList.some((like) => like.postId === item.id)
             const foundRelationship = findRelationship(item.uid)
@@ -324,7 +335,7 @@ export const BlogList = () => {
                   <img
                     width={272}
                     alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    src={file}
                   />
                 }
               >
@@ -333,7 +344,7 @@ export const BlogList = () => {
                   title={<Link to={`/user/${username}`}>@{username}</Link>}
                   description={createdAt}
                 />
-                <div>{title}</div>
+                <div>{caption}</div>
               </List.Item>
             )
           }}
