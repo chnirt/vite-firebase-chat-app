@@ -226,35 +226,41 @@ export const BlogList = () => {
     }
   }, [user])
 
-  const IconText = ({ icon, text }) => (
-    <Space>
-      {React.createElement(icon)}
-      {text}
-    </Space>
-  )
+  // const IconText = ({ icon, text }) => (
+  //   <Space>
+  //     {React.createElement(icon)}
+  //     {text}
+  //   </Space>
+  // )
+
+  const loadMore =
+    !loadedAll && !moreLoading ? (
+      <div
+        style={{
+          textAlign: 'center',
+          marginTop: 12,
+          height: 32,
+          lineHeight: '32px',
+        }}
+      >
+        <Button onClick={fetchMoreData}>loading more</Button>
+      </div>
+    ) : null;
+
 
   return (
     <Fragment>
       <div
         id="scrollableDiv"
         style={{
-          height: 400,
+          height: 'calc(var(--app-height) - 90px)',
           overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column-reverse',
+          padding: '0 16px',
+          border: '1px solid rgba(140, 140, 140, 0.35)',
+          borderRadius: 3,
         }}
       >
-        {/* <div
-      id="scrollableDiv"
-      style={{
-        height: 'calc(var(--app-height) - 90px)',
-        overflow: 'auto',
-        padding: '0 16px',
-        border: '1px solid rgba(140, 140, 140, 0.35)',
-        borderRadius: 3,
-      }}
-    > */}
-        <InfiniteScroll
+        {/* <InfiniteScroll
           dataLength={data.length}
           // next={loadMoreData}
           // hasMore={data.length < 50}
@@ -358,7 +364,94 @@ export const BlogList = () => {
               )
             }}
           />
-        </InfiniteScroll>
+        </InfiniteScroll> */}
+        <List
+          itemLayout="vertical"
+          size="large"
+          // pagination={{
+          //   onChange: page => {
+          //     console.log(page);
+          //   },
+          //   pageSize: 3,
+          // }}
+          loadMore={loadMore}
+          dataSource={data}
+          // footer={
+          //   <div>
+          //     <b>ant design</b> footer part
+          //   </div>
+          // }
+          renderItem={(item) => {
+            const id = item.id
+            const caption = item.caption
+            const file = item.files[0].file
+            const createdAt = moment(item.createdAt?.toDate()).fromNow()
+            const isLiked = likeList.some((like) => like.postId === item.id)
+            const foundRelationship = findRelationship(item.uid)
+            const username = foundRelationship?.username
+            const avatar = foundRelationship?.avatar
+            return (
+              <List.Item
+                key={`item-${id}`}
+                actions={[
+                  <Button
+                    style={{
+                      border: 0,
+                      boxShadow: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    ghost
+                    shape="circle"
+                    icon={
+                      isLiked ? (
+                        <FiHeart size={18} color="#ff4d4f" fill="#ff4d4f" />
+                      ) : (
+                        <FiHeart size={18} color="#767676" />
+                      )
+                    }
+                    onClick={() =>
+                      isLiked ? handleUnlike(item) : handleLike(item)
+                    }
+                  />,
+                  <Button
+                    style={{
+                      border: 0,
+                      boxShadow: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    ghost
+                    shape="circle"
+                    icon={<IoChatbubbleOutline size={18} color="#767676" />}
+                  />,
+                  <Button
+                    style={{
+                      border: 0,
+                      boxShadow: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    ghost
+                    shape="circle"
+                    icon={<IoPaperPlaneOutline size={18} color="#767676" />}
+                  />,
+                ]}
+                extra={<img width={272} alt="logo" src={file} />}
+              >
+                <List.Item.Meta
+                  avatar={<Avatar src={avatar ?? avatarPlaceholder} />}
+                  title={<Link to={`/user/${username}`}>@{username}</Link>}
+                  description={createdAt}
+                />
+                <div>{caption}</div>
+              </List.Item>
+            )
+          }}
+        />
       </div>
     </Fragment>
   )
