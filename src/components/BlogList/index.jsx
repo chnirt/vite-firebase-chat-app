@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Avatar, Button, Divider, List, Skeleton, Space } from 'antd'
 import {
@@ -25,7 +25,7 @@ import {
 import { useAuth, useLoading } from '../../context'
 import { avatarPlaceholder } from '../../constants'
 
-const LIMIT = 10
+const LIMIT = 5
 
 export const BlogList = () => {
   const { user } = useAuth()
@@ -234,7 +234,17 @@ export const BlogList = () => {
   )
 
   return (
-    <div
+    <Fragment>
+      <div
+        id="scrollableDiv"
+        style={{
+          height: 400,
+          overflow: 'auto',
+          display: 'flex',
+          flexDirection: 'column-reverse',
+        }}
+      >
+        {/* <div
       id="scrollableDiv"
       style={{
         height: 'calc(var(--app-height) - 90px)',
@@ -243,118 +253,113 @@ export const BlogList = () => {
         border: '1px solid rgba(140, 140, 140, 0.35)',
         borderRadius: 3,
       }}
-    >
-      <InfiniteScroll
-        dataLength={data.length}
-        // next={loadMoreData}
-        // hasMore={data.length < 50}
-        next={fetchMoreData}
-        hasMore={!loadedAll}
-        loader={
-          <Skeleton
-            avatar
-            paragraph={{
-              rows: 1,
-            }}
-            active
-          />
-        }
-        endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-        scrollableTarget="scrollableDiv"
-      >
-        <List
-          itemLayout="vertical"
-          size="large"
-          // pagination={{
-          //   onChange: page => {
-          //     console.log(page);
-          //   },
-          //   pageSize: 3,
-          // }}
-          dataSource={data}
-          // footer={
-          //   <div>
-          //     <b>ant design</b> footer part
-          //   </div>
-          // }
-          renderItem={(item) => {
-            const id = item.id
-            const caption = item.caption
-            const file = item.files[0].file
-            const createdAt = moment(item.createdAt?.toDate()).fromNow()
-            const isLiked = likeList.some((like) => like.postId === item.id)
-            const foundRelationship = findRelationship(item.uid)
-            const username = foundRelationship?.username
-            const avatar = foundRelationship?.avatar
-            return (
-              <List.Item
-                key={`item-${id}`}
-                actions={[
-                  <Button
-                    style={{
-                      border: 0,
-                      boxShadow: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    ghost
-                    shape="circle"
-                    icon={
-                      isLiked ? (
-                        <FiHeart size={18} color="#ff4d4f" fill="#ff4d4f" />
-                      ) : (
-                        <FiHeart size={18} color="#767676" />
-                      )
-                    }
-                    onClick={() =>
-                      isLiked ? handleUnlike(item) : handleLike(item)
-                    }
-                  />,
-                  <Button
-                    style={{
-                      border: 0,
-                      boxShadow: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    ghost
-                    shape="circle"
-                    icon={<IoChatbubbleOutline size={18} color="#767676" />}
-                  />,
-                  <Button
-                    style={{
-                      border: 0,
-                      boxShadow: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    ghost
-                    shape="circle"
-                    icon={<IoPaperPlaneOutline size={18} color="#767676" />}
-                  />,
-                ]}
-                extra={
-                  <img
-                    width={272}
-                    alt="logo"
-                    src={file}
+    > */}
+        <InfiniteScroll
+          dataLength={data.length}
+          // next={loadMoreData}
+          // hasMore={data.length < 50}
+          next={fetchMoreData}
+          hasMore={!loadedAll}
+          loader={
+            <Skeleton
+              avatar
+              paragraph={{
+                rows: 1,
+              }}
+              active
+            />
+          }
+          endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+          scrollableTarget="scrollableDiv"
+        >
+          <List
+            itemLayout="vertical"
+            size="large"
+            // pagination={{
+            //   onChange: page => {
+            //     console.log(page);
+            //   },
+            //   pageSize: 3,
+            // }}
+            dataSource={data}
+            // footer={
+            //   <div>
+            //     <b>ant design</b> footer part
+            //   </div>
+            // }
+            renderItem={(item) => {
+              const id = item.id
+              const caption = item.caption
+              const file = item.files[0].file
+              const createdAt = moment(item.createdAt?.toDate()).fromNow()
+              const isLiked = likeList.some((like) => like.postId === item.id)
+              const foundRelationship = findRelationship(item.uid)
+              const username = foundRelationship?.username
+              const avatar = foundRelationship?.avatar
+              return (
+                <List.Item
+                  key={`item-${id}`}
+                  actions={[
+                    <Button
+                      style={{
+                        border: 0,
+                        boxShadow: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      ghost
+                      shape="circle"
+                      icon={
+                        isLiked ? (
+                          <FiHeart size={18} color="#ff4d4f" fill="#ff4d4f" />
+                        ) : (
+                          <FiHeart size={18} color="#767676" />
+                        )
+                      }
+                      onClick={() =>
+                        isLiked ? handleUnlike(item) : handleLike(item)
+                      }
+                    />,
+                    <Button
+                      style={{
+                        border: 0,
+                        boxShadow: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      ghost
+                      shape="circle"
+                      icon={<IoChatbubbleOutline size={18} color="#767676" />}
+                    />,
+                    <Button
+                      style={{
+                        border: 0,
+                        boxShadow: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      ghost
+                      shape="circle"
+                      icon={<IoPaperPlaneOutline size={18} color="#767676" />}
+                    />,
+                  ]}
+                  extra={<img width={272} alt="logo" src={file} />}
+                >
+                  <List.Item.Meta
+                    avatar={<Avatar src={avatar ?? avatarPlaceholder} />}
+                    title={<Link to={`/user/${username}`}>@{username}</Link>}
+                    description={createdAt}
                   />
-                }
-              >
-                <List.Item.Meta
-                  avatar={<Avatar src={avatar ?? avatarPlaceholder} />}
-                  title={<Link to={`/user/${username}`}>@{username}</Link>}
-                  description={createdAt}
-                />
-                <div>{caption}</div>
-              </List.Item>
-            )
-          }}
-        />
-      </InfiniteScroll>
-    </div>
+                  <div>{caption}</div>
+                </List.Item>
+              )
+            }}
+          />
+        </InfiniteScroll>
+      </div>
+    </Fragment>
   )
 }
