@@ -1,24 +1,15 @@
 import { Fragment, useCallback } from 'react'
-import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  notification,
-  Row,
-  Typography,
-} from 'antd'
+import { Button, Col, Form, Input, notification, Row, Typography } from 'antd'
 import { t } from 'i18next'
 
-import { auth } from '../../firebase'
 import { eventNames, paths } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { APP_NAME } from '../../env'
 import { signInAccount } from '../../mock'
 import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
 import { useLoading } from '../../context'
+import { signInWithEmailAndPasswordFirebase } from '../../firebase/service'
 
 const SignIn = () => {
   let navigate = useNavigate()
@@ -45,7 +36,7 @@ const SignIn = () => {
     // console.log('Success:', values)
     const { emailOrYourPhoneNumber: email, password } = values
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPasswordFirebase(email, password)
 
       logAnalyticsEvent(eventNames.login, { email })
     } catch (error) {

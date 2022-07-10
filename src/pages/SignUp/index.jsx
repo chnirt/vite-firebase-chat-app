@@ -1,13 +1,17 @@
 import { Fragment, useCallback } from 'react'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { getDocs, query, where } from 'firebase/firestore'
 import { Button, Col, Form, Input, notification, Row, Typography } from 'antd'
 import { t } from 'i18next'
 
-import { auth } from '../../firebase'
 // import { Loading } from '../../components'
-import { addDocument, getColRef, getDocRef } from '../../firebase/service'
+import {
+  addDocument,
+  createUserWithEmailAndPasswordFirebase,
+  fetchSignInMethodsForEmailFirebase,
+  getColRef,
+  getDocRef,
+} from '../../firebase/service'
 import { avatarPlaceholder, eventNames, paths } from '../../constants'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { generateKeywords } from '../../firebase/utils'
@@ -92,15 +96,21 @@ const SignUp = () => {
   // ])
 
   const onFinish = useCallback(async (values) => {
-    loading.show()
-    // console.log('Success:', values)
-    const {
-      fullName,
-      emailOrYourPhoneNumber: email,
-      username,
-      password,
-    } = values
     try {
+      loading.show()
+      // console.log('Success:', values)
+      const {
+        fullName,
+        emailOrYourPhoneNumber: email,
+        username,
+        password,
+      } = values
+      const providers = await fetchSignInMethodsForEmailFirebase(email)
+
+      if (providers.length > 0) {
+        throw Error('Email already exists!')
+      }
+
       const q = query(getColRef('users'), where('username', '==', username))
       const querySnapshot = await getDocs(q)
       const docs = querySnapshot.docs
@@ -115,8 +125,7 @@ const SignUp = () => {
         throw Error('Username already exists!')
       }
 
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      const userCredential = await createUserWithEmailAndPasswordFirebase(
         email,
         password
       )
@@ -202,7 +211,7 @@ const SignUp = () => {
               <Logo
                 width={50}
                 height={68}
-                // fill={PRIMARY_COLOR}
+              // fill={PRIMARY_COLOR}
               />
               {/* </FadeIn> */}
             </Row>

@@ -3,7 +3,16 @@
 // https://stackoverflow.com/questions/70571720/firestore-query-snapshot-foreach-seems-to-be-overwriting-products-state
 // https://stackoverflow.com/questions/50807905/are-firestore-updates-charged-the-same-cost-as-writes
 // https://stackoverflow.com/questions/37811684/how-to-create-credential-object-needed-by-firebase-web-user-reauthenticatewith
-import { EmailAuthProvider, reauthenticateWithCredential, signOut, updatePassword } from 'firebase/auth'
+import { async } from '@firebase/util'
+import {
+  createUserWithEmailAndPassword,
+  EmailAuthProvider,
+  fetchSignInMethodsForEmail,
+  reauthenticateWithCredential,
+  signInWithEmailAndPassword,
+  signOut,
+  updatePassword,
+} from 'firebase/auth'
 import {
   doc,
   getDoc,
@@ -79,6 +88,24 @@ export const deleteDocument = async (
 
 export const getBatch = () => writeBatch(db)
 
+export const signInWithEmailAndPasswordFirebase = async (email, password) => {
+  await signInWithEmailAndPassword(auth, email, password)
+}
+
+export const createUserWithEmailAndPasswordFirebase = async (email, password) => {
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  )
+  return userCredential
+}
+
+export const fetchSignInMethodsForEmailFirebase = async (email) => {
+  const providers = await fetchSignInMethodsForEmail(auth, email)
+  return providers
+}
+
 export const signOutFirebase = async () => await signOut(auth)
 
 export const reauthenticateWithCredentialFirebase = async (currentPassword) => {
@@ -87,11 +114,11 @@ export const reauthenticateWithCredentialFirebase = async (currentPassword) => {
     auth.currentUser.email,
     currentPassword
   )
-  const user = auth.currentUser;
+  const user = auth.currentUser
   return await reauthenticateWithCredential(user, credential)
 }
 
 export const updatePasswordFirebase = async (newPassword) => {
-  const user = auth.currentUser;
+  const user = auth.currentUser
   return await updatePassword(user, newPassword)
 }
