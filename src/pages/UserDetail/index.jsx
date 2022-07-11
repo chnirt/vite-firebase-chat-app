@@ -301,6 +301,8 @@ const UserDetail = () => {
 
   if (!user) return null
 
+  console.log(blogList)
+
   return (
     <div style={{ padding: '30px 20px 0px 20px' }}>
       <Row
@@ -475,7 +477,7 @@ const UserDetail = () => {
             </Row>
           }
         >
-          <PostList />
+          <PostList data={blogList} />
         </Tabs.TabPane>
         <Tabs.TabPane
           key="2"
@@ -493,7 +495,7 @@ const UserDetail = () => {
             </Row>
           }
         >
-          <PostList />
+          <PostList data={blogList} />
         </Tabs.TabPane>
         <Tabs.TabPane
           key="3"
@@ -511,7 +513,7 @@ const UserDetail = () => {
             </Row>
           }
         >
-          <PostList />
+          <PostList data={blogList} />
         </Tabs.TabPane>
       </Tabs>
     </div>
