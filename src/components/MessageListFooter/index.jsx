@@ -4,7 +4,12 @@ import { BsImage } from 'react-icons/bs'
 import { FiHeart } from 'react-icons/fi'
 import { AiOutlineSmile } from 'react-icons/ai'
 
-import { addDocument, getColRef, getDocRef, updateDocument } from '../../firebase/service'
+import {
+  addDocument,
+  getColRef,
+  getDocRef,
+  updateDocument,
+} from '../../firebase/service'
 import { useAuth } from '../../context'
 
 export const MessageListFooter = ({ currentChat }) => {
@@ -14,27 +19,24 @@ export const MessageListFooter = ({ currentChat }) => {
 
   const handleGetInfo = useCallback(() => { }, [])
 
-  const handleSubmit = useCallback(
-    async () => {
-      console.log('hello', String(message).trim())
+  const handleSubmit = useCallback(async () => {
+    if (!message) return
 
-      const messageColRef = getColRef('chats', currentChat.id, 'messages')
-      const messageData = {
-        text: message,
-        sender: auth?.user?.uid,
-      }
-      await addDocument(messageColRef, messageData)
+    const messageColRef = getColRef('chats', currentChat.id, 'messages')
+    const messageData = {
+      text: String(message).trim(),
+      sender: auth?.user?.uid,
+    }
+    await addDocument(messageColRef, messageData)
 
-      const chatDocRef = getDocRef('chats', currentChat.id)
-      const chatData = {
-        latestMessage: message,
-      }
-      await updateDocument(chatDocRef, chatData)
+    const chatDocRef = getDocRef('chats', currentChat.id)
+    const chatData = {
+      latestMessage: String(message).trim(),
+    }
+    await updateDocument(chatDocRef, chatData)
 
-      setMessage('')
-    },
-    [message]
-  )
+    setMessage('')
+  }, [message])
 
   const handleUploadImage = useCallback(() => { }, [])
 

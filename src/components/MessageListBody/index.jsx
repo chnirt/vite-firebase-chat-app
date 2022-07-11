@@ -154,7 +154,14 @@ export const MessageListBody = ({ currentChat }) => {
     [loadedAll, moreLoading, fetchMoreData]
   )
 
-  if (data.length === 0) return null
+  if (data.length === 0) return <Col
+    style={{
+      overflow: 'hidden scroll',
+      padding: '20px 20px 0 20px',
+      // border: '1px solid black',
+      height: 'calc(var(--app-height) - 236px)',
+    }}
+  />
 
   return (
     <Col
