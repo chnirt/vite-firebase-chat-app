@@ -13,7 +13,7 @@ import { useAuth } from '../../context'
 import { getColRef } from '../../firebase/service'
 import { MessageItem } from '../../components'
 
-const LIMIT = 10
+const LIMIT = 15
 
 export const MessageListBody = ({ currentChat }) => {
   const auth = useAuth()
@@ -61,22 +61,24 @@ export const MessageListBody = ({ currentChat }) => {
       setLoadedAll(size < limitNumber)
 
       querySnapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          console.log("New city: ", change.doc.data());
+        if (change.type === 'added') {
+          // console.log("New city: ", change.doc.data());
           scrollSpanRef.current?.scrollIntoView({
             behavior: 'smooth',
           })
         }
-        if (change.type === "modified") {
-          console.log("Modified city: ", change.doc.data());
+        if (change.type === 'modified') {
+          // console.log("Modified city: ", change.doc.data());
         }
-        if (change.type === "removed") {
-          console.log("Removed city: ", change.doc.data());
+        if (change.type === 'removed') {
+          // console.log("Removed city: ", change.doc.data());
         }
-      });
+      })
     })
 
-    setLoading(false)
+    setTimeout(() => {
+      setLoading(false)
+    }, 1000)
   }, [loading])
 
   const fetchMoreData = useCallback(async () => {
@@ -122,15 +124,18 @@ export const MessageListBody = ({ currentChat }) => {
   }, [last, moreLoading, loadedAll])
 
   useEffect(() => {
-    fetchData()
+    fetchData().then(() => {
+      scrollSpanRef.current?.scrollIntoView({
+        behavior: 'smooth',
+      })
+    })
   }, [currentChat])
 
   useEffect(() => {
-    if (moreLoading) return
     scrollSpanRef.current?.scrollIntoView({
       behavior: 'smooth',
     })
-  }, [data, moreLoading])
+  }, [loading])
 
   const LoadMoreMessageList = useCallback(
     () =>

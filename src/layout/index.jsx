@@ -103,6 +103,7 @@ export const Layout = ({ children }) => {
             style={{
               alignItems: 'center',
               margin: '0 auto',
+              overflow: 'hidden',
             }}
             // span={18}
             xs={24}

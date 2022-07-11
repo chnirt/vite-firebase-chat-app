@@ -253,7 +253,7 @@ export const BlogList = () => {
         id="scrollableDiv"
         style={{
           height: 'calc(var(--app-height) - 90px)',
-          overflow: 'auto',
+          overflow: 'hidden scroll',
           // padding: '0 16px',
           border: '1px solid rgba(140, 140, 140, 0.35)',
           borderRadius: 3,
