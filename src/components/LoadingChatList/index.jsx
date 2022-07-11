@@ -1,5 +1,4 @@
 import { Skeleton } from "antd";
-import React from "react";
 
 export const LoadingChatList = () => {
   return <div

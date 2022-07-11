@@ -157,7 +157,7 @@ export const MessageListBody = ({ currentChat }) => {
         overflow: 'hidden scroll',
         padding: '20px 20px 0 20px',
         // border: '1px solid black',
-        height: 400,
+        height: 'calc(var(--app-height) - 236px)',
       }}
     >
       <LoadMoreMessageList />

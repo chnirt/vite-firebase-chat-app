@@ -1,7 +1,7 @@
 import { Avatar, Button, Col, Row, Typography } from 'antd'
 import { useCallback } from 'react'
-import { FaInfoCircle } from 'react-icons/fa'
 import { UserOutlined } from '@ant-design/icons'
+import { ImInfo } from 'react-icons/im'
 
 import { avatarPlaceholder } from '../../constants'
 import { useAuth } from '../../context'
@@ -54,7 +54,7 @@ export const MessageListHeader = ({ currentChat }) => {
       justify="space-between"
     >
       <Col flex={1}>
-        <Row align='middle'>
+        <Row align="middle">
           <Avatar
             shape="circle"
             size={{
@@ -88,7 +88,7 @@ export const MessageListHeader = ({ currentChat }) => {
         }}
         ghost
         shape="circle"
-        icon={<FaInfoCircle size={20} color="#767676" />}
+        icon={<ImInfo size={20} color="#767676" />}
         onClick={handleGetInfo}
       />
     </Row>
