@@ -135,9 +135,9 @@ const SignUp = () => {
         const userDocRef = getDocRef('users', uid)
         const userData = {
           uid,
-          fullName,
+          fullName: String(fullName).trim(),
           email,
-          username,
+          username: String(username).trim(),
           avatar: avatarPlaceholder,
           keywords: generateKeywords(email),
         }

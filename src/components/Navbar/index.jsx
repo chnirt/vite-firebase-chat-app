@@ -178,7 +178,7 @@ export const Navbar = () => {
             </Button>
           </Col>
 
-          <Col xs={0} sm={8}>
+          <Col xs={0} sm={6}>
             <MyAutoComplete />
           </Col>
 
@@ -190,7 +190,7 @@ export const Navbar = () => {
               paddingLeft: '24px',
             }}
             xs={16}
-            sm={8}
+            sm={{ offset: 2, span: 8 }}
           >
             <Button
               style={{
@@ -202,7 +202,7 @@ export const Navbar = () => {
               }}
               ghost
               shape="circle"
-              icon={<IoHomeOutline size={24} color="#767676" />}
+              icon={<IoHomeOutline size={20} color="#767676" />}
               onClick={navigateBlog}
             />
             <Button
@@ -216,8 +216,8 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={
-                <Badge count={9} overflowCount={99}>
-                  <IoChatbubbleEllipsesOutline size={24} color="#767676" />
+                <Badge size="small" count={9} overflowCount={99} dot>
+                  <IoChatbubbleEllipsesOutline size={20} color="#767676" />
                 </Badge>
               }
               onClick={navigateChat}
@@ -232,7 +232,7 @@ export const Navbar = () => {
               }}
               ghost
               shape="circle"
-              icon={<AiOutlinePlusSquare size={24} color="#767676" />}
+              icon={<AiOutlinePlusSquare size={20} color="#767676" />}
               onClick={handleCreatePost}
             />
             <Button
@@ -245,7 +245,7 @@ export const Navbar = () => {
               }}
               ghost
               shape="circle"
-              icon={<AiOutlineCompass size={24} color="#767676" />}
+              icon={<AiOutlineCompass size={20} color="#767676" />}
             />
             <Button
               style={{
@@ -257,7 +257,7 @@ export const Navbar = () => {
               }}
               ghost
               shape="circle"
-              icon={<FiHeart size={24} color="#767676" />}
+              icon={<FiHeart size={20} color="#767676" />}
             />
             <Dropdown
               overlay={menu}
@@ -280,7 +280,7 @@ export const Navbar = () => {
               >
                 <Avatar
                   shape="circle"
-                  size={24}
+                  size={20}
                   icon={<UserOutlined color="#eeeeee" />}
                   src={auth?.user?.avatar ?? avatarPlaceholder}
                 />

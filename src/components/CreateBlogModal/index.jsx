@@ -49,7 +49,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           // setDownloadURL(downloadURL)
 
           const blogData = {
-            caption,
+            caption: String(caption).trim(),
             files: arrayUnion({
               file,
               url,

@@ -123,7 +123,7 @@ const Profile = ({ }) => {
         style={{
           height: 'calc(var(--app-height) - 90px)',
           overflow: 'auto',
-          padding: '0 16px',
+          // padding: '0 16px',
           border: '1px solid rgba(140, 140, 140, 0.35)',
           borderRadius: 3,
         }}

@@ -1,4 +1,4 @@
-import { Row } from 'antd'
+import { Col, Row } from 'antd'
 import { Fragment, useCallback, useState } from 'react'
 
 import { ChatList, MessageList } from '../../components'
@@ -16,7 +16,7 @@ const Messenger = () => {
         style={{
           height: 'calc(var(--app-height) - 90px)',
           overflow: 'auto',
-          padding: '0 16px',
+          // padding: '0 16px',
           border: '1px solid rgba(140, 140, 140, 0.35)',
           borderRadius: 3,
         }}
@@ -26,30 +26,34 @@ const Messenger = () => {
             height: '100%',
           }}
         >
-          <ChatList handleJoinChat={joinChat} />
-          <MessageList currentChat={currentChat} />
+          <Col span={10}>
+            <ChatList handleJoinChat={joinChat} />
+          </Col>
+          <Col span={14}>
+            <MessageList currentChat={currentChat} />
+          </Col>
         </Row>
       </div>
     </Fragment>
   )
 
-  return (
-    <div>
-      <div>Messenger</div>
-      <div
-        style={{
-          height: 500,
-          display: 'flex',
-          flexDirection: 'row',
-          border: 'solid 1px black',
-          overflow: 'hidden',
-        }}
-      >
-        <ChatList handleJoinChat={joinChat} />
-        <MessageList currentChat={currentChat} />
-      </div>
-    </div>
-  )
+  // return (
+  //   <div>
+  //     <div>Messenger</div>
+  //     <div
+  //       style={{
+  //         height: 500,
+  //         display: 'flex',
+  //         flexDirection: 'row',
+  //         border: 'solid 1px black',
+  //         overflow: 'hidden',
+  //       }}
+  //     >
+  //       <ChatList handleJoinChat={joinChat} />
+  //       <MessageList currentChat={currentChat} />
+  //     </div>
+  //   </div>
+  // )
 }
 
 export default Messenger

@@ -25,7 +25,7 @@ import {
 import { useAuth, useLoading } from '../../context'
 import { avatarPlaceholder } from '../../constants'
 
-const LIMIT = 5
+const LIMIT = 10
 
 export const BlogList = () => {
   const { user } = useAuth()
@@ -243,10 +243,9 @@ export const BlogList = () => {
           lineHeight: '32px',
         }}
       >
-        <Button onClick={fetchMoreData}>loading more</Button>
+        <Button onClick={fetchMoreData}>Load more</Button>
       </div>
-    ) : null;
-
+    ) : null
 
   return (
     <Fragment>
@@ -255,7 +254,7 @@ export const BlogList = () => {
         style={{
           height: 'calc(var(--app-height) - 90px)',
           overflow: 'auto',
-          padding: '0 16px',
+          // padding: '0 16px',
           border: '1px solid rgba(140, 140, 140, 0.35)',
           borderRadius: 3,
         }}
