@@ -11,7 +11,7 @@ import { analytics } from './firebase'
 import { getRemoteAll, getRemoteValue } from './firebase/remoteConfig'
 import { eventNames, paths } from './constants'
 import {
-  // setUpBaseName,
+  setUpBaseName,
   setUpAppHeight,
 } from './utils'
 import { logAnalyticsEvent } from './firebase/analytics'
@@ -42,7 +42,7 @@ const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
 
 const LazyNotFoundScreen = lazy(() => import('./pages/NotFound'))
 
-// setUpBaseName()
+setUpBaseName()
 setUpAppHeight()
 
 function App() {

@@ -9,7 +9,7 @@ const Home = () => {
   let navigate = useNavigate()
 
   useEffect(() => {
-    navigate(paths.messenger)
+    navigate(paths.blog)
   }, [])
 
   return (

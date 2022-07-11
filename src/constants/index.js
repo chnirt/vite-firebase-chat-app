@@ -1,7 +1,7 @@
 export const env = import.meta.env
 
-// export const basename = encodeURIComponent('👾')
-export const basename = ''
+export const basename = encodeURIComponent('👾')
+// export const basename = ''
 
 export const paths = {
   login: 'login',
