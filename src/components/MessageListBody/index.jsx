@@ -79,7 +79,7 @@ export const MessageListBody = ({ currentChat }) => {
     setTimeout(() => {
       setLoading(false)
     }, 1000)
-  }, [loading])
+  }, [currentChat, loading])
 
   const fetchMoreData = useCallback(async () => {
     // console.log('fetchMoreData')
@@ -121,7 +121,7 @@ export const MessageListBody = ({ currentChat }) => {
     setTimeout(() => {
       setMoreLoading(false)
     }, 1000)
-  }, [last, moreLoading, loadedAll])
+  }, [currentChat, last, moreLoading, loadedAll])
 
   useEffect(() => {
     fetchData().then(() => {
@@ -129,7 +129,7 @@ export const MessageListBody = ({ currentChat }) => {
         behavior: 'smooth',
       })
     })
-  }, [currentChat])
+  }, [fetchData])
 
   useEffect(() => {
     scrollSpanRef.current?.scrollIntoView({
@@ -154,14 +154,17 @@ export const MessageListBody = ({ currentChat }) => {
     [loadedAll, moreLoading, fetchMoreData]
   )
 
-  if (data.length === 0) return <Col
-    style={{
-      overflow: 'hidden scroll',
-      padding: '20px 20px 0 20px',
-      // border: '1px solid black',
-      height: 'calc(var(--app-height) - 236px)',
-    }}
-  />
+  if (data.length === 0)
+    return (
+      <Col
+        style={{
+          overflow: 'hidden scroll',
+          padding: '20px 20px 0 20px',
+          // border: '1px solid black',
+          height: 'calc(var(--app-height) - 236px)',
+        }}
+      />
+    )
 
   return (
     <Col
