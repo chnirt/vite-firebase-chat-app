@@ -211,7 +211,7 @@ const SignUp = () => {
               <Logo
                 width={50}
                 height={68}
-              // fill={PRIMARY_COLOR}
+                // fill={PRIMARY_COLOR}
               />
               {/* </FadeIn> */}
             </Row>
@@ -276,6 +276,10 @@ const SignUp = () => {
                   {
                     required: true,
                     message: 'Please input your Username!',
+                  },
+                  {
+                    pattern: new RegExp('^[a-zA-Z0-9_.-]*$'),
+                    message: 'Please use only letters and numbers.',
                   },
                 ]}
               >
