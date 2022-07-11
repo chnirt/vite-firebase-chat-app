@@ -154,7 +154,7 @@ export const MessageListBody = ({ currentChat }) => {
     [loadedAll, moreLoading, fetchMoreData]
   )
 
-  if (data.length === 0)
+  if (data.length === 0 || loading)
     return (
       <Col
         style={{
