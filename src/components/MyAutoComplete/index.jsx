@@ -3,6 +3,7 @@ import { AutoComplete, Input, Empty } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { getDocs, query, where } from 'firebase/firestore'
 import { CgSearch } from 'react-icons/cg'
+import debounce from 'lodash/debounce'
 
 import { getColRef } from '../../firebase/service'
 
@@ -56,7 +57,7 @@ export const MyAutoComplete = () => {
           borderRadius: '8px',
         }}
         options={options}
-        onSearch={handleSearch}
+        onSearch={debounce(handleSearch, 200)}
         onSelect={handleSelect}
         filterOption={(inputValue, option) =>
           option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1

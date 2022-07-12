@@ -3,6 +3,7 @@ import { Button, Input, Row } from 'antd'
 import { BsImage } from 'react-icons/bs'
 import { FiHeart } from 'react-icons/fi'
 import { AiOutlineSmile } from 'react-icons/ai'
+import debounce from 'lodash/debounce'
 
 import {
   addDocument,
@@ -90,7 +91,7 @@ export const MessageListFooter = ({ currentChat }) => {
             placeholder="Message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onPressEnter={handleSubmit}
+            onPressEnter={debounce(handleSubmit, 200)}
           />
         </Row>
         {hasCharacter ? (
