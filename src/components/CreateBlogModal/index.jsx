@@ -60,11 +60,11 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           const blogDocRef = getColRef('blogs')
           await addDocument(blogDocRef, blogData)
 
+          handleCancel()
+
           setTimeout(() => {
             appLoading.hide()
           }, 1000)
-
-          handleCancel()
 
           logAnalyticsEvent(eventNames.createBlog, {
             caption,
