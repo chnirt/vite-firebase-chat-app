@@ -37,8 +37,8 @@ export const CreateBlogModal = forwardRef((props, ref) => {
 
   const handleOk = useCallback(async () => {
     try {
-      appLoading.show()
       const values = await form.validateFields()
+      appLoading.show()
       const { caption, files } = values
       const file = files[0].originFileObj
       uploadStorageBytesResumable(
