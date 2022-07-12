@@ -129,7 +129,7 @@ export const MessageListBody = ({ currentChat }) => {
         behavior: 'smooth',
       })
     })
-  }, [fetchData])
+  }, [currentChat])
 
   useEffect(() => {
     scrollSpanRef.current?.scrollIntoView({
@@ -151,8 +151,10 @@ export const MessageListBody = ({ currentChat }) => {
           <Button onClick={fetchMoreData}>Load more</Button>
         </div>
       ) : null,
-    [loadedAll, moreLoading, fetchMoreData]
+    [fetchMoreData]
   )
+
+  console.log('sad')
 
   if (data.length === 0 || loading)
     return (
