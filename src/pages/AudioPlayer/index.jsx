@@ -1,6 +1,7 @@
 import axios from 'axios'
 import moment from 'moment'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useAuth } from '../../context'
 
 import {
   SPOTIFY_AUTH_ENDPOINT,
@@ -21,6 +22,7 @@ const urls = [
 ]
 
 const AudioPlayer = () => {
+  const auth = useAuth()
   const [token, , removeToken] = useLocalStorage('token', '')
   const audioRef = useRef(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -94,7 +96,7 @@ const AudioPlayer = () => {
     const searchArtists = async () => {
       const { data } = await axios.get('https://api.spotify.com/v1/search', {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${auth?.user?.spotifyToken}`,
         },
         params: {
           q: '2am',
@@ -103,13 +105,14 @@ const AudioPlayer = () => {
           limit: 10,
         },
       })
+      console.log(JSON.stringify(data))
       // console.log(JSON.stringify(data.tracks.items[0], null, 2))
       setAudioList(data.tracks.items)
     }
-    if (token) {
+    if (auth?.user?.spotifyToken) {
       searchArtists()
     }
-  }, [token])
+  }, [auth?.user?.spotifyToken])
 
   return (
     <div>

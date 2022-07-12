@@ -16,15 +16,12 @@ const Spotify = () => {
         spotifyToken,
       }
       await updateDocument(userDocRef, userData)
-      console.log(auth)
       userChannel.postMessage({
         userId: auth?.user?.uid, // If the user opened your app in multi-tabs and signed-in with multi accounts, you need to put the userId here to identify which account has signed out exactly
         payload: {
           type: 'FETCH_USER',
         },
       })
-      console.log("sad")
-
       window.close()
     },
     [auth]

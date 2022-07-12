@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from 'react'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import { Avatar, Button, Divider, List, Skeleton, Space } from 'antd'
+import { Button, List } from 'antd'
 import {
   getDocs,
   limit,
@@ -10,10 +9,7 @@ import {
   startAfter,
   where,
 } from 'firebase/firestore'
-import { Link } from 'react-router-dom'
 import moment from 'moment'
-import { FiHeart } from 'react-icons/fi'
-import { IoChatbubbleOutline, IoPaperPlaneOutline } from 'react-icons/io5'
 
 import {
   addDocument,
@@ -23,7 +19,7 @@ import {
   getDocument,
 } from '../../firebase/service'
 import { useAuth, useLoading } from '../../context'
-import { avatarPlaceholder } from '../../constants'
+import { BlogItem } from '../BlogItem'
 
 const LIMIT = 10
 
@@ -380,8 +376,9 @@ export const BlogList = () => {
           //     <b>ant design</b> footer part
           //   </div>
           // }
-          renderItem={(item) => {
+          renderItem={(item, ii) => {
             const id = item.id
+            const uid = item.uid
             const caption = item.caption
             const file = item.files[0].file
             const createdAt = moment(item.createdAt?.toDate()).fromNow()
@@ -389,66 +386,19 @@ export const BlogList = () => {
             const foundRelationship = findRelationship(item.uid)
             const username = foundRelationship?.username
             const avatar = foundRelationship?.avatar
-            return (
-              <List.Item
-                key={`item-${id}`}
-                actions={[
-                  <Button
-                    style={{
-                      border: 0,
-                      boxShadow: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    ghost
-                    shape="circle"
-                    icon={
-                      isLiked ? (
-                        <FiHeart size={18} color="#ff4d4f" fill="#ff4d4f" />
-                      ) : (
-                        <FiHeart size={18} color="#767676" />
-                      )
-                    }
-                    onClick={() =>
-                      isLiked ? handleUnlike(item) : handleLike(item)
-                    }
-                  />,
-                  <Button
-                    style={{
-                      border: 0,
-                      boxShadow: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    ghost
-                    shape="circle"
-                    icon={<IoChatbubbleOutline size={18} color="#767676" />}
-                  />,
-                  <Button
-                    style={{
-                      border: 0,
-                      boxShadow: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    ghost
-                    shape="circle"
-                    icon={<IoPaperPlaneOutline size={18} color="#767676" />}
-                  />,
-                ]}
-                extra={<img width={272} alt="logo" src={file} />}
-              >
-                <List.Item.Meta
-                  avatar={<Avatar src={avatar ?? avatarPlaceholder} />}
-                  title={<Link to={`/user/${username}`}>@{username}</Link>}
-                  description={createdAt}
-                />
-                <div>{caption}</div>
-              </List.Item>
-            )
+
+            const blog = {
+              id,
+              uid,
+              isLiked,
+              file,
+              avatar,
+              username,
+              createdAt,
+              caption,
+            }
+
+            return <BlogItem key={`blog-${ii}-${id}`} blog={blog} />
           }}
         />
       </div>

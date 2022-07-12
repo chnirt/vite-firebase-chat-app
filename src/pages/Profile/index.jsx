@@ -133,6 +133,7 @@ const Profile = ({ }) => {
           style={{
             height: '100%',
           }}
+          activeKey={"3"}
         >
           <Tabs.TabPane tab="Edit Profile" key="1">
             <EditProfile />

@@ -73,7 +73,7 @@ export const Navbar = () => {
   }, [])
 
   const handleShowNotification = useCallback(() => {
-    // navigate(paths.profile)
+    navigate(paths.profile)
   }, [])
 
   const items = useMemo(

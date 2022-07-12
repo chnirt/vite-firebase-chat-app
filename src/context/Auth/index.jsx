@@ -13,6 +13,7 @@ import isEmpty from 'lodash/isEmpty'
 
 import { auth } from '../../firebase'
 import { getDocRef, getDocument } from '../../firebase/service'
+import { Loading } from '../../components'
 
 const defaultState = {
   isAuth: false,
@@ -99,6 +100,8 @@ export const AuthProvider = ({ children }) => {
     }),
     [user, loaded, fetchUser]
   )
+
+  if (!loaded) return <Loading />
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
