@@ -7,7 +7,7 @@ import { LoadingChatList } from '../LoadingChatList'
 import { ChatItem } from '../ChatItem'
 import { useAuth } from '../../context'
 
-const LIMIT = 1
+const LIMIT = 15
 
 export const ChatListBody = ({ handleJoinChat = () => { } }) => {
   const auth = useAuth()
