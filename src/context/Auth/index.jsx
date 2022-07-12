@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }) => {
           // ...
           setUserDocReference(null)
           setUser(null)
+          setLoaded(true)
         }
       },
       (error) => {
