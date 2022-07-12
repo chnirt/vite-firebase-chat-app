@@ -19,7 +19,7 @@ import { UserOutlined } from '@ant-design/icons'
 import { arrayUnion } from 'firebase/firestore'
 
 import { avatarPlaceholder, eventNames } from '../../constants'
-import { useAuth, useLoading } from '../../context'
+import { useAuth } from '../../context'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
 import { addDocument, getColRef } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
@@ -27,7 +27,6 @@ import { logAnalyticsEvent } from '../../firebase/analytics'
 
 export const CreateBlogModal = forwardRef((props, ref) => {
   const auth = useAuth()
-  const appLoading = useLoading()
   const [form] = Form.useForm()
   const [isModalVisible, setIsModalVisible] = useState(false)
 
@@ -38,7 +37,6 @@ export const CreateBlogModal = forwardRef((props, ref) => {
   const handleOk = useCallback(async () => {
     try {
       const values = await form.validateFields()
-      appLoading.show()
       const { caption, files } = values
       const file = files[0].originFileObj
       uploadStorageBytesResumable(
@@ -61,10 +59,6 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           await addDocument(blogDocRef, blogData)
 
           handleCancel()
-
-          setTimeout(() => {
-            appLoading.hide()
-          }, 1000)
 
           logAnalyticsEvent(eventNames.createBlog, {
             caption,
