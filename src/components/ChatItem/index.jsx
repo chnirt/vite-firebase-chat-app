@@ -90,12 +90,12 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
           {chatName}
         </Typography.Paragraph>
         {latestMessage && (
-          <Row>
+          <Row align="middle" justify="start">
             <Typography.Paragraph
               style={{
-                flex: 1,
                 marginTop: 8,
                 paddingBottom: 0,
+                maxWidth: 150,
               }}
               ellipsis
             >
