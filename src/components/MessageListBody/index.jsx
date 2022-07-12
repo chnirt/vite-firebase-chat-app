@@ -146,6 +146,7 @@ export const MessageListBody = ({ currentChat }) => {
             // marginTop: 12,
             height: 32,
             lineHeight: '32px',
+            marginBottom: 8
           }}
         >
           <Button onClick={fetchMoreData}>Load more</Button>

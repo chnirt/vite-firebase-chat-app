@@ -1,7 +1,7 @@
 import { Avatar, Col, Row, Typography } from 'antd'
 import { getDocs, query, where } from 'firebase/firestore'
 import moment from 'moment'
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { UserOutlined } from '@ant-design/icons'
 
 import { useAuth } from '../../context'
@@ -76,28 +76,33 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
       }}
       onClick={() => handleJoinChat(chatDetail)}
     >
-      <Avatar
-        style={{ marginRight: 12 }}
-        shape="circle"
-        size={56}
-        icon={<UserOutlined color="#eeeeee" />}
-        src={avatar ?? avatarPlaceholder}
-      />
-      <Col>
-        <Typography.Paragraph style={{ marginBottom: 0 }} strong>
+      <Col span={5}>
+        <Avatar
+          style={{ marginRight: 12, minWidth: 56 }}
+          shape="circle"
+          size={56}
+          icon={<UserOutlined color="#eeeeee" />}
+          src={avatar ?? avatarPlaceholder}
+        />
+      </Col>
+      <Col span={19}>
+        <Typography.Paragraph style={{ marginBottom: 0 }} strong ellipsis>
           {chatName}
         </Typography.Paragraph>
-        <Row>
-          {latestMessage && (
-            <Fragment>
+        {latestMessage && (
+          <Row>
+            <Col span={15}>
               <Typography.Paragraph
                 style={{
                   marginTop: 8,
                   paddingBottom: 0,
                 }}
+                ellipsis
               >
                 {latestMessage}
               </Typography.Paragraph>
+            </Col>
+            <Col style={{ display: 'flex', justifyContent: 'center' }} span={1}>
               <Typography.Paragraph
                 style={{
                   marginTop: 8,
@@ -108,17 +113,20 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
               >
                 ·
               </Typography.Paragraph>
+            </Col>
+            <Col span={8}>
               <Typography.Paragraph
                 style={{
                   marginTop: 8,
                   paddingBottom: 0,
                 }}
+                ellipsis
               >
                 {updatedAt}
               </Typography.Paragraph>
-            </Fragment>
-          )}
-        </Row>
+            </Col>
+          </Row>
+        )}
       </Col>
     </Row>
   )

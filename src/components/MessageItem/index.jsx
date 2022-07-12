@@ -6,6 +6,7 @@ import { avatarPlaceholder } from '../../constants'
 
 export const MessageItem = ({ message }) => {
   const { isSender, avatar, text, createdAt } = message
+
   return (
     <div
       style={{
@@ -15,13 +16,15 @@ export const MessageItem = ({ message }) => {
         marginBottom: 8,
       }}
     >
-      {!isSender && <Avatar
-        style={{ marginRight: 8 }}
-        shape="circle"
-        size={24}
-        icon={<UserOutlined color="#eeeeee" />}
-        src={avatar ?? avatarPlaceholder}
-      />}
+      {!isSender && (
+        <Avatar
+          style={{ marginRight: 8, minWidth: 24 }}
+          shape="circle"
+          size={24}
+          icon={<UserOutlined color="#eeeeee" />}
+          src={avatar ?? avatarPlaceholder}
+        />
+      )}
       <Bubble placement={isSender ? 'right' : 'left'} text={text} />
     </div>
   )

@@ -1,11 +1,11 @@
 import { Fragment, useCallback } from 'react'
-import { Button, Row, Typography } from 'antd'
-import { FiEdit } from 'react-icons/fi'
+import { Button, Row } from 'antd'
 
 import { useAuth } from '../../context'
 import { useFetch } from '../../firebase/hooks'
 import { ChatItem } from '../ChatItem'
 import { LoadingChatList } from '../LoadingChatList'
+import { ChatListHeader } from '..'
 
 export const ChatList = ({ handleJoinChat = () => { } }) => {
   const { user } = useAuth()
@@ -21,44 +21,6 @@ export const ChatList = ({ handleJoinChat = () => { } }) => {
   })
 
   const handleCreateChat = useCallback(() => { }, [])
-
-  const ChatListHeader = useCallback(
-    () => (
-      <Row
-        style={{
-          height: 59,
-          padding: '0 20px',
-          borderBottom: '1px solid #F0F0F0',
-        }}
-        align="middle"
-        justify="space-between"
-      >
-        <Typography.Title
-          style={{
-            marginLeft: '14px',
-            marginBottom: 0,
-          }}
-          level={5}
-        >
-          {user?.username}
-        </Typography.Title>
-        <Button
-          style={{
-            border: 0,
-            boxShadow: 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          ghost
-          shape="circle"
-          icon={<FiEdit size={20} color="#767676" />}
-          onClick={handleCreateChat}
-        />
-      </Row>
-    ),
-    [user]
-  )
 
   const LoadMoreChatList = useCallback(
     () =>

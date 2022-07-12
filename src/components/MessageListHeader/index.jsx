@@ -2,9 +2,11 @@ import { Avatar, Button, Col, Row, Typography } from 'antd'
 import { useCallback } from 'react'
 import { UserOutlined } from '@ant-design/icons'
 import { ImInfo } from 'react-icons/im'
+import { GiInfo } from 'react-icons/gi'
 
 import { avatarPlaceholder } from '../../constants'
 import { useAuth } from '../../context'
+import { IoInformationCircleOutline } from 'react-icons/io5'
 
 export const MessageListHeader = ({ currentChat }) => {
   const auth = useAuth()
@@ -88,7 +90,7 @@ export const MessageListHeader = ({ currentChat }) => {
         }}
         ghost
         shape="circle"
-        icon={<ImInfo size={20} color="#767676" />}
+        icon={<IoInformationCircleOutline size={20} color="#767676" />}
         onClick={handleGetInfo}
       />
     </Row>

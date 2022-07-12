@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useState } from 'react'
 import { Button, Input, Row } from 'antd'
-import { BsImage } from 'react-icons/bs'
 import { FiHeart } from 'react-icons/fi'
 import { AiOutlineSmile } from 'react-icons/ai'
 import debounce from 'lodash/debounce'
@@ -12,6 +11,7 @@ import {
   updateDocument,
 } from '../../firebase/service'
 import { useAuth } from '../../context'
+import { IoImageOutline } from 'react-icons/io5'
 
 export const MessageListFooter = ({ currentChat }) => {
   const auth = useAuth()
@@ -117,7 +117,7 @@ export const MessageListFooter = ({ currentChat }) => {
               }}
               ghost
               shape="circle"
-              icon={<BsImage size={20} color="#767676" />}
+              icon={<IoImageOutline size={20} color="#767676" />}
               onClick={handleUploadImage}
             />
             <Button
