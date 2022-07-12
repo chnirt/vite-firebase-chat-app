@@ -1,88 +1,81 @@
-import { Fragment, useCallback } from 'react'
-import { Button, Row } from 'antd'
+import { Fragment } from 'react'
 
-import { useAuth } from '../../context'
-import { useFetch } from '../../firebase/hooks'
-import { ChatItem } from '../ChatItem'
-import { LoadingChatList } from '../LoadingChatList'
-import { ChatListHeader } from '..'
+import { ChatListHeader, ChatListBody } from '..'
 
 export const ChatList = ({ handleJoinChat = () => { } }) => {
-  const { user } = useAuth()
-  const {
-    loading,
-    data: chats,
-    moreLoading,
-    loadedAll,
-    handleLoadMore,
-  } = useFetch('chats', {
-    limit: 10,
-    where: ['members', 'array-contains', user.uid],
-  })
+  // const { user } = useAuth()
+  // const {
+  //   loading,
+  //   data: chats,
+  //   moreLoading,
+  //   loadedAll,
+  //   handleLoadMore,
+  // } = useFetch('chats', {
+  //   limit: 10,
+  //   where: ['members', 'array-contains', user.uid],
+  // })
 
-  const handleCreateChat = useCallback(() => { }, [])
+  // const LoadMoreChatList = useCallback(
+  //   () =>
+  //     !loadedAll && !moreLoading ? (
+  //       <div
+  //         style={{
+  //           textAlign: 'center',
+  //           marginTop: 12,
+  //           height: 32,
+  //           lineHeight: '32px',
+  //         }}
+  //       >
+  //         <Button onClick={handleLoadMore}>Load more</Button>
+  //       </div>
+  //     ) : null,
+  //   [loadedAll, moreLoading, handleLoadMore]
+  // )
 
-  const LoadMoreChatList = useCallback(
-    () =>
-      !loadedAll && !moreLoading ? (
-        <div
-          style={{
-            textAlign: 'center',
-            marginTop: 12,
-            height: 32,
-            lineHeight: '32px',
-          }}
-        >
-          <Button onClick={handleLoadMore}>Load more</Button>
-        </div>
-      ) : null,
-    [loadedAll, moreLoading, handleLoadMore]
-  )
-
-  const ChatListBody = useCallback(
-    () => (
-      <div>
-        <Row
-          style={{
-            height: 'calc(100% - 63px)',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              paddingTop: 8,
-              overflow: 'hidden auto',
-              height: '100%',
-              width: '100%',
-            }}
-          >
-            {chats.length > 0 ? (
-              <div>
-                {chats.map((chat, ci) => {
-                  return (
-                    <ChatItem
-                      key={`chat-${ci}`}
-                      chat={chat}
-                      handleJoinChat={handleJoinChat}
-                    />
-                  )
-                })}
-                <LoadMoreChatList />
-              </div>
-            ) : (
-              <LoadingChatList />
-            )}
-          </div>
-        </Row>
-      </div>
-    ),
-    [chats]
-  )
+  // const ChatListBody = useCallback(
+  //   () => (
+  //     <div>
+  //       <Row
+  //         style={{
+  //           height: 'calc(100% - 63px)',
+  //           overflow: 'hidden',
+  //         }}
+  //       >
+  //         <div
+  //           style={{
+  //             paddingTop: 8,
+  //             overflow: 'hidden auto',
+  //             height: '100%',
+  //             width: '100%',
+  //           }}
+  //         >
+  //           {chats.length > 0 ? (
+  //             <div>
+  //               {chats.map((chat, ci) => {
+  //                 return (
+  //                   <ChatItem
+  //                     key={`chat-${ci}`}
+  //                     chat={chat}
+  //                     handleJoinChat={handleJoinChat}
+  //                   />
+  //                 )
+  //               })}
+  //               <LoadMoreChatList />
+  //             </div>
+  //           ) : (
+  //             <LoadingChatList />
+  //           )}
+  //         </div>
+  //       </Row>
+  //     </div>
+  //   ),
+  //   [chats]
+  // )
 
   return (
     <Fragment>
       <ChatListHeader />
-      <ChatListBody />
+      <ChatListBody handleJoinChat={handleJoinChat} />
     </Fragment>
   )
 

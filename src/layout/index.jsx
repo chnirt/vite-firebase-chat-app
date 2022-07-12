@@ -97,6 +97,7 @@ export const Layout = ({ children }) => {
             aspectRatio: 1,
             maxWidth: 975,
             paddingTop: '90px',
+            overflow: 'hidden',
           }}
         >
           <Col

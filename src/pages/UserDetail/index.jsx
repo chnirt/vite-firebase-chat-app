@@ -301,8 +301,6 @@ const UserDetail = () => {
 
   if (!user) return null
 
-  console.log(blogList)
-
   return (
     <div style={{ padding: '30px 20px 0px 20px' }}>
       <Row

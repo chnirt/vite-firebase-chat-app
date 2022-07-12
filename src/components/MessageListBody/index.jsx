@@ -155,8 +155,6 @@ export const MessageListBody = ({ currentChat }) => {
     [fetchMoreData]
   )
 
-  console.log('sad')
-
   if (data.length === 0 || loading)
     return (
       <Col
