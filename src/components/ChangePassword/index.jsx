@@ -80,7 +80,7 @@ export const ChangePassword = () => {
 
   return (
     <Fragment>
-      <Row style={{ marginTop: 32 }}>
+      <Row style={{ margin: '32px 32px 0 32px' }}>
         <Col
           style={{
             display: 'flex',

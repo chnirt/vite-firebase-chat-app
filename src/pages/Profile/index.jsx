@@ -1,6 +1,6 @@
 import { Tabs } from 'antd'
 import { Fragment } from 'react'
-import { ChangePassword, EditProfile } from '../../components'
+import { ChangePassword, EditProfile, Applications } from '../../components'
 
 const Profile = ({ }) => {
   // const { user, fetchUser } = useAuth()
@@ -139,6 +139,9 @@ const Profile = ({ }) => {
           </Tabs.TabPane>
           <Tabs.TabPane tab="Change Password" key="2">
             <ChangePassword />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Applications" key="3">
+            <Applications />
           </Tabs.TabPane>
         </Tabs>
       </div>

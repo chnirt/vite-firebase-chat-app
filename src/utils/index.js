@@ -20,7 +20,7 @@ export const handleError = (error) => {
     message: error.code,
     description: error.message,
     onClick: () => {
-      console.log('Notification Clicked!')
+      // console.log('Notification Clicked!')
     },
     placement: 'bottomRight',
   })

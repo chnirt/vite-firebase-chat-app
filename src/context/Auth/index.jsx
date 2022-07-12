@@ -1,3 +1,4 @@
+// https://stackoverflow.com/questions/58813834/how-multi-tab-logout-can-be-managed-in-reactjs
 import {
   createContext,
   useCallback,
@@ -20,6 +21,8 @@ const defaultState = {
   fetchUser: () => { },
 }
 
+export const userChannel = new BroadcastChannel('user')
+
 const AuthContext = createContext(defaultState)
 
 export const AuthProvider = ({ children }) => {
@@ -32,11 +35,11 @@ export const AuthProvider = ({ children }) => {
       try {
         const userDocRef = getDocRef('users', fbUser.uid)
         const userDocData = await getDocument(userDocRef)
-
         if (userDocReference === null) {
           setUserDocReference(userDocRef)
         }
-        setUser({ ...fbUser, ...userDocData })
+        // setUser({ ...fbUser, ...userDocData })
+        setUser(userDocData)
       } catch (error) {
       } finally {
         setLoaded(true)
@@ -71,6 +74,18 @@ export const AuthProvider = ({ children }) => {
         // console.log(error)
       }
     )
+  }, [user])
+
+  useEffect(() => {
+    userChannel.onmessage = (e) => {
+      const type = e.data.payload.type
+      if (type === 'FETCH_USER') {
+        // As I talked before about multi-accounts, we need to check the current user id with the sent userId by the userChannel and if they were the same, we have to dispatch the userSignOut action.
+        fetchUser(user)
+      }
+      if (type === 'SIGN_OUT') {
+      }
+    }
   }, [user])
 
   const isAuth = !isEmpty(user) || false

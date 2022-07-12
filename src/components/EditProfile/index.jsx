@@ -152,7 +152,7 @@ export const EditProfile = () => {
 
   return (
     <Fragment>
-      <Row style={{ marginTop: 32 }}>
+      <Row style={{ margin: '32px 32px 0 32px' }}>
         <Col
           style={{
             display: 'flex',
@@ -287,6 +287,6 @@ You can only change your name twice within 14 days."
           )}
         </Form.Item>
       </Form>
-    </Fragment>
+    </Fragment >
   )
 }

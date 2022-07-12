@@ -72,6 +72,10 @@ export const Navbar = () => {
     navigate(paths.messenger)
   }, [])
 
+  const handleShowNotification = useCallback(() => {
+    navigate(paths.profile)
+  }, [])
+
   const items = useMemo(
     () => [
       {
@@ -258,6 +262,7 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<FiHeart size={20} color="#767676" />}
+              onClick={handleShowNotification}
             />
             <Dropdown
               overlay={menu}
