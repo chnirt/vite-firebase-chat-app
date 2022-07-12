@@ -91,40 +91,34 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
         </Typography.Paragraph>
         {latestMessage && (
           <Row>
-            <Col span={15}>
-              <Typography.Paragraph
-                style={{
-                  marginTop: 8,
-                  paddingBottom: 0,
-                }}
-                ellipsis
-              >
-                {latestMessage}
-              </Typography.Paragraph>
-            </Col>
-            <Col style={{ display: 'flex', justifyContent: 'center' }} span={1}>
-              <Typography.Paragraph
-                style={{
-                  marginTop: 8,
-                  paddingBottom: 0,
-                  marginLeft: 4,
-                  marginRight: 4,
-                }}
-              >
-                ·
-              </Typography.Paragraph>
-            </Col>
-            <Col span={8}>
-              <Typography.Paragraph
-                style={{
-                  marginTop: 8,
-                  paddingBottom: 0,
-                }}
-                ellipsis
-              >
-                {updatedAt}
-              </Typography.Paragraph>
-            </Col>
+            <Typography.Paragraph
+              style={{
+                flex: 1,
+                marginTop: 8,
+                paddingBottom: 0,
+              }}
+              ellipsis
+            >
+              {latestMessage}
+            </Typography.Paragraph>
+            <Typography.Paragraph
+              style={{
+                marginTop: 8,
+                paddingBottom: 0,
+                marginLeft: 4,
+                marginRight: 4,
+              }}
+            >
+              ·
+            </Typography.Paragraph>
+            <Typography.Paragraph
+              style={{
+                marginTop: 8,
+                paddingBottom: 0,
+              }}
+            >
+              {updatedAt}
+            </Typography.Paragraph>
           </Row>
         )}
       </Col>
