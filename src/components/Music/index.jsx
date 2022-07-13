@@ -220,12 +220,13 @@ export const Music = forwardRef(
               &:after {
                 content: '';
                 background-color: #ffffff;
-                width: ${20}px;
-                height: ${20}px;
+                width: ${30}px;
+                height: ${30}px;
                 border-radius: 50%;
                 position: absolute;
-                left: calc(50% - ${20 / 2}px);
-                top: -${20 / 2}px;
+                left: calc(50% - ${30 / 2}px);
+                top: -${30 / 2}px;
+                ${'' /* border: 10px solid #000000; */}
               }
             `}
           >

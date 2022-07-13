@@ -2,7 +2,12 @@ import { Avatar, Button, List, Typography } from 'antd'
 import React, { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { FiHeart } from 'react-icons/fi'
-import { IoChatbubbleOutline, IoPaperPlaneOutline } from 'react-icons/io5'
+import {
+  IoBookmark,
+  IoBookmarkOutline,
+  IoChatbubbleOutline,
+  IoPaperPlaneOutline,
+} from 'react-icons/io5'
 
 import { avatarPlaceholder } from '../../constants'
 import { useAuth } from '../../context'
@@ -16,7 +21,7 @@ import {
 import { increment } from 'firebase/firestore'
 
 export const BlogItem = ({ blog = {} }) => {
-  const { id, isLiked, file, avatar, username, createdAt, caption, likeTotal } =
+  const { id, isLiked, isSaved, file, avatar, username, createdAt, caption, likeTotal } =
     blog
   const auth = useAuth()
 
@@ -52,6 +57,23 @@ export const BlogItem = ({ blog = {} }) => {
     }
     if (blogDocData) {
       await updateDocument(blogDocRef, blogData)
+    }
+  }, [])
+
+  const handleSave = useCallback(async (doc) => {
+    const savedData = {
+      postId: doc.id,
+      uid: doc.uid,
+    }
+    const savedDocRef = getDocRef('users', auth?.user?.uid, 'saved', doc.id)
+    await addDocument(savedDocRef, savedData)
+  }, [])
+
+  const handleUnsave = useCallback(async (doc) => {
+    const savedDocRef = getDocRef('users', auth?.user?.uid, 'saved', doc.id)
+    const savedDocData = await getDocument(savedDocRef)
+    if (savedDocData) {
+      await deleteDocument('users', auth?.user?.uid, 'saved', doc.id)
     }
   }, [])
 
@@ -107,6 +129,25 @@ export const BlogItem = ({ blog = {} }) => {
           ghost
           shape="circle"
           icon={<IoPaperPlaneOutline size={18} color="#767676" />}
+        />,
+        <Button
+          style={{
+            border: 0,
+            boxShadow: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          ghost
+          shape="circle"
+          icon={
+            isSaved ? (
+              <IoBookmark size={18} color="#767676" />
+            ) : (
+              <IoBookmarkOutline size={18} color="#767676" />
+            )
+          }
+          onClick={() => (isSaved ? handleUnsave(blog) : handleSave(blog))}
         />,
       ]}
       extra={<img width={272} alt="logo" src={file} />}

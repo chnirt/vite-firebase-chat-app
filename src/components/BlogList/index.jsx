@@ -33,6 +33,7 @@ export const BlogList = () => {
   const [moreLoading, setMoreLoading] = useState(false)
   const [loadedAll, setLoadedAll] = useState(false)
   const [likeList, setLikeList] = useState([])
+  const [savedList, setSavedList] = useState([])
 
   // const handleLike = useCallback(async (doc) => {
   //   const likeData = {
@@ -217,8 +218,25 @@ export const BlogList = () => {
         console.log(error)
       }
     )
+    const savedDocRef = getColRef('users', user.uid, 'saved')
+    const unsubscribeSaved = onSnapshot(
+      savedDocRef,
+      async (querySnapshot) => {
+        const data = querySnapshot.docs.map((docSnapshot) => {
+          return {
+            id: docSnapshot.id,
+            ...docSnapshot.data(),
+          }
+        })
+        setSavedList(data)
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
     return () => {
       unsubscribeLike()
+      unsubscribeSaved()
     }
   }, [user])
 
@@ -384,6 +402,7 @@ export const BlogList = () => {
             const likeTotal = item.likeTotal ?? 0
             const createdAt = moment(item.createdAt?.toDate()).fromNow()
             const isLiked = likeList.some((like) => like.postId === item.id)
+            const isSaved = savedList.some((like) => like.postId === item.id)
             const foundRelationship = findRelationship(item.uid)
             const username = foundRelationship?.username
             const avatar = foundRelationship?.avatar
@@ -392,12 +411,13 @@ export const BlogList = () => {
               id,
               uid,
               isLiked,
+              isSaved,
               file,
               avatar,
               username,
               createdAt,
               caption,
-              likeTotal
+              likeTotal,
             }
 
             return <BlogItem key={`blog-${ii}-${id}`} blog={blog} />
