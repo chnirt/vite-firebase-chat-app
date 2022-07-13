@@ -146,7 +146,7 @@ export const MessageListBody = ({ currentChat }) => {
             // marginTop: 12,
             height: 32,
             lineHeight: '32px',
-            marginBottom: 8
+            marginBottom: 8,
           }}
         >
           <Button onClick={fetchMoreData}>Load more</Button>
@@ -179,18 +179,22 @@ export const MessageListBody = ({ currentChat }) => {
       <LoadMoreMessageList />
       {data.length > 0 &&
         data.map((message, mi) => {
-          const id = message.id
-          const isSender = auth?.user?.uid === message.sender
-          const text = message.text
-          const createdAt = moment(message.createdAt?.toDate()).fromNow()
+          const id = message?.id
+          const isSender = auth?.user?.uid === message?.sender
+          const text = message?.text
+          const createdAt = moment(message?.createdAt?.toDate()).fromNow()
           const avatar = currentChat?.members?.find(
-            (member) => member.uid === message.sender
+            (member) => member?.uid === message?.sender
           )?.avatar
+          const file = message?.file
+          const type = message?.type
           const messageData = {
+            type,
             isSender,
             avatar,
             text,
             createdAt,
+            file
           }
 
           return (

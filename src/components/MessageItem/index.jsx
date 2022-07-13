@@ -1,11 +1,16 @@
-import { Avatar } from 'antd'
+import { Avatar, Image } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
+import { FiHeart } from 'react-icons/fi'
 
 import { Bubble } from '../../components'
 import { avatarPlaceholder } from '../../constants'
 
 export const MessageItem = ({ message }) => {
-  const { isSender, avatar, text, createdAt } = message
+  const { isSender, avatar, text, createdAt, type, file } = message
+
+  const isMessage = type === 'message'
+  const isHeart = type === 'heart'
+  const isPhoto = type === 'photo'
 
   return (
     <div
@@ -25,7 +30,20 @@ export const MessageItem = ({ message }) => {
           src={avatar ?? avatarPlaceholder}
         />
       )}
-      <Bubble placement={isSender ? 'right' : 'left'} text={text} />
+      {isMessage && (
+        <Bubble placement={isSender ? 'right' : 'left'} text={text} />
+      )}
+      {isHeart && <FiHeart size={20} color="#ff4d4f" fill="#ff4d4f" />}
+      {isPhoto && (
+        <Image
+          style={{
+            // width: 220,
+            height: 220,
+            borderRadius: 22
+          }}
+          src={file}
+        />
+      )}
     </div>
   )
 }

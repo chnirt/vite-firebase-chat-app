@@ -269,7 +269,7 @@ export const Applications = () => {
                   const isSelected = index === ii
                   const preview_url = item?.preview_url
                   const isSelectedBackgroundMusic =
-                    backgroundMusic.preview_url === preview_url
+                    backgroundMusic?.preview_url === preview_url
                   const backgroundMusicData = {
                     name,
                     album,
