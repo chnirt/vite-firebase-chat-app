@@ -9,34 +9,22 @@ import { getColRef } from '../../firebase/service'
 import { avatarPlaceholder } from '../../constants'
 
 export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
-  const { user } = useAuth()
+  const auth = useAuth()
   const [chatDetail, setChatDetail] = useState(null)
 
   const getAvatarAndChatName = (chatDetail) => {
-    let avatar
-    let chatName
+    let avatars
+    let chatNames
 
-    if (chatDetail?.members?.length <= 2) {
-      const chatee = chatDetail?.members.find(
-        (member) => member.uid !== user.uid
-      )
-      avatar = chatee.avatar
-      chatName = chatee.username
-    } else {
-      avatar = ''
-      chatName = chatDetail?.members
-        ?.map((item) => item.username)
-        .sort((a, b) => {
-          if (a === user.username) return 1
-          if (b === user.username) return -1
-          return 0
-        })
-        .join(', ')
-    }
+    const otherMembers = chatDetail?.members?.filter(
+      (member) => member.uid !== auth?.user?.uid
+    )
+    avatars = otherMembers?.map((member) => member.avatar)
+    chatNames = otherMembers?.map((member) => member.username)
 
     return {
-      avatar,
-      chatName,
+      avatars,
+      chatNames,
     }
   }
 
@@ -65,7 +53,7 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
   const id = chat.id
   const latestMessage = chat.latestMessage
   const updatedAt = moment(chat.updatedAt?.toDate()).fromNow()
-  const { avatar, chatName } = getAvatarAndChatName(chatDetail)
+  const { avatars, chatNames } = getAvatarAndChatName(chatDetail)
 
   return (
     <Row
@@ -82,12 +70,12 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
           shape="circle"
           size={56}
           icon={<UserOutlined color="#eeeeee" />}
-          src={avatar ?? avatarPlaceholder}
+          src={avatars[0] ?? avatarPlaceholder}
         />
       </Col>
       <Col span={19}>
         <Typography.Paragraph style={{ marginBottom: 0 }} strong ellipsis>
-          {chatName}
+          {chatNames.join(', ')}
         </Typography.Paragraph>
         {latestMessage && (
           <Row align="middle" justify="start">

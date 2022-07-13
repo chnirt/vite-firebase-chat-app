@@ -1,47 +1,34 @@
 import { Avatar, Button, Col, Row, Typography } from 'antd'
 import { useCallback } from 'react'
 import { UserOutlined } from '@ant-design/icons'
-import { ImInfo } from 'react-icons/im'
-import { GiInfo } from 'react-icons/gi'
+import { Link } from 'react-router-dom'
+import { IoInformationCircleOutline } from 'react-icons/io5'
 
 import { avatarPlaceholder } from '../../constants'
 import { useAuth } from '../../context'
-import { IoInformationCircleOutline } from 'react-icons/io5'
 
 export const MessageListHeader = ({ currentChat }) => {
   const auth = useAuth()
 
   const getAvatarAndChatName = (chatDetail) => {
-    let avatar
-    let chatName
+    let avatars
+    let usernames
 
-    if (chatDetail?.members?.length <= 2) {
-      const chatee = chatDetail?.members.find(
-        (member) => member.uid !== auth?.user?.uid
-      )
-      avatar = chatee.avatar
-      chatName = chatee.username
-    } else {
-      avatar = ''
-      chatName = chatDetail?.members
-        ?.map((item) => item.username)
-        .sort((a, b) => {
-          if (a === auth?.user.username) return 1
-          if (b === auth?.user.username) return -1
-          return 0
-        })
-        .join(', ')
-    }
+    const otherMembers = chatDetail?.members?.filter(
+      (member) => member.uid !== auth?.user?.uid
+    )
+    avatars = otherMembers?.map((member) => member.avatar)
+    usernames = otherMembers?.map((member) => member.username)
 
     return {
-      avatar,
-      chatName,
+      avatars,
+      usernames,
     }
   }
 
   const handleGetInfo = useCallback(() => { }, [])
 
-  const { avatar, chatName } = getAvatarAndChatName(currentChat)
+  const { avatars, usernames } = getAvatarAndChatName(currentChat)
 
   return (
     <Row
@@ -68,16 +55,26 @@ export const MessageListHeader = ({ currentChat }) => {
               xxl: 38,
             }}
             icon={<UserOutlined color="#eeeeee" />}
-            src={avatar ?? avatarPlaceholder}
+            src={avatars[0] ?? avatarPlaceholder}
           />
-          {chatName && (
-            <Typography.Title
-              style={{ marginLeft: '14px', marginBottom: 0 }}
-              level={5}
-            >
-              {chatName}
-            </Typography.Title>
-          )}
+          <Row
+            style={{
+              marginLeft: '14px',
+            }}
+          >
+            {usernames.length > 0 &&
+              usernames.map((username, ui) => {
+                const isFirst = ui === 0
+                return (
+                  <Link key={`username-${ui}`} to={`/user/${username}`}>
+                    <Typography.Title style={{ marginBottom: 0 }} level={5}>
+                      {!isFirst && ','}
+                      {username}
+                    </Typography.Title>
+                  </Link>
+                )
+              })}
+          </Row>
         </Row>
       </Col>
       <Button
