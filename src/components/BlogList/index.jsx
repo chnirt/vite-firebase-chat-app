@@ -34,23 +34,23 @@ export const BlogList = () => {
   const [loadedAll, setLoadedAll] = useState(false)
   const [likeList, setLikeList] = useState([])
 
-  const handleLike = useCallback(async (doc) => {
-    const likeData = {
-      postId: doc.id,
-      uid: doc.uid,
-    }
-    const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
-    await addDocument(likeDocRef, likeData)
-  }, [])
+  // const handleLike = useCallback(async (doc) => {
+  //   const likeData = {
+  //     postId: doc.id,
+  //     uid: doc.uid,
+  //   }
+  //   const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
+  //   await addDocument(likeDocRef, likeData)
+  // }, [])
 
-  const handleUnlike = useCallback(async (doc) => {
-    const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
-    const likeDocData = await getDocument(likeDocRef)
+  // const handleUnlike = useCallback(async (doc) => {
+  //   const likeDocRef = getDocRef('users', user.uid, 'likes', doc.id)
+  //   const likeDocData = await getDocument(likeDocRef)
 
-    if (likeDocData) {
-      await deleteDocument('users', user.uid, 'likes', doc.id)
-    }
-  }, [])
+  //   if (likeDocData) {
+  //     await deleteDocument('users', user.uid, 'likes', doc.id)
+  //   }
+  // }, [])
 
   const getRelationship = useCallback(async () => {
     const followerDocRef = getColRef('users', user.uid, 'following')
@@ -381,6 +381,7 @@ export const BlogList = () => {
             const uid = item.uid
             const caption = item.caption
             const file = item.files[0].file
+            const likeTotal = item.likeTotal ?? 0
             const createdAt = moment(item.createdAt?.toDate()).fromNow()
             const isLiked = likeList.some((like) => like.postId === item.id)
             const foundRelationship = findRelationship(item.uid)
@@ -396,6 +397,7 @@ export const BlogList = () => {
               username,
               createdAt,
               caption,
+              likeTotal
             }
 
             return <BlogItem key={`blog-${ii}-${id}`} blog={blog} />
