@@ -1,9 +1,11 @@
 // https://www.youtube.com/watch?v=QTHRWGn_sJw
 // https://stackoverflow.com/questions/18389224/how-to-style-html5-range-input-to-have-different-color-before-and-after-slider
+// https://thewebdev.info/2021/10/14/how-to-playback-html-audio-with-fade-in-and-fade-out-with-javascript/
 import {
   forwardRef,
   Fragment,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -108,6 +110,24 @@ export const Music = forwardRef(
       }),
       [handleSelect, handlePausePlayClick, handlePlayClick, handleEnded]
     )
+
+    useEffect(() => {
+      audioRef.current.volume = 0
+      const fadeAudio = setInterval(() => {
+        // console.log(audioRef.current.volume)
+        const startPoint = 3
+        const endPoint = audioRef.current.duration - startPoint
+        if (audioRef.current.currentTime <= startPoint) {
+          audioRef.current.volume = Math.min(audioRef.current.volume + 0.1, 1)
+        }
+        if (audioRef.current.currentTime >= endPoint) {
+          audioRef.current.volume = Math.max(audioRef.current.volume - 0.1, 0)
+        }
+        if (audioRef.current.volume === 0) {
+          clearInterval(fadeAudio);
+        }
+      }, 200)
+    }, [])
 
     const name = data[audioIndex]?.name
     const image = data[audioIndex]?.album?.images[0].url ?? SpotifyLogo
