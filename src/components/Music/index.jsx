@@ -102,8 +102,9 @@ export const Music = forwardRef(
         handleSelect,
         handlePausePlayClick,
         handlePlayClick,
+        handleEnded
       }),
-      [handleSelect, handlePausePlayClick, handlePlayClick]
+      [handleSelect, handlePausePlayClick, handlePlayClick, handleEnded]
     )
 
     const name = data[audioIndex]?.name

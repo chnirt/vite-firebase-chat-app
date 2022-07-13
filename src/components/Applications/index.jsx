@@ -88,6 +88,10 @@ export const Applications = () => {
           handleUnconnectSpotify()
         }
       } finally {
+        musicRef?.current?.handleEnded()
+        musicRef?.current?.handleSelect(0)
+        setIndex(0)
+
         setInitLoading(false)
         setLoading(false)
       }
