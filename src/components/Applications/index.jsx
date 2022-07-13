@@ -30,8 +30,8 @@ const limit = 15
 export const Applications = () => {
   const auth = useAuth()
   const musicRef = useRef(null)
-  const spotifyToken = auth?.user?.spotifyToken
-  // const [spotifyToken, setSpotifyToken] = useState(null)
+  // const spotifyToken = auth?.user?.spotifyToken
+  const [spotifyToken, setSpotifyToken] = useState(null)
 
   const [initLoading, setInitLoading] = useState(true)
   const [page, setPage] = useState(0)
@@ -108,12 +108,12 @@ export const Applications = () => {
     onLoad()
   }, [onLoad])
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const spotifyAccessToken = await getSpotifyAccessToken()
-  //     setSpotifyToken(spotifyAccessToken)
-  //   })()
-  // }, [])
+  useEffect(() => {
+    (async () => {
+      const spotifyAccessToken = await getSpotifyAccessToken()
+      setSpotifyToken(spotifyAccessToken)
+    })()
+  }, [])
 
   const loadMore = useMemo(
     () =>
@@ -136,7 +136,7 @@ export const Applications = () => {
   return (
     <Fragment>
       <div style={{ margin: '32px 32px 0 32px' }}>
-        <Row align="middle" justify="space-between">
+        {/* <Row align="middle" justify="space-between">
           <Row align="middle" justify="space-between">
             <div style={{ marginRight: 8 }}>
               <Image src={SpotifyLogo} width={30} preview={false} />
@@ -167,9 +167,9 @@ export const Applications = () => {
               CONNECT
             </Button>
           )}
-        </Row>
+        </Row> */}
 
-        {spotifyToken && (
+        {spotifyToken && list.length > 0 && (
           <div>
             <Row
               style={{
@@ -183,11 +183,15 @@ export const Applications = () => {
               />
             </Row>
 
-            <Row>
+            <Row
+              style={{
+                marginTop: 32,
+              }}
+            >
               <List
                 style={{
                   flex: 1,
-                  height: 'calc(var(--app-height) - 236px)',
+                  height: 'calc(var(--app-height) - 336px)',
                   overflow: 'hidden scroll',
                   // padding: '0 16px',
                   // border: '1px solid rgba(140, 140, 140, 0.35)',

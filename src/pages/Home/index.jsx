@@ -9,12 +9,11 @@ const Home = () => {
   let navigate = useNavigate()
 
   useEffect(() => {
-    navigate(paths.profile)
+    navigate(paths.blog)
   }, [])
 
   return (
     <Fragment>
-      {/* Home */}
       <Outlet />
       <CreateBlogModal
         ref={(ref) => {

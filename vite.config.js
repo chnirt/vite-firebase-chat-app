@@ -1,5 +1,6 @@
 // https://github.com/vitejs/vite/issues/2185#issuecomment-784637827
 // https://stackoverflow.com/questions/69039093/how-to-change-antd-theme-in-vite-config
+// https://angularfixing.com/npm-package-with-emption-react-with-vite-not-working-as-expected-2/
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import vitePluginImp from 'vite-plugin-imp'
@@ -23,7 +24,13 @@ export default defineConfig({
       ],
     }),
     svgr(),
-    react(),
+    react({
+      jsxRuntime: 'automatic',
+      jsxImportSource: '@emotion/react',
+      babel: {
+        plugins: ['@emotion/babel-plugin'],
+      },
+    }),
   ],
   resolve: {
     alias: [

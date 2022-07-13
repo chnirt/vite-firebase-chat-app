@@ -1,3 +1,5 @@
+// https://www.youtube.com/watch?v=QTHRWGn_sJw
+// https://stackoverflow.com/questions/18389224/how-to-style-html5-range-input-to-have-different-color-before-and-after-slider
 import {
   forwardRef,
   Fragment,
@@ -7,6 +9,24 @@ import {
   useState,
 } from 'react'
 import moment from 'moment'
+import { colors } from '../../constants'
+import { css, keyframes } from '@emotion/react'
+import {
+  IoIosFastforward,
+  IoIosPause,
+  IoIosPlay,
+  IoIosRewind,
+} from 'react-icons/io'
+import { Button, Row, Typography } from 'antd'
+
+const rotate = keyframes`
+  from, 0, to {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`
 
 export const Music = forwardRef(
   ({ data = [], onStateChange = () => { } }, ref) => {
@@ -26,6 +46,7 @@ export const Music = forwardRef(
     }, [])
 
     const handleEnded = useCallback(() => {
+      onStateChange(false)
       setPlay(false)
     }, [])
 
@@ -73,9 +94,6 @@ export const Music = forwardRef(
 
     const handleSelect = useCallback(async (ii) => {
       setAudioIndex(ii)
-      // audioRef.current.play()
-      // onStateChange(true)
-      // setPlay(true)
     }, [])
 
     useImperativeHandle(
@@ -83,14 +101,231 @@ export const Music = forwardRef(
       () => ({
         handleSelect,
         handlePausePlayClick,
-        handlePlayClick
+        handlePlayClick,
       }),
       [handleSelect, handlePausePlayClick, handlePlayClick]
     )
 
+    const name = data[audioIndex]?.name
+    const image = data[audioIndex]?.album?.images[0].url
+
     return (
       <Fragment>
-        <audio
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: 16,
+            boxShadow: `0 16px 16px 0 ${colors.firebase}30`,
+            display: 'flex',
+            padding: 20,
+            marginTop: 90,
+            position: 'relative',
+          }}
+        >
+          <audio
+            ref={audioRef}
+            src={data[audioIndex]?.preview_url}
+            onLoadedData={handleLoadedData}
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleEnded}
+          >
+            Your browser does not support the
+            <code> audio</code> element.
+          </audio>
+
+          <div
+            css={((isPlay) => css`
+              background-color: #ffffff80;
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              margin-left: auto;
+              margin-right: auto;
+              width: calc(100% - ${8 * 4}px);
+              border-radius: 8px 8px 0 0;
+              align-self: center;
+
+              ${isPlay
+                ? `
+                opacity: 1;
+                transform: translateY(-100%);
+                transition: transform 0.5s ease-in, opacity 0.5s ease-in;
+              `
+                : `
+                opacity: 0;
+                transform: translateY(0%);
+                transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+              `}
+
+              padding: 8px 8px 8px 140px;
+            `)(isPlay)}
+          >
+            <Typography.Title
+              style={{
+                marginBottom: 0,
+              }}
+              level={5}
+            >
+              <marquee scrolldelay={180}>{name}</marquee>
+            </Typography.Title>
+            <Row justify="space-between">
+              <Typography.Paragraph
+                style={{ color: colors.border, marginBottom: 0 }}
+              >
+                {formatSecondToMMSS(Math.floor(currentTime))}
+              </Typography.Paragraph>
+              <Typography.Paragraph
+                style={{ color: colors.border, marginBottom: 0 }}
+              >
+                {formatSecondToMMSS(Math.floor(duration))}
+              </Typography.Paragraph>
+            </Row>
+            <input
+              css={((percent) => css`
+                width: 100%;
+                -webkit-appearance: none;
+                background-color: #76767650;
+                height: 5px;
+                border-radius: 5px;
+                overflow: hidden;
+                &::-webkit-slider-runnable-track {
+                  -webkit-appearance: none;
+                }
+                &::-webkit-slider-thumb {
+                  -webkit-appearance: none;
+                  width: 10px;
+                  height: 10px;
+                  ${'' /* border-radius: ${10 / 2}px; */}
+                  background: #ffffff;
+                  box-shadow: -115px 0 0 110px ${colors.spotify};
+                }
+              `)(Math.floor((currentTime / duration) * 100))}
+              type="range"
+              value={currentTime}
+              onChange={handleTimeSliderChange}
+              min={0}
+              max={duration}
+            />
+          </div>
+          <div
+            css={css`
+              position: relative;
+              width: 100px;
+              aspect-ratio: 2;
+              &:after {
+                content: '';
+                background-color: #ffffff;
+                width: ${20}px;
+                height: ${20}px;
+                border-radius: 50%;
+                position: absolute;
+                left: calc(50% - ${20 / 2}px);
+                top: -${20 / 2}px;
+              }
+            `}
+          >
+            <img
+              css={((isPlay) => css`
+                width: inherit;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                object-fit: cover;
+                position: absolute;
+                left: 0;
+                bottom: 0;
+
+                animation: ${rotate} 6s linear infinite;
+
+                ${isPlay
+                  ? `
+                animation-play-state: running;
+                `
+                  : `
+                animation-play-state: paused;
+                `}
+              `)(isPlay)}
+              src={image}
+            />
+          </div>
+
+          <div
+            css={css`
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            `}
+          >
+            <Button
+              style={{
+                border: 0,
+                boxShadow: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 20px',
+              }}
+              ghost
+              shape="circle"
+              icon={
+                <IoIosRewind
+                  size={20}
+                  color={colors.spotify}
+                />
+              }
+              onClick={handlePrev}
+            />
+            <Button
+              style={{
+                border: 0,
+                boxShadow: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 20px',
+              }}
+              ghost
+              shape="circle"
+              icon={
+                isPlay ? (
+                  <IoIosPause
+                    size={30}
+                    color={colors.spotify}
+                  />
+                ) : (
+                  <IoIosPlay
+                    size={30}
+                    color={colors.spotify}
+                  />
+                )
+              }
+              onClick={handlePausePlayClick}
+            />
+            <Button
+              style={{
+                border: 0,
+                boxShadow: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 20px',
+              }}
+              ghost
+              shape="circle"
+              icon={
+                <IoIosFastforward
+                  size={20}
+                  color={colors.spotify}
+                // color={isSelected ? colors.spotify : '#767676'}
+                // fill={isSelected ? colors.spotify : '#767676'}
+                />
+              }
+              onClick={handleNext}
+            />
+          </div>
+        </div>
+
+        {/* <audio
           ref={audioRef}
           src={data[audioIndex]?.preview_url}
           onLoadedData={handleLoadedData}
@@ -115,7 +350,7 @@ export const Music = forwardRef(
           onChange={handleTimeSliderChange}
           min={0}
           max={duration}
-        />
+        /> */}
       </Fragment>
     )
   }
