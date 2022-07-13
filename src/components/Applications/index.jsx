@@ -9,7 +9,7 @@ import {
 import { Button, Input, List, Row } from 'antd'
 import { deleteField } from 'firebase/firestore'
 import axios from 'axios'
-import { IoIosPause, IoIosPlay } from 'react-icons/io'
+import { IoIosMusicalNote, IoIosPause, IoIosPlay } from 'react-icons/io'
 import debounce from 'lodash/debounce'
 
 // import SpotifyLogo from '../../assets/logo/spotify_logo.png'
@@ -32,6 +32,7 @@ export const Applications = () => {
   const auth = useAuth()
   const musicRef = useRef(null)
   // const spotifyToken = auth?.user?.spotifyToken
+  const backgroundMusic = auth?.user?.backgroundMusic
   const [spotifyToken, setSpotifyToken] = useState(null)
 
   const [initLoading, setInitLoading] = useState(true)
@@ -56,6 +57,26 @@ export const Applications = () => {
 
   const handleStateChange = useCallback((state) => {
     setIsPlay(state)
+  }, [])
+
+  const handleSetBackgroundMusic = useCallback(async (backgroundMusicData) => {
+    const userDocRef = getDocRef('users', auth?.user?.uid)
+    const userData = {
+      backgroundMusic: backgroundMusicData,
+    }
+    await updateDocument(userDocRef, userData)
+
+    auth?.fetchUser(auth?.user)
+  }, [])
+
+  const handleRemoveBackgroundMusic = useCallback(async () => {
+    const userDocRef = getDocRef('users', auth?.user?.uid)
+    const userData = {
+      backgroundMusic: deleteField(),
+    }
+    await updateDocument(userDocRef, userData)
+
+    auth?.fetchUser(auth?.user)
   }, [])
 
   const onLoad = useCallback(async () => {
@@ -124,7 +145,7 @@ export const Applications = () => {
 
   useEffect(() => {
     onLoad()
-  }, [])
+  }, [onLoad])
 
   useEffect(() => {
     debouncedSearchText()
@@ -157,7 +178,12 @@ export const Applications = () => {
 
   return (
     <Fragment>
-      <div style={{ margin: '32px 32px 0 32px' }}>
+      <div
+        style={{
+          padding: '32px 32px 0 32px',
+          backgroundImage: `linear-gradient(0deg, #ffffff, ${colors.firebase}30)`,
+        }}
+      >
         {/* <Row align="middle" justify="space-between">
           <Row align="middle" justify="space-between">
             <div style={{ marginRight: 8 }}>
@@ -234,12 +260,21 @@ export const Applications = () => {
                 loadMore={loadMore}
                 dataSource={list}
                 renderItem={(item, ii) => {
-                  const image = item?.album?.images[0].url
+                  const album = item?.album
+                  const image = album?.images[0].url
                   const name = item?.name
                   const nameArtists = item?.artists
                     ?.map((artist) => artist.name)
                     .join(', ')
                   const isSelected = index === ii
+                  const preview_url = item?.preview_url
+                  const isSelectedBackgroundMusic =
+                    backgroundMusic.preview_url === preview_url
+                  const backgroundMusicData = {
+                    name,
+                    album,
+                    preview_url,
+                  }
                   return (
                     <List.Item
                       actions={[
@@ -277,6 +312,37 @@ export const Applications = () => {
                             musicRef?.current?.handlePlayClick()
                             setIndex(ii)
                           }}
+                        />,
+                        <Button
+                          style={{
+                            border: 0,
+                            boxShadow: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          ghost
+                          shape="circle"
+                          icon={
+                            <IoIosMusicalNote
+                              size={18}
+                              color={
+                                isSelectedBackgroundMusic
+                                  ? colors.spotify
+                                  : '#767676'
+                              }
+                              fill={
+                                isSelectedBackgroundMusic
+                                  ? colors.spotify
+                                  : '#767676'
+                              }
+                            />
+                          }
+                          onClick={() =>
+                            isSelectedBackgroundMusic
+                              ? handleRemoveBackgroundMusic()
+                              : handleSetBackgroundMusic(backgroundMusicData)
+                          }
                         />,
                       ]}
                     >

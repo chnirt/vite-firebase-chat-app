@@ -14,9 +14,9 @@ import {
   getColRef,
   getDocRef,
 } from '../../firebase/service'
-import { PostList } from '../../components'
+import { Music, PostList } from '../../components'
 import { useAuth, useLoading } from '../../context'
-import { avatarPlaceholder, paths } from '../../constants'
+import { avatarPlaceholder, colors, paths } from '../../constants'
 import { Global } from '../../global'
 
 const UserDetail = () => {
@@ -32,8 +32,9 @@ const UserDetail = () => {
   const [followingList, setFollowingList] = useState([])
   const [followerList, setFollowerList] = useState([])
 
-  const isOwner = auth.user.username === username
-  const isFollowing = followerList.some((item) => item.uid === auth.user.uid)
+  const isOwner = auth?.user?.username === username
+  const isFollowing = followerList.some((item) => item.uid === auth?.user?.uid)
+  const backgroundMusic = auth?.user?.backgroundMusic
 
   const navigateProfile = useCallback(() => {
     navigate(`../${paths.profile}`)
@@ -319,9 +320,9 @@ const UserDetail = () => {
           // span={18}
           xs={8}
           sm={8}
-        // md={18}
-        // lg={24}
-        // xl={24}
+          // md={18}
+          // lg={24}
+          // xl={24}
         >
           <Avatar
             shape="circle"
@@ -341,9 +342,9 @@ const UserDetail = () => {
           // span={18}
           xs={16}
           sm={16}
-        // md={18}
-        // lg={24}
-        // xl={24}
+          // md={18}
+          // lg={24}
+          // xl={24}
         >
           <Row
             style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}
@@ -445,7 +446,11 @@ const UserDetail = () => {
               following
             </Typography.Text>
           </Row>
-          <Row>
+          <Row
+            style={{
+              marginBottom: 20,
+            }}
+          >
             <div
               style={{
                 display: 'flex',
@@ -456,6 +461,22 @@ const UserDetail = () => {
               <Typography.Text>{user.bio}</Typography.Text>
             </div>
           </Row>
+          {backgroundMusic && (
+            <Row
+              style={{
+                padding: '16px 16px 0 16px',
+                borderRadius: 16,
+                backgroundImage: `linear-gradient(0deg, #ffffff, ${colors.firebase}30)`,
+              }}
+            >
+              <Music
+                // ref={musicRef}
+                data={[backgroundMusic]}
+                // onStateChange={handleStateChange}
+                autoplay
+              />
+            </Row>
+          )}
         </Col>
       </Row>
       <Tabs defaultActiveKey="1" centered>

@@ -6,7 +6,7 @@ import { useLoading } from '../context'
 import { auth } from '../firebase'
 import { useLocalStorage } from '../hooks'
 import { Navbar } from '../components'
-import { colors } from '../constants'
+// import { colors } from '../constants'
 
 // const LinkRoutes = [
 //   {
@@ -61,9 +61,9 @@ export const Layout = ({ children }) => {
   return (
     <Fragment>
       <div
-        style={{
-          backgroundImage: `linear-gradient(0deg, #ffffff, ${colors.firebase}30)`,
-        }}
+      // style={{
+      //   backgroundImage: `linear-gradient(0deg, #ffffff, ${colors.firebase}30)`,
+      // }}
       >
         <Navbar />
         {/* <div className="App">

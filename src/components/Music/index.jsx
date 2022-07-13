@@ -19,6 +19,8 @@ import {
 } from 'react-icons/io'
 import { Button, Row, Typography } from 'antd'
 
+import SpotifyLogo from '../../assets/logo/spotify_logo.png'
+
 const rotate = keyframes`
   from, 0, to {
     transform: rotate(0);
@@ -29,11 +31,11 @@ const rotate = keyframes`
 `
 
 export const Music = forwardRef(
-  ({ data = [], onStateChange = () => { } }, ref) => {
+  ({ data = [], onStateChange = () => { }, autoplay = false }, ref) => {
     const audioRef = useRef(null)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
-    const [isPlay, setPlay] = useState(false)
+    const [isPlay, setPlay] = useState(autoplay)
     const [audioIndex, setAudioIndex] = useState(0)
 
     const handleLoadedData = useCallback(() => {
@@ -102,13 +104,13 @@ export const Music = forwardRef(
         handleSelect,
         handlePausePlayClick,
         handlePlayClick,
-        handleEnded
+        handleEnded,
       }),
       [handleSelect, handlePausePlayClick, handlePlayClick, handleEnded]
     )
 
     const name = data[audioIndex]?.name
-    const image = data[audioIndex]?.album?.images[0].url
+    const image = data[audioIndex]?.album?.images[0].url ?? SpotifyLogo
     const previewUrl = data[audioIndex]?.preview_url
 
     return (
@@ -117,7 +119,7 @@ export const Music = forwardRef(
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: 16,
-            boxShadow: `0 16px 16px 0 ${colors.firebase}30`,
+            boxShadow: `0 12px 12px 0 ${colors.firebase}30`,
             display: 'flex',
             padding: 20,
             marginTop: 90,
@@ -269,12 +271,7 @@ export const Music = forwardRef(
               }}
               ghost
               shape="circle"
-              icon={
-                <IoIosRewind
-                  size={20}
-                  color={colors.spotify}
-                />
-              }
+              icon={<IoIosRewind size={20} color={colors.spotify} />}
               onClick={handlePrev}
             />
             <Button
@@ -290,15 +287,9 @@ export const Music = forwardRef(
               shape="circle"
               icon={
                 isPlay ? (
-                  <IoIosPause
-                    size={30}
-                    color={colors.spotify}
-                  />
+                  <IoIosPause size={30} color={colors.spotify} />
                 ) : (
-                  <IoIosPlay
-                    size={30}
-                    color={colors.spotify}
-                  />
+                  <IoIosPlay size={30} color={colors.spotify} />
                 )
               }
               onClick={handlePausePlayClick}
