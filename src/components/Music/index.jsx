@@ -108,6 +108,7 @@ export const Music = forwardRef(
 
     const name = data[audioIndex]?.name
     const image = data[audioIndex]?.album?.images[0].url
+    const previewUrl = data[audioIndex]?.preview_url
 
     return (
       <Fragment>
@@ -124,7 +125,7 @@ export const Music = forwardRef(
         >
           <audio
             ref={audioRef}
-            src={data[audioIndex]?.preview_url}
+            src={previewUrl}
             onLoadedData={handleLoadedData}
             onTimeUpdate={handleTimeUpdate}
             onEnded={handleEnded}

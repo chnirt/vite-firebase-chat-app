@@ -6,18 +6,19 @@ import {
   useRef,
   useState,
 } from 'react'
-import { Button, Image, List, Row, Typography } from 'antd'
+import { Button, Input, List, Row } from 'antd'
 import { deleteField } from 'firebase/firestore'
 import axios from 'axios'
 import { IoIosPause, IoIosPlay } from 'react-icons/io'
+import debounce from 'lodash/debounce'
 
-import SpotifyLogo from '../../assets/logo/spotify_logo.png'
-import {
-  SPOTIFY_AUTH_ENDPOINT,
-  SPOTIFY_CLIENT_ID,
-  SPOTIFY_REDIRECT_URI,
-  SPOTIFY_RESPONSE_TYPE,
-} from '../../env'
+// import SpotifyLogo from '../../assets/logo/spotify_logo.png'
+// import {
+//   SPOTIFY_AUTH_ENDPOINT,
+//   SPOTIFY_CLIENT_ID,
+//   SPOTIFY_REDIRECT_URI,
+//   SPOTIFY_RESPONSE_TYPE,
+// } from '../../env'
 import { useAuth } from '../../context'
 import { getDocRef, updateDocument } from '../../firebase/service'
 // import { audioList } from '../../mock'
@@ -25,7 +26,7 @@ import { Music } from '../Music'
 import { colors } from '../../constants'
 import { getSpotifyAccessToken } from '../../utils'
 
-const limit = 15
+const limit = 5
 
 export const Applications = () => {
   const auth = useAuth()
@@ -40,6 +41,8 @@ export const Applications = () => {
 
   const [index, setIndex] = useState(0)
   const [isPlay, setIsPlay] = useState(false)
+
+  const [search, setSearch] = useState('')
 
   const handleUnconnectSpotify = useCallback(async () => {
     const userDocRef = getDocRef('users', auth?.user?.uid)
@@ -58,29 +61,38 @@ export const Applications = () => {
   const onLoad = useCallback(async () => {
     if (spotifyToken) {
       try {
-        const { data } = await axios.get('https://api.spotify.com/v1/search', {
-          headers: {
-            Authorization: `Bearer ${spotifyToken}`,
-          },
-          params: {
-            q: '2am',
-            type: 'track',
-            include_external: 'audio',
-            offset: page * limit,
-            limit,
-          },
-        })
-        // console.log(JSON.stringify(data.tracks.items[0], null, 2))
-        setList(data.tracks.items)
+        if (search.length === 0) {
+          setList([])
+          return
+        } else {
+          const { data } = await axios.get(
+            'https://api.spotify.com/v1/search',
+            {
+              headers: {
+                Authorization: `Bearer ${spotifyToken}`,
+              },
+              params: {
+                q: search,
+                type: 'track',
+                include_external: 'audio',
+                offset: page * limit,
+                limit,
+              },
+            }
+          )
+          // console.log(JSON.stringify(data.tracks.items[0], null, 2))
+          setList(data.tracks.items)
+        }
       } catch (error) {
         if (error.response.status === 401) {
           handleUnconnectSpotify()
         }
       } finally {
         setInitLoading(false)
+        setLoading(false)
       }
     }
-  }, [spotifyToken])
+  }, [spotifyToken, search])
 
   const onLoadMore = useCallback(async () => {
     if (spotifyToken) {
@@ -90,7 +102,7 @@ export const Applications = () => {
           Authorization: `Bearer ${spotifyToken}`,
         },
         params: {
-          q: '2am',
+          q: search,
           type: 'track',
           offset: (page + 1) * limit,
           limit,
@@ -102,14 +114,20 @@ export const Applications = () => {
       setLoading(false)
       window.dispatchEvent(new Event('resize'))
     }
-  }, [spotifyToken, page])
+  }, [spotifyToken, page, search])
+
+  const debouncedSearchText = debounce(onLoad, 1000)
 
   useEffect(() => {
     onLoad()
-  }, [onLoad])
+  }, [])
 
   useEffect(() => {
-    (async () => {
+    debouncedSearchText()
+  }, [search])
+
+  useEffect(() => {
+    ; (async () => {
       const spotifyAccessToken = await getSpotifyAccessToken()
       setSpotifyToken(spotifyAccessToken)
     })()
@@ -117,7 +135,7 @@ export const Applications = () => {
 
   const loadMore = useMemo(
     () =>
-      !initLoading && !loading ? (
+      !initLoading && !loading && list.length > 0 ? (
         <div
           style={{
             textAlign: 'center',
@@ -130,7 +148,7 @@ export const Applications = () => {
           <Button onClick={onLoadMore}>loading more</Button>
         </div>
       ) : null,
-    [initLoading, loading, onLoadMore]
+    [initLoading, loading, onLoadMore, list]
   )
 
   return (
@@ -169,7 +187,7 @@ export const Applications = () => {
           )}
         </Row> */}
 
-        {spotifyToken && list.length > 0 && (
+        {spotifyToken && (
           <div>
             <Row
               style={{
@@ -183,6 +201,14 @@ export const Applications = () => {
               />
             </Row>
 
+            <Row style={{ marginTop: 32 }}>
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Type your search"
+              />
+            </Row>
+
             <Row
               style={{
                 marginTop: 32,
@@ -191,7 +217,7 @@ export const Applications = () => {
               <List
                 style={{
                   flex: 1,
-                  height: 'calc(var(--app-height) - 336px)',
+                  height: 'calc(var(--app-height) - 400px)',
                   overflow: 'hidden scroll',
                   // padding: '0 16px',
                   // border: '1px solid rgba(140, 140, 140, 0.35)',
