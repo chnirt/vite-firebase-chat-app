@@ -124,9 +124,13 @@ export const Music = forwardRef(
           audioRef.current.volume = Math.max(audioRef.current.volume - 0.1, 0)
         }
         if (audioRef.current.volume === 0) {
-          clearInterval(fadeAudio);
+          clearInterval(fadeAudio)
         }
       }, 200)
+
+      return () => {
+        clearInterval(fadeAudio)
+      }
     }, [])
 
     const name = data[audioIndex]?.name

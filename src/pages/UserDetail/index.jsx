@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore'
+import {
+  documentId,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore'
 import { Avatar, Button, Col, message, Row, Tabs, Typography } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { IoSettingsOutline } from 'react-icons/io5'
@@ -29,6 +36,7 @@ const UserDetail = () => {
   const [user, setUser] = useState(null)
 
   const [blogList, setBlogList] = useState([])
+  const [savedBlogList, setSavedBlogList] = useState([])
   const [followingList, setFollowingList] = useState([])
   const [followerList, setFollowerList] = useState([])
 
@@ -173,6 +181,19 @@ const UserDetail = () => {
     }
   }, [])
 
+  const fetchSavedData = useCallback(async () => {
+    const savedDocRef = getColRef('users', user.uid, 'saved')
+    const querySnapshot = await getDocs(savedDocRef)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    return data
+  }, [user])
+
   useEffect(() => {
     const fetchData = async (username) => {
       try {
@@ -223,6 +244,22 @@ const UserDetail = () => {
       // console.log(data)
       setBlogList(data)
     }
+    const fetchSavedBlogData = async () => {
+      const savedList = await fetchSavedData()
+      const savedIds = savedList.map(saved => saved.id)
+      const savedBlogDocRef = getColRef('blogs')
+      const q = query(savedBlogDocRef, ...(savedList.length > 0 ? [where(documentId(), 'in', savedIds)] : []))
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setSavedBlogList(data)
+    }
     const fetchFollowingData = async () => {
       const followingDocRef = getColRef('users', user.uid, 'following')
       const q = query(followingDocRef, where('uid', '!=', user.uid))
@@ -266,6 +303,7 @@ const UserDetail = () => {
     appLoading.show()
     Promise.all([
       fetchBlogData(),
+      fetchSavedBlogData(),
       fetchFollowingData(),
       fetchFollowerData(),
       // fetchLikeData(),
@@ -320,9 +358,9 @@ const UserDetail = () => {
           // span={18}
           xs={8}
           sm={8}
-          // md={18}
-          // lg={24}
-          // xl={24}
+        // md={18}
+        // lg={24}
+        // xl={24}
         >
           <Avatar
             shape="circle"
@@ -342,9 +380,9 @@ const UserDetail = () => {
           // span={18}
           xs={16}
           sm={16}
-          // md={18}
-          // lg={24}
-          // xl={24}
+        // md={18}
+        // lg={24}
+        // xl={24}
         >
           <Row
             style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}
@@ -514,7 +552,7 @@ const UserDetail = () => {
             </Row>
           }
         >
-          <PostList data={blogList} />
+          <PostList data={savedBlogList} />
         </Tabs.TabPane>
         <Tabs.TabPane
           key="3"
