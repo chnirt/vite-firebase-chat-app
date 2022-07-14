@@ -1,4 +1,4 @@
-import { Avatar, Button, List, Typography } from 'antd'
+import { Avatar, Button, List, Tag, Typography } from 'antd'
 import React, { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { FiHeart } from 'react-icons/fi'
@@ -9,7 +9,7 @@ import {
   IoPaperPlaneOutline,
 } from 'react-icons/io5'
 
-import { avatarPlaceholder } from '../../constants'
+import { avatarPlaceholder, colors } from '../../constants'
 import { useAuth } from '../../context'
 import {
   addDocument,
@@ -19,10 +19,21 @@ import {
   updateDocument,
 } from '../../firebase/service'
 import { increment } from 'firebase/firestore'
+import { css } from '@emotion/react'
+import { splitWithUsername } from '../../utils'
 
 export const BlogItem = ({ blog = {} }) => {
-  const { id, isLiked, isSaved, file, avatar, username, createdAt, caption, likeTotal } =
-    blog
+  const {
+    id,
+    isLiked,
+    isSaved,
+    file,
+    avatar,
+    username,
+    createdAt,
+    caption,
+    likeTotal,
+  } = blog
   const auth = useAuth()
 
   const handleLike = useCallback(async (doc) => {
@@ -76,6 +87,8 @@ export const BlogItem = ({ blog = {} }) => {
       await deleteDocument('users', auth?.user?.uid, 'saved', doc.id)
     }
   }, [])
+
+  const captions = splitWithUsername(caption)
 
   return (
     <List.Item
@@ -157,7 +170,27 @@ export const BlogItem = ({ blog = {} }) => {
         title={<Link to={`/user/${username}`}>@{username}</Link>}
         description={createdAt}
       />
-      <div>{caption}</div>
+      {captions.map((caption) => {
+        const isUsername = String(caption).startsWith('@')
+        const usernameCaption = String(caption).substring(1)
+
+        if (isUsername) {
+          return (
+            <Link to={`/user/${usernameCaption}`}>
+              <Tag
+                css={css`
+                color: ${colors.firebase};
+                background: ${`${colors.firebase}10`};
+                border-color: ${`${colors.firebase}50`};
+              `}
+              >
+                {caption}
+              </Tag>
+            </Link>
+          )
+        }
+        return <div>{caption}</div>
+      })}
     </List.Item>
   )
 }

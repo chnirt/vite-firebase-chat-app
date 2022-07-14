@@ -40,6 +40,7 @@ const UserDetail = () => {
 
   const [blogList, setBlogList] = useState([])
   const [savedBlogList, setSavedBlogList] = useState([])
+  const [taggedBlogList, setTaggedBlogList] = useState([])
   const [followingList, setFollowingList] = useState([])
   const [followerList, setFollowerList] = useState([])
 
@@ -237,6 +238,19 @@ const UserDetail = () => {
     return data
   }, [user])
 
+  const fetchTaggedData = useCallback(async () => {
+    const savedDocRef = getColRef('users', user.uid, 'tagged')
+    const querySnapshot = await getDocs(savedDocRef)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    return data
+  }, [user])
+
   useEffect(() => {
     const fetchData = async (username) => {
       try {
@@ -305,6 +319,25 @@ const UserDetail = () => {
       // console.log(data)
       setSavedBlogList(data)
     }
+    const fetchTaggedBlogData = async () => {
+      const taggedList = await fetchTaggedData()
+      const taggedIds = taggedList.map((saved) => saved.id)
+      const taggedBlogDocRef = getColRef('blogs')
+      const q = query(
+        taggedBlogDocRef,
+        ...(taggedList.length > 0 ? [where(documentId(), 'in', taggedIds)] : [])
+      )
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setTaggedBlogList(data)
+    }
     const fetchFollowingData = async () => {
       const followingDocRef = getColRef('users', user.uid, 'following')
       const q = query(followingDocRef, where('uid', '!=', user.uid))
@@ -349,6 +382,7 @@ const UserDetail = () => {
     Promise.all([
       fetchBlogData(),
       fetchSavedBlogData(),
+      fetchTaggedBlogData(),
       fetchFollowingData(),
       fetchFollowerData(),
       // fetchLikeData(),
@@ -615,7 +649,7 @@ const UserDetail = () => {
             </Row>
           }
         >
-          <PostList data={blogList} />
+          <PostList data={taggedBlogList} />
         </Tabs.TabPane>
       </Tabs>
     </div>

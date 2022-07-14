@@ -2,7 +2,7 @@ import {
   Avatar,
   Button,
   Form,
-  Input,
+  Mentions,
   Modal,
   Row,
   Typography,
@@ -12,16 +12,22 @@ import {
   forwardRef,
   Fragment,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useState,
 } from 'react'
 import { UserOutlined } from '@ant-design/icons'
-import { arrayUnion } from 'firebase/firestore'
+import { arrayUnion, getDocs, query, where } from 'firebase/firestore'
 
 import { avatarPlaceholder, eventNames } from '../../constants'
 import { useAuth } from '../../context'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
-import { addDocument, getColRef } from '../../firebase/service'
+import {
+  addDocument,
+  getBatch,
+  getColRef,
+  getDocRef,
+} from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 // import { capitalizeAvatarUsername } from '../../utils'
 
@@ -29,6 +35,9 @@ export const CreateBlogModal = forwardRef((props, ref) => {
   const auth = useAuth()
   const [form] = Form.useForm()
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [followingList, setFollowingList] = useState([])
+
+  const usernames = followingList.map((item) => item.username)
 
   const showModal = useCallback(() => {
     setIsModalVisible(true)
@@ -38,6 +47,8 @@ export const CreateBlogModal = forwardRef((props, ref) => {
     try {
       const values = await form.validateFields()
       const { caption, files } = values
+      // console.log(values)
+
       const file = files[0].originFileObj
       uploadStorageBytesResumable(
         file,
@@ -45,7 +56,6 @@ export const CreateBlogModal = forwardRef((props, ref) => {
         null,
         async ({ downloadURL: file, url }) => {
           // setDownloadURL(downloadURL)
-
           const blogData = {
             caption: String(caption).trim(),
             files: arrayUnion({
@@ -56,7 +66,29 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           }
 
           const blogDocRef = getColRef('blogs')
-          await addDocument(blogDocRef, blogData)
+          const newBlogDocRef = await addDocument(blogDocRef, blogData)
+          const doc = newBlogDocRef
+
+          const batch = getBatch()
+          followingList.forEach((item) => {
+            const isTagged = caption.includes(`@${item.username} `)
+            if (isTagged) {
+              const taggedData = {
+                postId: doc.id,
+                uid: item.uid,
+              }
+              const taggedDocRef = getDocRef(
+                'users',
+                item.uid,
+                'tagged',
+                doc.id
+              )
+              // await addDocument(taggedDocRef, taggedData)
+              batch.set(taggedDocRef, taggedData)
+            }
+          })
+
+          await batch.commit()
 
           handleCancel()
 
@@ -68,7 +100,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
     } catch (error) {
       console.log('Validate Failed:', error)
     }
-  }, [])
+  }, [followingList])
 
   const handleCancel = useCallback(() => {
     setIsModalVisible(false)
@@ -93,6 +125,26 @@ export const CreateBlogModal = forwardRef((props, ref) => {
     }),
     []
   )
+
+  useEffect(() => {
+    const fetchFollowingData = async () => {
+      const followingDocRef = getColRef('users', auth?.user?.uid, 'following')
+      const q = query(followingDocRef, where('uid', '!=', auth?.user.uid))
+      const querySnapshot = await getDocs(q)
+      const docs = querySnapshot.docs
+      const data = docs.map((docSnapshot) => {
+        return {
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }
+      })
+      // console.log(data)
+      setFollowingList(data)
+    }
+    if (isModalVisible) {
+      fetchFollowingData()
+    }
+  }, [isModalVisible])
 
   return (
     <Fragment>
@@ -169,11 +221,13 @@ export const CreateBlogModal = forwardRef((props, ref) => {
               },
             ]}
           >
-            <Input
-              style={{ borderWidth: 0, padding: 0 }}
-              placeholder="Write a caption..."
-              maxLength={200}
-            />
+            <Mentions rows={1} placeholder="Write a caption..." maxLength={200}>
+              {usernames.map((username, ui) => (
+                <Mentions.Option key={`username-${ui}`} value={username}>
+                  {username}
+                </Mentions.Option>
+              ))}
+            </Mentions>
           </Form.Item>
           <Form.Item
             name="files"
