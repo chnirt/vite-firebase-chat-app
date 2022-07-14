@@ -170,13 +170,13 @@ export const BlogItem = ({ blog = {} }) => {
         title={<Link to={`/user/${username}`}>@{username}</Link>}
         description={createdAt}
       />
-      {captions.map((caption) => {
+      {captions.map((caption, ci) => {
         const isUsername = String(caption).startsWith('@')
         const usernameCaption = String(caption).substring(1)
 
         if (isUsername) {
           return (
-            <Link to={`/user/${usernameCaption}`}>
+            <Link key={`username-${ci}`} to={`/user/${usernameCaption}`}>
               <Tag
                 css={css`
                 color: ${colors.firebase};
