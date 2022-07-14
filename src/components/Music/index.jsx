@@ -112,26 +112,32 @@ export const Music = forwardRef(
     )
 
     useEffect(() => {
-      audioRef.current.volume = 0
-      const fadeAudio = setInterval(() => {
-        // console.log(audioRef.current.volume)
-        const startPoint = 3
-        const endPoint = audioRef.current.duration - startPoint
-        if (audioRef.current.currentTime <= startPoint) {
-          audioRef.current.volume = Math.min(audioRef.current.volume + 0.1, 1)
-        }
-        if (audioRef.current.currentTime >= endPoint) {
-          audioRef.current.volume = Math.max(audioRef.current.volume - 0.1, 0)
-        }
-        if (audioRef.current.volume === 0) {
-          clearInterval(fadeAudio)
-        }
-      }, 200)
+      let fadeAudio
+      if (isPlay) {
+        audioRef.current.volume = 0
+        fadeAudio = setInterval(() => {
+          // console.log(audioRef.current.volume)
+          const startPoint = 3
+          const endPoint = audioRef.current.duration - startPoint
+          if (audioRef.current.currentTime <= startPoint) {
+            audioRef.current.volume = Math.min(audioRef.current.volume + 0.1, 1)
+          }
+          if (audioRef.current.currentTime >= endPoint) {
+            audioRef.current.volume = Math.max(audioRef.current.volume - 0.1, 0)
+          }
+          if (audioRef.current.volume === 0) {
+            clearInterval(fadeAudio)
+          }
+          audioRef.current.volume = 1
+        }, 200)
+      } else {
+        audioRef.current.volume = 0
+      }
 
       return () => {
         clearInterval(fadeAudio)
       }
-    }, [])
+    }, [isPlay])
 
     const name = data[audioIndex]?.name
     const image = data[audioIndex]?.album?.images[0].url ?? SpotifyLogo

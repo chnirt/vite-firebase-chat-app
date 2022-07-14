@@ -4,6 +4,7 @@ import {
   documentId,
   getDoc,
   getDocs,
+  increment,
   onSnapshot,
   query,
   where,
@@ -20,6 +21,8 @@ import {
   deleteDocument,
   getColRef,
   getDocRef,
+  getDocument,
+  updateDocument,
 } from '../../firebase/service'
 import { Music, PostList } from '../../components'
 import { useAuth, useLoading } from '../../context'
@@ -42,7 +45,11 @@ const UserDetail = () => {
 
   const isOwner = auth?.user?.username === username
   const isFollowing = followerList.some((item) => item.uid === auth?.user?.uid)
-  const backgroundMusic = auth?.user?.backgroundMusic
+  const avatar = user?.avatar
+  const otherUsername = user?.username
+  const followerTotal = user?.followerTotal ?? 0
+  const followingTotal = user?.followingTotal ?? 0
+  const backgroundMusic = user?.backgroundMusic
 
   const navigateProfile = useCallback(() => {
     navigate(`../${paths.profile}`)
@@ -56,35 +63,53 @@ const UserDetail = () => {
     try {
       // follower
       // const followerDocRef = getDocRef('users', user.uid)
-      const followingData = {
+      const userFollowingData = {
         type: 'followee',
         uid: doc.uid,
         avatar: doc.avatar,
         username: doc.username,
       }
-      const followerDocRef = getDocRef(
+      const userFollowingDocRef = getDocRef(
         'users',
-        auth.user.uid,
+        auth?.user?.uid,
         'following',
         doc.uid
       )
-      await addDocument(followerDocRef, followingData)
+      await addDocument(userFollowingDocRef, userFollowingData)
+
+      const followerDocRef = getDocRef('users', auth?.user?.uid)
+      const followerDocData = await getDocument(followerDocRef)
+      const followerData = {
+        followingTotal: increment(1),
+      }
+      if (followerDocData) {
+        await updateDocument(followerDocRef, followerData)
+      }
 
       // followee
       // const followeeDocRef = doc.ref
-      const followerData = {
+      const userFollowerData = {
         type: 'follower',
-        uid: auth.user.uid,
-        avatar: auth.user.avatar,
-        username: auth.user.username,
+        uid: auth?.user?.uid,
+        avatar: auth?.user?.avatar,
+        username: auth?.user?.username,
       }
-      const followeeDocRef = getDocRef(
+      const userFolloweeDocRef = getDocRef(
         'users',
         doc.uid,
         'follower',
-        auth.user.uid
+        auth?.user?.uid
       )
-      await addDocument(followeeDocRef, followerData)
+      await addDocument(userFolloweeDocRef, userFollowerData)
+
+      const followeeDocRef = getDocRef('users', doc.uid)
+      const followeeDocData = await getDocument(followeeDocRef)
+      const followeeData = {
+        followerTotal: increment(1),
+      }
+      if (followeeDocData) {
+        await updateDocument(followeeDocRef, followeeData)
+      }
 
       // // add relationship
       // const batch = getBatch()
@@ -108,29 +133,47 @@ const UserDetail = () => {
   const handleUnfollow = useCallback(async (doc) => {
     try {
       // follower
-      const followerDocRef = getDocRef(
+      const userFollowingDocRef = getDocRef(
         'users',
         auth.user.uid,
         'following',
         doc.uid
       )
-      const followerDocSnap = await getDoc(followerDocRef)
-      // console.log(followerDocSnap.data())
-      if (followerDocSnap.exists()) {
+      const followingDocSnap = await getDoc(userFollowingDocRef)
+      // console.log(followingDocSnap.data())
+      if (followingDocSnap.exists()) {
         await deleteDocument('users', auth.user.uid, 'following', doc.uid)
       }
 
+      const followerDocRef = getDocRef('users', auth?.user?.uid)
+      const followerDocData = await getDocument(followerDocRef)
+      const followerData = {
+        followingTotal: increment(-1),
+      }
+      if (followerDocData) {
+        await updateDocument(followerDocRef, followerData)
+      }
+
       // followee
-      const followeeDocRef = getDocRef(
+      const userFollowerDocRef = getDocRef(
         'users',
         doc.uid,
         'follower',
         auth.user.uid
       )
-      const followeeDocSnap = await getDoc(followeeDocRef)
-      // console.log(followeeDocSnap.data())
-      if (followeeDocSnap.exists()) {
+      const followerDocSnap = await getDoc(userFollowerDocRef)
+      // console.log(followerDocSnap.data())
+      if (followerDocSnap.exists()) {
         await deleteDocument('users', doc.uid, 'follower', auth.user.uid)
+      }
+
+      const followeeDocRef = getDocRef('users', doc.uid)
+      const followeeDocData = await getDocument(followeeDocRef)
+      const followeeData = {
+        followerTotal: increment(-1),
+      }
+      if (followeeDocData) {
+        await updateDocument(followeeDocRef, followeeData)
       }
 
       // // remove relationship
@@ -201,19 +244,18 @@ const UserDetail = () => {
 
         setLoading(true)
 
-        const q = query(getColRef('users'), where('username', '==', username))
-        const querySnapshot = await getDocs(q)
-        const docs = querySnapshot.docs
-        const data = docs.map((docSnapshot) => {
-          return {
-            id: docSnapshot.id,
-            ...docSnapshot.data(),
-          }
+        const userColRef = getColRef('users')
+        const q = query(userColRef, where('username', '==', username))
+        onSnapshot(q, async (querySnapshot) => {
+          const data = querySnapshot.docs.map((docSnapshot) => {
+            return {
+              id: docSnapshot.id,
+              ...docSnapshot.data(),
+            }
+          })
+          const foundUser = data?.[0]
+          setUser(foundUser)
         })
-        const foundUser = data[0]
-
-        // console.log(foundUser)
-        setUser(foundUser)
       } catch (error) {
         // console.log(error.message)
         setError(error.message)
@@ -246,9 +288,12 @@ const UserDetail = () => {
     }
     const fetchSavedBlogData = async () => {
       const savedList = await fetchSavedData()
-      const savedIds = savedList.map(saved => saved.id)
+      const savedIds = savedList.map((saved) => saved.id)
       const savedBlogDocRef = getColRef('blogs')
-      const q = query(savedBlogDocRef, ...(savedList.length > 0 ? [where(documentId(), 'in', savedIds)] : []))
+      const q = query(
+        savedBlogDocRef,
+        ...(savedList.length > 0 ? [where(documentId(), 'in', savedIds)] : [])
+      )
       const querySnapshot = await getDocs(q)
       const docs = querySnapshot.docs
       const data = docs.map((docSnapshot) => {
@@ -373,7 +418,7 @@ const UserDetail = () => {
               xxl: 150,
             }}
             icon={<UserOutlined color="#eeeeee" />}
-            src={user?.avatar ?? avatarPlaceholder}
+            src={avatar ?? avatarPlaceholder}
           />
         </Col>
         <Col
@@ -388,7 +433,7 @@ const UserDetail = () => {
             style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}
           >
             <Typography.Title style={{ marginBottom: 0 }} level={2}>
-              {user.username}
+              {otherUsername}
             </Typography.Title>
             {isOwner ? (
               <Button
@@ -476,11 +521,11 @@ const UserDetail = () => {
               <Typography.Text strong>{blogList.length}</Typography.Text> posts
             </Typography.Text>
             <Typography.Text style={{ marginRight: 40 }}>
-              <Typography.Text strong>{followerList.length}</Typography.Text>{' '}
+              <Typography.Text strong>{followerTotal}</Typography.Text>{' '}
               followers
             </Typography.Text>
             <Typography.Text>
-              <Typography.Text strong>{followingList.length}</Typography.Text>{' '}
+              <Typography.Text strong>{followingTotal}</Typography.Text>{' '}
               following
             </Typography.Text>
           </Row>
