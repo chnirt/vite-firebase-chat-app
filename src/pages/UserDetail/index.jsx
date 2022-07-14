@@ -302,6 +302,7 @@ const UserDetail = () => {
     }
     const fetchSavedBlogData = async () => {
       const savedList = await fetchSavedData()
+      if (savedList.length === 0) return
       const savedIds = savedList.map((saved) => saved.id)
       const savedBlogDocRef = getColRef('blogs')
       const q = query(
@@ -321,7 +322,8 @@ const UserDetail = () => {
     }
     const fetchTaggedBlogData = async () => {
       const taggedList = await fetchTaggedData()
-      const taggedIds = taggedList.map((saved) => saved.id)
+      if (taggedList.length === 0) return
+      const taggedIds = taggedList.map((tagged) => tagged.id)
       const taggedBlogDocRef = getColRef('blogs')
       const q = query(
         taggedBlogDocRef,
@@ -420,7 +422,13 @@ const UserDetail = () => {
   if (!user) return null
 
   return (
-    <div style={{ padding: '30px 20px 0px 20px' }}>
+    <div
+      style={{
+        padding: '30px 20px 0px 20px',
+        overflow: 'hidden scroll',
+        height: 'calc(100%-172px)',
+      }}
+    >
       <Row
         style={{
           marginBottom: 44,
