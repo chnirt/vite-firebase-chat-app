@@ -1,4 +1,4 @@
-import { Avatar, Button, List, Tag, Typography } from 'antd'
+import { Avatar, Button, List, Row, Tag, Typography } from 'antd'
 import React, { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { FiHeart } from 'react-icons/fi'
@@ -177,27 +177,29 @@ export const BlogItem = ({ blog = {} }) => {
         title={<Link to={`/user/${username}`}>@{username}</Link>}
         description={createdAt}
       />
-      {captions.map((caption, ci) => {
-        const isUsername = String(caption).startsWith('@')
-        const usernameCaption = String(caption).substring(1)
+      <Row>
+        {captions.map((caption, ci) => {
+          const isUsername = String(caption).startsWith('@')
+          const usernameCaption = String(caption).substring(1)
 
-        if (isUsername) {
-          return (
-            <Link key={`username-${ci}`} to={`/user/${usernameCaption}`}>
-              <Tag
-                css={css`
+          if (isUsername) {
+            return (
+              <Link key={`username-${ci}`} to={`/user/${usernameCaption}`}>
+                <Tag
+                  css={css`
                   color: ${colors.firebase};
                   background: ${`${colors.firebase}10`};
                   border-color: ${`${colors.firebase}50`};
                 `}
-              >
-                {caption}
-              </Tag>
-            </Link>
-          )
-        }
-        return <div key={`username-${ci}`}>{caption}</div>
-      })}
+                >
+                  {caption}
+                </Tag>
+              </Link>
+            )
+          }
+          return <div key={`username-${ci}`}>{caption}</div>
+        })}
+      </Row>
     </List.Item>
   )
 }

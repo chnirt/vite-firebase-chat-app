@@ -11,7 +11,6 @@ import { Fragment, useCallback, useEffect, useState } from 'react'
 
 import { getColRef } from '../../firebase/service'
 import { CommentItem } from '../CommentItem'
-import { Loading } from '../Loading'
 
 const LIMIT = 10
 
@@ -135,28 +134,22 @@ export const CommentList = ({ currentBlog, parentId = '0', handleReply }) => {
 
   return (
     <Fragment>
-      {loading ? (
-        <Loading />
-      ) : (
-        <div>
-          {data.length > 0 &&
-            data.map((comment, ci) => {
-              return (
-                <CommentItem
-                  key={`comment-${ci}`}
-                  comment={comment}
-                  handleReply={handleReply}
-                >
-                  <CommentList
-                    currentBlog={currentBlog}
-                    parentId={comment.id}
-                  />
-                </CommentItem>
-              )
-            })}
-          <LoadMoreCommentList />
-        </div>
-      )}
+      {data.length > 0 &&
+        data.map((comment, ci) => {
+          return (
+            <CommentItem
+              key={`comment-${ci}`}
+              comment={comment}
+              handleReply={handleReply}
+            >
+              <CommentList
+                currentBlog={currentBlog}
+                parentId={comment.id}
+              />
+            </CommentItem>
+          )
+        })}
+      <LoadMoreCommentList />
     </Fragment>
   )
 }

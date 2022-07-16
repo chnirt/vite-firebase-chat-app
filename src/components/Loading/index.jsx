@@ -5,6 +5,7 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />
 
 
 export const Loading = ({
+  style,
   spinning = false,
   children,
 }) => {
@@ -35,6 +36,7 @@ export const Loading = ({
         alignItems: 'center',
         backgroundColor: '#ffffff70',
         zIndex: 1001,
+        ...style
       }}
       spinning={spinning}
       indicator={antIcon}
