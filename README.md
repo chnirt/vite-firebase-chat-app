@@ -13,3 +13,13 @@ https://medium.com/quick-code/100vh-problem-with-ios-safari-92ab23c852a8#:~:text
 https://www.freecodecamp.org/news/how-to-import-svgs-in-react-and-vite/
 
 https://www.google.com/search?q=avatar%20waifu&tbm=isch&hl=en&tbs=rimg:Cb6FabYVlXIzYaS5wbmjdmuT8AEAsgIMCgIIABAAOgQIABAA&sa=X&ved=0CAIQrnZqFwoTCKCqrcz87fgCFQAAAAAdAAAAABAP&biw=1680&bih=882#imgrc=vx-W9NJZUv-oTM
+
+https://stackoverflow.com/questions/71440101/firebase-onsnapshot-how-to-only-get-new-data-with-added-type-react-js
+
+https://www.smashingmagazine.com/2020/08/comment-system-firebase/
+
+https://github.com/DanielArturoAlejoAlvarez/react-masonry-layout
+
+https://www.npmjs.com/package/react-masonry-css
+
+https://stackoverflow.com/questions/64427319/looking-for-a-cleaner-way-to-make-this-pagination-function-in-javascript

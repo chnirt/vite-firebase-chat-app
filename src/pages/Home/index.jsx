@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 
 import { paths } from '../../constants'
 import { Global } from '../../global'
-import { SettingModal, CreateBlogModal } from '../../components'
+import { SettingModal, CreateBlogModal, CommentModal } from '../../components'
 
 const Home = () => {
   let navigate = useNavigate()
@@ -23,6 +23,11 @@ const Home = () => {
       <SettingModal
         ref={(ref) => {
           Global.SettingModal = ref
+        }}
+      />
+      <CommentModal
+        ref={(ref) => {
+          Global.CommentModal = ref
         }}
       />
     </Fragment>

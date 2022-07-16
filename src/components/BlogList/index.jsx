@@ -400,6 +400,7 @@ export const BlogList = () => {
             const caption = item.caption
             const file = item.files[0].file
             const likeTotal = item.likeTotal ?? 0
+            const commentTotal = item.commentTotal ?? 0
             const createdAt = moment(item.createdAt?.toDate()).fromNow()
             const isLiked = likeList.some((like) => like.postId === item.id)
             const isSaved = savedList.some((like) => like.postId === item.id)
@@ -418,6 +419,7 @@ export const BlogList = () => {
               createdAt,
               caption,
               likeTotal,
+              commentTotal
             }
 
             return <BlogItem key={`blog-${ii}-${id}`} blog={blog} />

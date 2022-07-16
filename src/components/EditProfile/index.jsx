@@ -84,7 +84,7 @@ export const EditProfile = () => {
 
           auth?.fetchUser(auth?.user)
 
-          message.success('File updated successfully.')
+          message.success('Avatar updated successfully.')
 
           logAnalyticsEvent(eventNames.editAvatar, {
             avatar,

@@ -142,17 +142,20 @@ export const MessageListFooter = ({ currentChat }) => {
         />
         <Row
           style={{
-            width: `calc(100% - ${hasCharacter ? '98px' : '96px'})`,
+            // width: `calc(100% - ${hasCharacter ? '98px' : '96px'})`,
+            flex: 1
           }}
           align="middle"
         >
           <Input
             style={{
               borderWidth: 0,
+              flex: 1
             }}
             placeholder="Message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            maxLength={200}
             onPressEnter={debounce(handleSubmit, 200)}
           />
         </Row>

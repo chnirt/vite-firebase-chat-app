@@ -1,4 +1,4 @@
-import { Button, Row } from 'antd'
+import { Button } from 'antd'
 import {
   limit,
   onSnapshot,
@@ -7,17 +7,15 @@ import {
   startAfter,
   where,
 } from 'firebase/firestore'
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 
 import { getColRef } from '../../firebase/service'
-import { LoadingChatList } from '../LoadingChatList'
-import { ChatItem } from '../ChatItem'
-import { useAuth } from '../../context'
+import { CommentItem } from '../CommentItem'
+import { Loading } from '../Loading'
 
-const LIMIT = 15
+const LIMIT = 10
 
-export const ChatListBody = ({ handleJoinChat = () => { } }) => {
-  const auth = useAuth()
+export const CommentList = ({ currentBlog, parentId = '0', handleReply }) => {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [last, setLast] = useState(null)
@@ -25,20 +23,17 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
   const [loadedAll, setLoadedAll] = useState(false)
 
   const fetchData = useCallback(async () => {
-    //  console.log('fetchData')
-
-    if (loading) {
-      return
-    }
+    // console.log('fetchData')
+    if (!currentBlog) return
 
     setLoading(true)
 
     const limitNumber = LIMIT + 1
 
-    const chatsDocRef = getColRef('chats')
+    const commentDocRef = getColRef('blogs', currentBlog.id, 'comments')
     const first = query(
-      chatsDocRef,
-      where('members', 'array-contains', auth?.user?.uid),
+      commentDocRef,
+      where('parentId', '==', parentId),
       orderBy('createdAt', 'desc'),
       limit(limitNumber)
     )
@@ -74,7 +69,7 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
     setTimeout(() => {
       setLoading(false)
     }, 1000)
-  }, [loading])
+  }, [currentBlog])
 
   const fetchMoreData = useCallback(async () => {
     // console.log('fetchMoreData')
@@ -87,10 +82,10 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
 
     const limitNumber = LIMIT + 1
 
-    const chatsDocRef = getColRef('chats')
+    const commentDocRef = getColRef('blogs', currentBlog.id, 'comments')
     const next = query(
-      chatsDocRef,
-      where('members', 'array-contains', auth?.user?.uid),
+      commentDocRef,
+      where('parentId', '==', parentId),
       orderBy('createdAt', 'desc'),
       limit(limitNumber),
       ...(last ? [startAfter(last)] : [])
@@ -119,9 +114,9 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
-  const LoadMoreChatList = useCallback(
+  const LoadMoreCommentList = useCallback(
     () =>
       !loadedAll && !moreLoading ? (
         <div
@@ -139,39 +134,29 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
   )
 
   return (
-    <div>
-      <Row
-        style={{
-          height: 'calc(100% - 63px)',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            paddingTop: 8,
-            overflow: 'hidden auto',
-            height: '100%',
-            width: '100%',
-          }}
-        >
-          {data.length > 0 ? (
-            <div>
-              {data.map((chat, ci) => {
-                return (
-                  <ChatItem
-                    key={`chat-${ci}`}
-                    chat={chat}
-                    handleJoinChat={handleJoinChat}
+    <Fragment>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div>
+          {data.length > 0 &&
+            data.map((comment, ci) => {
+              return (
+                <CommentItem
+                  key={`comment-${ci}`}
+                  comment={comment}
+                  handleReply={handleReply}
+                >
+                  <CommentList
+                    currentBlog={currentBlog}
+                    parentId={comment.id}
                   />
-                )
-              })}
-              <LoadMoreChatList />
-            </div>
-          ) : (
-            <LoadingChatList />
-          )}
+                </CommentItem>
+              )
+            })}
+          <LoadMoreCommentList />
         </div>
-      </Row>
-    </div>
+      )}
+    </Fragment>
   )
 }

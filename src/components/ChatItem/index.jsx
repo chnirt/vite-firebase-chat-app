@@ -7,6 +7,7 @@ import { UserOutlined } from '@ant-design/icons'
 import { useAuth } from '../../context'
 import { getColRef } from '../../firebase/service'
 import { avatarPlaceholder } from '../../constants'
+import { useCallback } from 'react'
 
 export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
   const auth = useAuth()
@@ -28,25 +29,26 @@ export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
     }
   }
 
-  useEffect(() => {
-    const fetchChatDetail = async () => {
-      const userDocRef = getColRef('users')
-      const q = query(userDocRef, where('uid', 'in', chat.members))
-      const querySnapshot = await getDocs(q)
-      const docs = querySnapshot.docs
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
-      setChatDetail({
-        ...chat,
-        members: data,
-      })
-    }
-    fetchChatDetail()
+  const fetchChatDetail = useCallback(async () => {
+    const userDocRef = getColRef('users')
+    const q = query(userDocRef, where('uid', 'in', chat.members))
+    const querySnapshot = await getDocs(q)
+    const docs = querySnapshot.docs
+    const data = docs.map((docSnapshot) => {
+      return {
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      }
+    })
+    setChatDetail({
+      ...chat,
+      members: data,
+    })
   }, [chat])
+
+  useEffect(() => {
+    fetchChatDetail()
+  }, [fetchChatDetail])
 
   if (!chatDetail) return null
 

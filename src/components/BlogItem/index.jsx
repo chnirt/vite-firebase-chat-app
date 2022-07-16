@@ -21,6 +21,7 @@ import {
 import { increment } from 'firebase/firestore'
 import { css } from '@emotion/react'
 import { splitWithUsername } from '../../utils'
+import { Global } from '../../global'
 
 export const BlogItem = ({ blog = {} }) => {
   const {
@@ -33,6 +34,7 @@ export const BlogItem = ({ blog = {} }) => {
     createdAt,
     caption,
     likeTotal,
+    commentTotal
   } = blog
   const auth = useAuth()
 
@@ -69,6 +71,10 @@ export const BlogItem = ({ blog = {} }) => {
     if (blogDocData) {
       await updateDocument(blogDocRef, blogData)
     }
+  }, [])
+
+  const handleComment = useCallback((doc) => {
+    Global.CommentModal.show(doc)
   }, [])
 
   const handleSave = useCallback(async (doc) => {
@@ -128,8 +134,9 @@ export const BlogItem = ({ blog = {} }) => {
             ghost
             shape="circle"
             icon={<IoChatbubbleOutline size={18} color="#767676" />}
+            onClick={() => handleComment(blog)}
           />
-          <Typography.Text>6789</Typography.Text>
+          <Typography.Text>{commentTotal}</Typography.Text>
         </div>,
         <Button
           style={{
@@ -179,17 +186,17 @@ export const BlogItem = ({ blog = {} }) => {
             <Link key={`username-${ci}`} to={`/user/${usernameCaption}`}>
               <Tag
                 css={css`
-                color: ${colors.firebase};
-                background: ${`${colors.firebase}10`};
-                border-color: ${`${colors.firebase}50`};
-              `}
+                  color: ${colors.firebase};
+                  background: ${`${colors.firebase}10`};
+                  border-color: ${`${colors.firebase}50`};
+                `}
               >
                 {caption}
               </Tag>
             </Link>
           )
         }
-        return <div>{caption}</div>
+        return <div key={`username-${ci}`}>{caption}</div>
       })}
     </List.Item>
   )

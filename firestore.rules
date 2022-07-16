@@ -6,19 +6,41 @@ service cloud.firestore {
     }
 
     function belongsTo(userId) {
-    	return request.auth.uid == userId
+    	return request.auth.uid == userId;
 		}
 
     match /{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if true;
     }
 
+    /*
     match /users/{userId} {
+      allow get: if true;
+      allow list: if true;
     	allow create: if isSignedIn();
-      allow update: if belongsTo(userId);
+      // allow update: if belongsTo(userId);
+      allow update: if isSignedIn();
       allow delete: if false;
     }
-    
+
+    match /chat/{chatId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if false;
+    }
+
+    match /blogs/{blogsId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if false;
+    }
+    */
+
     /*
     match /cities/{city} {
       // A read rule can be divided into get and list rules

@@ -93,7 +93,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           handleCancel()
 
           logAnalyticsEvent(eventNames.createBlog, {
-            caption,
+            caption: String(caption).trim(),
           })
         }
       )
@@ -223,7 +223,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
           >
             <Mentions rows={1} placeholder="Write a caption..." maxLength={200}>
               {usernames.map((username, ui) => (
-                <Mentions.Option key={`username-${ui}`} value={username}>
+                <Mentions.Option key={`username-${username}-${ui}`} value={username}>
                   {username}
                 </Mentions.Option>
               ))}
@@ -273,7 +273,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
               name="picture"
               listType="picture"
               beforeUpload={(file) => {
-                console.log('beforeUpload', file)
+                // console.log('beforeUpload', file)
                 return false
               }}
               maxCount={1}

@@ -11,12 +11,10 @@ import { useNavigate } from 'react-router-dom'
 
 import { useLoading } from '../../context'
 import { signOutFirebase } from '../../firebase/service'
-import { useLocalStorage } from '../../hooks'
 import { paths } from '../../constants'
 
 export const SettingModal = forwardRef((props, ref) => {
   const appLoading = useLoading()
-  const [, , removeToken] = useLocalStorage('token', '')
   let navigate = useNavigate()
 
   const [visible, setVisible] = useState(false)
