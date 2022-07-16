@@ -419,7 +419,7 @@ export const BlogList = () => {
               createdAt,
               caption,
               likeTotal,
-              commentTotal
+              commentTotal,
             }
 
             return <BlogItem key={`blog-${ii}-${id}`} blog={blog} />

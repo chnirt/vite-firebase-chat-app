@@ -1,8 +1,29 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if request.auth!=null;
+   	function isSignedIn() {
+    	return request.auth != null;
     }
+  	// A read rule can be divided into read and list rules
+    match /uploads/{filenamePrefixWildcard}/{imageFilename=**} {
+      // Applies to single file read requests
+      allow get: if isSignedIn();
+      // Applies to list and listAll requests (Rules Version 2)
+      allow list: if isSignedIn();
+      // Applies to writes to file contents
+      allow create: if isSignedIn();
+
+      // Applies to updates to (pre-existing) file metadata
+      allow update: if isSignedIn();
+
+      // Applies to delete operations
+      allow delete: if isSignedIn();
+    }
+  
+  	/*
+    match /{allPaths=**} {
+      allow read, write: if request.auth.uid != null;
+    }
+    */
   }
 }

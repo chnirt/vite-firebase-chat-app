@@ -9,37 +9,76 @@ service cloud.firestore {
     	return request.auth.uid == userId;
 		}
 
+    /*
     match /{document=**} {
       allow read: if true;
       allow write: if true;
     }
+    */
 
-    /*
     match /users/{userId} {
-      allow get: if true;
+      allow get: if isSignedIn();
       allow list: if true;
     	allow create: if isSignedIn();
       // allow update: if belongsTo(userId);
       allow update: if isSignedIn();
       allow delete: if false;
+      match /following/{userId} {
+        allow get: if isSignedIn();
+        allow list: if isSignedIn();
+        allow create: if isSignedIn();
+        allow update: if isSignedIn();
+        allow delete: if isSignedIn();
+      }
+      match /follower/{userId} {
+        allow get: if isSignedIn();
+        allow list: if isSignedIn();
+        allow create: if isSignedIn();
+        allow delete: if isSignedIn();
+      }
+      match /likes/{postId} {
+        allow get: if isSignedIn();
+        allow list: if isSignedIn();
+        allow create: if isSignedIn();
+        allow delete: if isSignedIn();
+      }
+      match /saved/{postId} {
+        allow get: if isSignedIn();
+        allow list: if isSignedIn();
+        allow create: if isSignedIn();
+        allow delete: if isSignedIn();
+      }
+      match /tagged/{postId} {
+        allow list: if isSignedIn();
+        // allow create: if isSignedIn();
+      }
     }
 
-    match /chat/{chatId} {
+    match /blogs/{blogId} {
       allow get: if isSignedIn();
+      allow list: if isSignedIn();
+    	allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      // allow delete: if false;
+      match /comments/{commentId} {
+        allow list: if isSignedIn();
+        allow create: if isSignedIn();
+      }
+    }
+
+    match /chats/{chatsId} {
       allow list: if isSignedIn();
       allow create: if isSignedIn();
       allow update: if isSignedIn();
-      allow delete: if false;
+      match /messages/{messageId} {
+        allow list: if isSignedIn();
+        allow create: if isSignedIn();
+      }
     }
 
-    match /blogs/{blogsId} {
-      allow get: if isSignedIn();
+    match /{path=**}/following/{userId} {
       allow list: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update: if isSignedIn();
-      allow delete: if false;
     }
-    */
 
     /*
     match /cities/{city} {

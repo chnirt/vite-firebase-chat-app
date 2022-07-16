@@ -23,3 +23,5 @@ https://github.com/DanielArturoAlejoAlvarez/react-masonry-layout
 https://www.npmjs.com/package/react-masonry-css
 
 https://stackoverflow.com/questions/64427319/looking-for-a-cleaner-way-to-make-this-pagination-function-in-javascript
+
+https://stackoverflow.com/questions/56313459/collection-group-permissions-for-firestore
