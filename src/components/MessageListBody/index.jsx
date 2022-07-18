@@ -131,16 +131,34 @@ export const MessageListBody = ({ currentChat }) => {
     )
 
     // onSnapshot
-    onSnapshot(next, (querySnapshot) => {
+    onSnapshot(next, async (querySnapshot) => {
       const docs = querySnapshot.docs.slice(0, LIMIT)
-      const data = docs
-        .map((docSnapshot) => {
-          return {
-            id: docSnapshot.id,
-            ...docSnapshot.data(),
-          }
-        })
-        .reverse()
+      // const data = docs
+      //   .map((docSnapshot) => {
+      //     return {
+      //       id: docSnapshot.id,
+      //       ...docSnapshot.data(),
+      //     }
+      //   })
+      //   .reverse()
+      const data = await Promise.all(
+        docs
+          .map(async (docSnapshot) => {
+            const data = docSnapshot.data()
+            const text = data?.text
+            const decryptedMessage = await handleDecryptE2EE(
+              publicKey,
+              privateKey,
+              text
+            )
+            return {
+              id: docSnapshot.id,
+              ...docSnapshot.data(),
+              text: decryptedMessage,
+            }
+          })
+          .reverse()
+      )
       setData((prevState) => [...data, ...prevState])
       const lastVisible = docs[docs.length - 1]
       setLast(lastVisible)

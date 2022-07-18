@@ -19,10 +19,6 @@ export const MessageListFooter = ({ currentChat }) => {
   const auth = useAuth()
   const [message, setMessage] = useState('')
   const hasCharacter = message.length > 0
-  const publicKey = [...currentChat.members].filter(
-    (member) => member.id !== auth?.user?.uid
-  )[0]?.jwkKeys?.publicKeyJwk
-  const privateKey = auth?.user?.jwkKeys?.privateKeyJwk
 
   const handleGetInfo = useCallback(() => { }, [])
 
@@ -36,6 +32,10 @@ export const MessageListFooter = ({ currentChat }) => {
     if (!message) return
 
     const newMessage = String(message).trim()
+    const publicKey = [...currentChat.members].filter(
+      (member) => member.id !== auth?.user?.uid
+    )[0]?.jwkKeys?.publicKeyJwk
+    const privateKey = auth?.user?.jwkKeys?.privateKeyJwk
     const encryptedMessage = await handleEncryptE2EE(
       publicKey,
       privateKey,
@@ -51,7 +51,7 @@ export const MessageListFooter = ({ currentChat }) => {
 
     const chatDocRef = getDocRef('chats', currentChat.id)
     const chatData = {
-      latestMessage: newMessage,
+      latestMessage: encryptedMessage,
     }
     await updateDocument(chatDocRef, chatData)
     setMessage('')
