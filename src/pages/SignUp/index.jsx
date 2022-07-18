@@ -19,7 +19,7 @@ import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
 import { APP_NAME } from '../../env'
 import { signUpAccount } from '../../mock'
 import { useLoading } from '../../context'
-import { getJwkKeys } from '../../utils'
+import { getJwkKeys } from '../../utils/e2ee'
 
 const SignUp = () => {
   let navigate = useNavigate()
