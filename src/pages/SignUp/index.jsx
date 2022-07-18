@@ -19,6 +19,7 @@ import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
 import { APP_NAME } from '../../env'
 import { signUpAccount } from '../../mock'
 import { useLoading } from '../../context'
+import { getJwkKeys } from '../../utils'
 
 const SignUp = () => {
   let navigate = useNavigate()
@@ -132,6 +133,7 @@ const SignUp = () => {
 
       if (userCredential) {
         const uid = userCredential.user.uid
+        const jwkKeys = await getJwkKeys()
         const userDocRef = getDocRef('users', uid)
         const userData = {
           uid,
@@ -140,6 +142,7 @@ const SignUp = () => {
           username: String(username).trim(),
           avatar: avatarPlaceholder,
           keywords: generateKeywords(email),
+          jwkKeys
         }
         await addDocument(userDocRef, userData)
 
@@ -211,7 +214,7 @@ const SignUp = () => {
               <Logo
                 width={50}
                 height={68}
-                // fill={PRIMARY_COLOR}
+              // fill={PRIMARY_COLOR}
               />
               {/* </FadeIn> */}
             </Row>

@@ -13,21 +13,37 @@ import {
 import { useAuth } from '../../context'
 import { IoImageOutline } from 'react-icons/io5'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
+import { encryptJwk, getDeriveKey } from '../../utils/e2ee'
 
 export const MessageListFooter = ({ currentChat }) => {
   const auth = useAuth()
   const [message, setMessage] = useState('')
   const hasCharacter = message.length > 0
+  const publicKey = [...currentChat.members].filter(
+    (member) => member.id !== auth?.user?.uid
+  )[0]?.jwkKeys?.publicKeyJwk
+  const privateKey = auth?.user?.jwkKeys?.privateKeyJwk
 
   const handleGetInfo = useCallback(() => { }, [])
+
+  const handleEncryptE2EE = useCallback(async (publicKey, privateKey, text) => {
+    const deriveKey = await getDeriveKey(publicKey, privateKey)
+    const encryptedText = await encryptJwk(text, deriveKey)
+    return encryptedText
+  }, [])
 
   const handleSubmit = useCallback(async () => {
     if (!message) return
 
     const newMessage = String(message).trim()
+    const encryptedMessage = await handleEncryptE2EE(
+      publicKey,
+      privateKey,
+      newMessage
+    )
     const messageColRef = getColRef('chats', currentChat.id, 'messages')
     const messageData = {
-      text: newMessage,
+      text: encryptedMessage,
       type: 'message',
       sender: auth?.user?.uid,
     }
@@ -39,7 +55,7 @@ export const MessageListFooter = ({ currentChat }) => {
     }
     await updateDocument(chatDocRef, chatData)
     setMessage('')
-  }, [message])
+  }, [message, auth])
 
   const handleUploadFile = useCallback(async (file) => {
     try {
@@ -143,14 +159,14 @@ export const MessageListFooter = ({ currentChat }) => {
         <Row
           style={{
             // width: `calc(100% - ${hasCharacter ? '98px' : '96px'})`,
-            flex: 1
+            flex: 1,
           }}
           align="middle"
         >
           <Input
             style={{
               borderWidth: 0,
-              flex: 1
+              flex: 1,
             }}
             placeholder="Message..."
             value={message}

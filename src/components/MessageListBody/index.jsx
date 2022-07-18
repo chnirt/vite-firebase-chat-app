@@ -12,6 +12,7 @@ import { Button, Col } from 'antd'
 import { useAuth } from '../../context'
 import { getColRef } from '../../firebase/service'
 import { MessageItem } from '../../components'
+import { decryptJwk, getDeriveKey } from '../../utils/e2ee'
 
 const LIMIT = 15
 
@@ -24,6 +25,17 @@ export const MessageListBody = ({ currentChat }) => {
   const [last, setLast] = useState(null)
   const [moreLoading, setMoreLoading] = useState(false)
   const [loadedAll, setLoadedAll] = useState(false)
+
+  const publicKey = [...currentChat.members].filter(
+    (member) => member.id !== auth?.user?.uid
+  )[0]?.jwkKeys?.publicKeyJwk
+  const privateKey = auth?.user?.jwkKeys?.privateKeyJwk
+
+  const handleDecryptE2EE = useCallback(async (publicKey, privateKey, text) => {
+    const deriveKey = await getDeriveKey(publicKey, privateKey)
+    const decryptedText = await decryptJwk(text, deriveKey)
+    return decryptedText
+  }, [])
 
   const fetchData = useCallback(async () => {
     // console.log('fetchData')
@@ -44,16 +56,34 @@ export const MessageListBody = ({ currentChat }) => {
     )
 
     // onSnapshot
-    onSnapshot(first, (querySnapshot) => {
+    onSnapshot(first, async (querySnapshot) => {
       const docs = querySnapshot.docs.slice(0, LIMIT)
-      const data = docs
-        .map((docSnapshot) => {
-          return {
-            id: docSnapshot.id,
-            ...docSnapshot.data(),
-          }
-        })
-        .reverse()
+      // const data = docs
+      //   .map((docSnapshot) => {
+      //     return {
+      //       id: docSnapshot.id,
+      //       ...docSnapshot.data(),
+      //     }
+      //   })
+      //   .reverse()
+      const data = await Promise.all(
+        docs
+          .map(async (docSnapshot) => {
+            const data = docSnapshot.data()
+            const text = data?.text
+            const decryptedMessage = await handleDecryptE2EE(
+              publicKey,
+              privateKey,
+              text
+            )
+            return {
+              id: docSnapshot.id,
+              ...docSnapshot.data(),
+              text: decryptedMessage,
+            }
+          })
+          .reverse()
+      )
       setData(data)
       const lastVisible = docs[docs.length - 1]
       setLast(lastVisible)
@@ -182,6 +212,7 @@ export const MessageListBody = ({ currentChat }) => {
           const id = message?.id
           const isSender = auth?.user?.uid === message?.sender
           const text = message?.text
+          const jwkText = message?.jwkText
           const createdAt = moment(message?.createdAt?.toDate()).fromNow()
           const avatar = currentChat?.members?.find(
             (member) => member?.uid === message?.sender
@@ -193,12 +224,17 @@ export const MessageListBody = ({ currentChat }) => {
             isSender,
             avatar,
             text,
+            jwkText,
             createdAt,
-            file
+            file,
           }
 
           return (
-            <MessageItem key={`message-${mi}-${id}`} message={messageData} />
+            <MessageItem
+              key={`message-${mi}-${id}`}
+              currentChat={currentChat}
+              message={messageData}
+            />
           )
         })}
 

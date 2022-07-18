@@ -56,7 +56,7 @@ export const getSpotifyAccessToken = async () => {
   return access_token
 }
 
-export const splitWithUsername = text => {
+export const splitWithUsername = (text) => {
   // console.log('@chin1 hello @dao day la @chin1'.split(/(\S*@[\w\d]*\S*)+/g)
   return String(text).split(/(\S*@[\w\d]*\S*)+/g)
 }
