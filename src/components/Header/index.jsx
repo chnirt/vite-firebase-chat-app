@@ -12,29 +12,35 @@ export const Header = () => {
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
+      {/* Primary Meta Tags */}
       <title>{appTitle}</title>
+      <meta name="title" content={appTitle} />
       <meta name="description" content={appDescription} />
-      <meta name="keywords" content="Firebase, Messenger" />
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta
-        name="twitter:image"
-        content="https://firebase.google.com/static/images/brand-guidelines/logo-built_white.png"
-      />
-      <meta name="twitter:title" content={appTitle} />
-      <meta name="twitter:creator" content="@chnirt" />
-      <meta name="twitter:site" content="@chnirt" />
-      <meta name="twitter:description" content={appDescription} />
-      {/* Facebook */}
+      {/* Open Graph / Facebook */}
       <meta property="og:type" content="website" />
       <meta
         property="og:url"
-        content="https://vite-firebase-chat-app.vercel.app"
+        content="https://vite-firebase-chat-app.vercel.app/"
       />
       <meta property="og:title" content={appTitle} />
-      <meta property="og:description" content={appDescription} />
       <meta
-        property="og:image"
+        property="og:description"
+        content={appDescription}
+      />
+      <meta property="og:image" content />
+      {/* Twitter */}
+      <meta property="twitter:card" content="summary_large_image" />
+      <meta
+        property="twitter:url"
+        content="https://vite-firebase-chat-app.vercel.app/"
+      />
+      <meta property="twitter:title" content={appTitle} />
+      <meta
+        property="twitter:description"
+        content={appDescription}
+      />
+      <meta
+        property="twitter:image"
         content="https://firebase.google.com/static/images/brand-guidelines/logo-built_white.png"
       />
     </Helmet>

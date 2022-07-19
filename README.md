@@ -26,4 +26,4 @@ https://stackoverflow.com/questions/64427319/looking-for-a-cleaner-way-to-make-t
 
 https://stackoverflow.com/questions/56313459/collection-group-permissions-for-firestore
 
-https://medium.com/modern-js-for-php-devs/can-i-use-react-helmet-to-add-social-card-meta-tags-for-twitter-and-facebook-5f4a4d42bb5e
+https://metatags.io/
