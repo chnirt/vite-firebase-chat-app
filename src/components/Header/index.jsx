@@ -19,7 +19,7 @@ export const Header = () => {
       <meta name="twitter:card" content="summary_large_image" />
       <meta
         name="twitter:image"
-        content="https://i.ytimg.com/vi/rAcWLPQIL38/maxresdefault.jpg"
+        content="https://firebase.google.com/static/images/brand-guidelines/logo-built_white.png"
       />
       <meta name="twitter:title" content={appTitle} />
       <meta name="twitter:creator" content="@chnirt" />
@@ -35,7 +35,7 @@ export const Header = () => {
       <meta property="og:description" content={appDescription} />
       <meta
         property="og:image"
-        content="https://i.ytimg.com/vi/rAcWLPQIL38/maxresdefault.jpg"
+        content="https://firebase.google.com/static/images/brand-guidelines/logo-built_white.png"
       />
     </Helmet>
   )
