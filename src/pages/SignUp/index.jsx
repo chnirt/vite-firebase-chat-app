@@ -18,7 +18,7 @@ import { generateKeywords } from '../../firebase/utils'
 import { ReactComponent as Logo } from '../../assets/logo/logo-logomark.svg'
 import { APP_NAME } from '../../env'
 import { signUpAccount } from '../../mock'
-import { useLoading } from '../../context'
+import { Language, useLoading } from '../../context'
 import { getJwkKeys } from '../../utils/e2ee'
 
 const SignUp = () => {
@@ -142,7 +142,8 @@ const SignUp = () => {
           username: String(username).trim(),
           avatar: avatarPlaceholder,
           keywords: generateKeywords(email),
-          jwkKeys
+          jwkKeys,
+          language: Language.EN,
         }
         await addDocument(userDocRef, userData)
 

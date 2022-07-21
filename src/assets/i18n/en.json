@@ -40,6 +40,22 @@
         "And": "and",
         "Terms": " Terms.",
         "LWS": "Login with {{appName}}"
+      },
+      "profile": {
+        "editProfile": "Edit Profile",
+        "changePassword": "Change Password",
+        "applications": "Applications",
+
+        "oldPassword": "Old Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+
+        "TYS": "Type your search",
+
+        "CPP": "Change profile photo",
+        "fullName": "Full name",
+        "language": "Language",
+        "submit": "Submit"
       }
     }
   }

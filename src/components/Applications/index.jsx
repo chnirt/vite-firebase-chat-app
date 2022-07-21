@@ -25,6 +25,7 @@ import { getDocRef, updateDocument } from '../../firebase/service'
 import { Music } from '../Music'
 import { colors } from '../../constants'
 import { getSpotifyAccessToken } from '../../utils'
+import { t } from 'i18next'
 
 const limit = 5
 
@@ -176,6 +177,10 @@ export const Applications = () => {
     [initLoading, loading, onLoadMore, list]
   )
 
+  const tText = {
+    TYS: t('src.screens.profile.TYS'),
+  }
+
   return (
     <Fragment>
       <div
@@ -235,7 +240,7 @@ export const Applications = () => {
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Type your search"
+                placeholder={tText.TYS}
               />
             </Row>
 

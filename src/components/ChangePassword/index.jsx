@@ -19,6 +19,7 @@ import {
 } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
 import { avatarPlaceholder, eventNames } from '../../constants'
+import { t } from 'i18next'
 
 export const ChangePassword = () => {
   const auth = useAuth()
@@ -78,6 +79,13 @@ export const ChangePassword = () => {
     console.log('Failed:', errorInfo)
   }, [])
 
+  const tText = {
+    oldPassword: t('src.screens.profile.oldPassword'),
+    newPassword: t('src.screens.profile.newPassword'),
+    confirmPassword: t('src.screens.profile.confirmPassword'),
+    changePassword: t('src.screens.profile.changePassword')
+  }
+
   return (
     <Fragment>
       <Row style={{ margin: '32px 32px 0 32px' }}>
@@ -122,7 +130,7 @@ export const ChangePassword = () => {
       >
         <Form.Item
           name="oldPassword"
-          label="Old Password"
+          label={tText.oldPassword}
           rules={[
             { required: true, message: 'Please input your old password!' },
           ]}
@@ -132,7 +140,7 @@ export const ChangePassword = () => {
 
         <Form.Item
           name="newPassword"
-          label="New Password"
+          label={tText.newPassword}
           dependencies={['oldPassword']}
           rules={[
             { required: true, message: 'Please input your new password!' },
@@ -156,7 +164,7 @@ export const ChangePassword = () => {
 
         <Form.Item
           name="confirmPassword"
-          label="Confirm Password"
+          label={tText.confirmPassword}
           dependencies={['newPassword']}
           rules={[
             {
@@ -192,7 +200,7 @@ export const ChangePassword = () => {
                   .length
               }
             >
-              Change Password
+              {tText.changePassword}
             </Button>
           )}
         </Form.Item>

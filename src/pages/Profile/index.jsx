@@ -1,4 +1,5 @@
 import { Tabs } from 'antd'
+import { t } from 'i18next'
 import { Fragment } from 'react'
 import { ChangePassword, EditProfile, Applications } from '../../components'
 
@@ -117,6 +118,12 @@ const Profile = ({ }) => {
   //   return <p>Updating...</p>
   // }
 
+  const tText = {
+    editProfile: t('src.screens.profile.editProfile'),
+    changePassword: t('src.screens.profile.changePassword'),
+    applications: t('src.screens.profile.applications'),
+  }
+
   return (
     <Fragment>
       <div
@@ -135,13 +142,13 @@ const Profile = ({ }) => {
           }}
         // activeKey={"3"}
         >
-          <Tabs.TabPane tab="Edit Profile" key="1">
+          <Tabs.TabPane tab={tText.editProfile} key="1">
             <EditProfile />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Change Password" key="2">
+          <Tabs.TabPane tab={tText.changePassword} key="2">
             <ChangePassword />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Applications" key="3">
+          <Tabs.TabPane tab={tText.applications} key="3">
             <Applications />
           </Tabs.TabPane>
         </Tabs>

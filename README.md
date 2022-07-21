@@ -27,3 +27,5 @@ https://stackoverflow.com/questions/64427319/looking-for-a-cleaner-way-to-make-t
 https://stackoverflow.com/questions/56313459/collection-group-permissions-for-firestore
 
 https://metatags.io/
+
+https://github.com/firebase/firebase-tools/issues/2856

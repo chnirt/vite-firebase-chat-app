@@ -41,6 +41,22 @@
         "And": "và",
         "Terms": " Điều kiện.",
         "LWS": "Đăng nhập với Firebase"
+      },
+      "profile": {
+        "editProfile": "Chỉnh sửa hồ sơ",
+        "changePassword": "Đổi mật khẩu",
+        "applications": "Các ứng dụng",
+
+        "oldPassword": "Mật khẩu cũ",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu",
+
+        "TYS": "Gõ tìm kiếm của bạn",
+
+        "CPP": "Thay đổi ảnh đại diện",
+        "fullName": "Họ tên",
+        "language": "Ngôn ngữ",
+        "submit": "Xác nhận"
       }
     }
   }

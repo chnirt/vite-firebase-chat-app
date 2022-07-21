@@ -7,7 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "emulators": "firebase emulators:start",
-    "deploy:hosting": "vite build && firebase deploy"
+    "deploy:hosting": "vite build && firebase deploy",
+    "restart-emulators": "npx kill-port --port 8000,9099,5001,8080 && yarn emulators"
   },
   "dependencies": {
     "@uiw/react-md-editor": "3.14.1",

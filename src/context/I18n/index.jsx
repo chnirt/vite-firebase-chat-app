@@ -11,6 +11,11 @@ import { initReactI18next, useTranslation } from 'react-i18next'
 import translationEN from '../../assets/i18n/en.json'
 import translationVI from '../../assets/i18n/vi.json'
 
+export const Language = {
+  VI: 'vi',
+  EN: 'en',
+}
+
 // the translations
 // (tip move them in a JSON file and import them)
 const resources = {
@@ -26,8 +31,8 @@ i18n
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
     resources,
-    lng: 'en',
-    fallbackLng: 'en', // use en if detected lng is not available
+    lng: Language.EN,
+    fallbackLng: Language.EN, // use en if detected lng is not available
 
     // keySeparator: false, // we do not use keys in form messages.welcome
 
@@ -37,7 +42,7 @@ i18n
   })
 
 const defaultState = {
-  language: 'en',
+  language: Language.EN,
   changeLanguage: () => { },
 }
 
@@ -47,7 +52,7 @@ export const I18nProvider = ({ children }) => {
   const { i18n } = useTranslation()
 
   useEffect(() => {
-    i18n.changeLanguage(localStorage.getItem('language') || 'en')
+    i18n.changeLanguage(localStorage.getItem('language') || Language.EN)
   }, [i18n])
 
   const changeLanguage = useCallback(

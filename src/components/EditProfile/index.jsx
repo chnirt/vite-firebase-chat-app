@@ -8,13 +8,15 @@ import {
   message,
   // notification,
   Row,
+  Select,
   Typography,
   Upload,
 } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { getDocs, query, where } from 'firebase/firestore'
+import { t } from 'i18next';
 
-import { useAuth, useLoading } from '../../context'
+import { Language, useAuth, useI18n, useLoading } from '../../context'
 import { uploadStorageBytesResumable } from '../../firebase/storage'
 import {
   getBatch,
@@ -28,6 +30,7 @@ import { logAnalyticsEvent } from '../../firebase/analytics'
 export const EditProfile = () => {
   const auth = useAuth()
   const appLoading = useLoading()
+  const { language, changeLanguage } = useI18n()
   const [form] = Form.useForm()
   const [, forceUpdate] = useState({}) // To disable submit button at the beginning.
   const [state, setState] = useState(null)
@@ -150,6 +153,18 @@ export const EditProfile = () => {
     console.log('Failed:', errorInfo)
   }, [])
 
+  const handleChange = useCallback((value) => {
+    console.log(`selected ${value}`)
+    changeLanguage(value)
+  })
+
+  const tText = {
+    CPP: t('src.screens.profile.CPP'),
+    fullName: t('src.screens.profile.fullName'),
+    language: t('src.screens.profile.language'),
+    submit: t('src.screens.profile.submit')
+  }
+
   return (
     <Fragment>
       <Row style={{ margin: '32px 32px 0 32px' }}>
@@ -171,10 +186,7 @@ export const EditProfile = () => {
               xxl: 38,
             }}
             icon={<UserOutlined color="#eeeeee" />}
-            src={
-              auth?.user?.avatar ??
-              avatarPlaceholder
-            }
+            src={auth?.user?.avatar ?? avatarPlaceholder}
           />
         </Col>
         <Col span={16} offset={1}>
@@ -191,7 +203,7 @@ export const EditProfile = () => {
                 // border: 0,
                 // display: 'inline-block',
                 // cursor: 'pointer',
-                color: "#0095f6",
+                color: '#0095f6',
                 padding: 0,
               }}
               // type="ghost"
@@ -199,7 +211,7 @@ export const EditProfile = () => {
               // size="large"
               type="link"
             >
-              Change profile photo
+              {tText.CPP}
             </Button>
           </Upload>
         </Col>
@@ -218,6 +230,7 @@ export const EditProfile = () => {
           username: auth?.user?.username,
           bio: auth?.user?.bio,
           email: auth?.user?.email,
+          language,
         }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
@@ -225,7 +238,8 @@ export const EditProfile = () => {
       >
         <Form.Item
           name="fullName"
-          label="Full name"
+          // label="Full name"
+          label={tText.fullName}
           rules={[{ required: true, message: 'Please input your full name!' }]}
           extra="Help people discover your account by using the name you're known by: either your full name, nickname, or business name.
 You can only change your name twice within 14 days."
@@ -267,6 +281,17 @@ You can only change your name twice within 14 days."
           <Input disabled />
         </Form.Item>
 
+        <Form.Item
+          name="language"
+          label={tText.language}
+          rules={[{ required: true, message: 'Please select language!' }]}
+        >
+          <Select placeholder="Select your language" onChange={handleChange}>
+            <Select.Option value={Language.EN}>English</Select.Option>
+            <Select.Option value={Language.VI}>Tiếng Việt</Select.Option>
+          </Select>
+        </Form.Item>
+
         <Form.Item wrapperCol={{ offset: 7, span: 16 }} shouldUpdate>
           {() => (
             <Button
@@ -282,11 +307,11 @@ You can only change your name twice within 14 days."
                   .length
               }
             >
-              Submit
+              {tText.submit}
             </Button>
           )}
         </Form.Item>
       </Form>
-    </Fragment >
+    </Fragment>
   )
 }
