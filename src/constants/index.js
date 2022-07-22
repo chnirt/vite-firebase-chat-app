@@ -16,6 +16,7 @@ export const paths = {
   search: 'search',
   messenger: 'messenger',
   audioPlayer: 'audioPlayer',
+  thirdweb: "thirdweb",
   profile: 'profile',
   changePassword: 'change-password',
   spotify: 'spotify',

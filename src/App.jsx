@@ -1,6 +1,7 @@
 // https://gist.github.com/codediodeio/513bf77ee45be6d38d27868f5345a002
 import { lazy, Suspense, useEffect } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
+import { ChainId, ThirdwebProvider } from '@thirdweb-dev/react'
 
 import './App.less'
 import { Layout } from './layout'
@@ -15,6 +16,8 @@ import {
   setUpAppHeight,
 } from './utils'
 import { logAnalyticsEvent } from './firebase/analytics'
+
+const activeChainId = ChainId.Goerli;
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -36,6 +39,8 @@ const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 
 const LazyAudioPlayerScreen = lazy(() => import('./pages/AudioPlayer'))
 const LazySpotifyScreen = lazy(() => import('./pages/Spotify'))
+
+const LazyThirdwebScreen = lazy(() => import('./pages/Thirdweb'))
 
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
@@ -176,6 +181,17 @@ function App() {
           element: (
             <Suspense fallback={<Loading />}>
               <LazyAudioPlayerScreen />
+            </Suspense>
+          ),
+        },
+
+        {
+          path: paths.thirdweb,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <ThirdwebProvider desiredChainId={activeChainId}>
+                <LazyThirdwebScreen />
+              </ThirdwebProvider>
             </Suspense>
           ),
         },

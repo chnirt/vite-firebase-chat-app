@@ -1,3 +1,17 @@
+# Sample Hardhat Project
+
+This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+
+Try running some of the following tasks:
+
+```shell
+npx hardhat help
+npx hardhat test
+GAS_REPORT=true npx hardhat test
+npx hardhat node
+npx hardhat run scripts/deploy.js
+```
+
 ### See more:
 
 https://stackoverflow.com/questions/64815012/why-does-react-router-not-works-at-vercel
@@ -29,3 +43,15 @@ https://stackoverflow.com/questions/56313459/collection-group-permissions-for-fi
 https://metatags.io/
 
 https://github.com/firebase/firebase-tools/issues/2856
+
+https://blog.logrocket.com/full-stack-dapp-tutorial-vite-react-tailwind-css-solidity/
+
+https://www.reddit.com/r/ethdev/comments/ljuns7/hardhat_couldnt_download_solcs_version_list_when/
+
+https://blog.cryptostars.is/goerli-g%C3%B6rli-testnet-network-to-metamask-and-receiving-test-ethereum-in-less-than-2-min-de13e6fe5677
+
+https://stackoverflow.com/questions/70714690/buffer-is-not-defined-in-react-vite
+
+https://goerlifaucet.com/
+https://faucets.chain.link/goerli
+https://dashboard.alchemyapi.io/apps/d5dypli2f4e0sa54

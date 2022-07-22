@@ -60,6 +60,10 @@ export const Navbar = () => {
 
   const handleCreatePost = useCallback(() => Global.CreateBlogModal.show(), [])
 
+  const handleExplore = useCallback(() => {
+    navigate(paths.thirdweb)
+  }, [])
+
   const navigateHome = useCallback(() => {
     navigate(paths.blog)
   }, [])
@@ -250,6 +254,7 @@ export const Navbar = () => {
               ghost
               shape="circle"
               icon={<AiOutlineCompass size={20} color="#767676" />}
+              onClick={handleExplore}
             />
             <Button
               style={{
@@ -294,13 +299,6 @@ export const Navbar = () => {
           </Col>
         </Col>
       </Row>
-
-      {/* <PostCreateForm
-        form={modal.form}
-        visible={modal.visible}
-        onCreate={onCreate}
-        onCancel={onCancel}
-      /> */}
     </Row>
   )
 }
