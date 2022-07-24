@@ -55,3 +55,9 @@ https://stackoverflow.com/questions/70714690/buffer-is-not-defined-in-react-vite
 https://goerlifaucet.com/
 https://faucets.chain.link/goerli
 https://dashboard.alchemyapi.io/apps/d5dypli2f4e0sa54
+
+https://docs.alchemy.com/alchemy/tutorials/nft-minter
+
+https://www.freecodecamp.org/news/how-to-make-an-nft-and-render-on-opensea-marketplace/
+
+https://docs.openzeppelin.com/learn/developing-smart-contracts
