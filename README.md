@@ -61,3 +61,11 @@ https://docs.alchemy.com/alchemy/tutorials/nft-minter
 https://www.freecodecamp.org/news/how-to-make-an-nft-and-render-on-opensea-marketplace/
 
 https://docs.openzeppelin.com/learn/developing-smart-contracts
+
+https://docs.openzeppelin.com/contracts/4.x/wizard
+
+https://www.youtube.com/watch?v=bZKVfXmzRDw
+
+https://www.youtube.com/watch?v=GKJBEEXUha0
+
+https://dev.to/edge-and-node/building-scalable-full-stack-apps-on-ethereum-with-polygon-2cfb

@@ -61,7 +61,7 @@ export const Navbar = () => {
   const handleCreatePost = useCallback(() => Global.CreateBlogModal.show(), [])
 
   const handleExplore = useCallback(() => {
-    navigate(paths.thirdweb)
+    navigate(paths.nftMarketplace)
   }, [])
 
   const navigateHome = useCallback(() => {

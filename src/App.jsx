@@ -40,7 +40,10 @@ const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 const LazyAudioPlayerScreen = lazy(() => import('./pages/AudioPlayer'))
 const LazySpotifyScreen = lazy(() => import('./pages/Spotify'))
 
-const LazyThirdwebScreen = lazy(() => import('./pages/Thirdweb'))
+const LazyThirdwebScreen = lazy(() => import('./pages/thirdweb'))
+const LazyNFTMarketplaceScreen = lazy(() => import('./pages/NFTMarketplace'))
+const LazyCreateNFTScreen = lazy(() => import('./pages/CreateNFT'))
+const LazyMyNFTscreen = lazy(() => import('./pages/MyNFTs'))
 
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
@@ -192,6 +195,31 @@ function App() {
               <ThirdwebProvider desiredChainId={activeChainId}>
                 <LazyThirdwebScreen />
               </ThirdwebProvider>
+            </Suspense>
+          ),
+        },
+
+        {
+          path: paths.nftMarketplace,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyNFTMarketplaceScreen />
+            </Suspense>
+          ),
+        },
+        {
+          path: paths.createNFT,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyCreateNFTScreen />
+            </Suspense>
+          ),
+        },
+        {
+          path: paths.myNFTs,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyMyNFTscreen />
             </Suspense>
           ),
         },
