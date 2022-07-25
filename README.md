@@ -69,3 +69,5 @@ https://www.youtube.com/watch?v=bZKVfXmzRDw
 https://www.youtube.com/watch?v=GKJBEEXUha0
 
 https://dev.to/edge-and-node/building-scalable-full-stack-apps-on-ethereum-with-polygon-2cfb
+
+[Fullstack NFT] https://www.youtube.com/watch?v=GKJBEEXUha0
