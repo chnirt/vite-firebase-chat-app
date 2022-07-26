@@ -24,11 +24,14 @@ import { t } from 'i18next'
 import { avatarPlaceholder, eventNames } from '../../constants'
 import { useAuth } from '../../context'
 import { logAnalyticsEvent } from '../../firebase/analytics'
-import { CONTRACT_ADDRESS, DEV, INFURA_PROJECT_ID, PRIVATE_KEY } from '../../env'
-
 import {
-  marketplaceAddress
-} from '../../../config'
+  CONTRACT_ADDRESS,
+  DEV,
+  INFURA_PROJECT_ID,
+  PRIVATE_KEY,
+} from '../../env'
+
+import { marketplaceAddress } from '../../../config'
 
 import NFTMarketplace from '../../../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
 
@@ -90,9 +93,11 @@ export const CreateNftModal = forwardRef((props, ref) => {
         provider = new ethers.providers.Web3Provider(connection)
         signer = provider.getSigner()
       } else {
-        var infuraUrl = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+        // var infuraUrl = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+        var infuraUrl = 'https://rpc-mumbai.maticvigil.com'
         provider = new ethers.providers.JsonRpcProvider(infuraUrl)
-        signer = provider.getSigner(CONTRACT_ADDRESS)
+        // signer = provider.getSigner(CONTRACT_ADDRESS)
+        signer = provider.getSigner()
       }
 
       /* create the NFT */
@@ -110,7 +115,7 @@ export const CreateNftModal = forwardRef((props, ref) => {
       await transaction.wait()
 
       logAnalyticsEvent(eventNames.createNFT, {
-        url
+        url,
       })
 
       handleCancel()

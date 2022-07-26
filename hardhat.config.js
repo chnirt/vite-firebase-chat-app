@@ -27,6 +27,10 @@ module.exports = {
     //   // url: 'https://rpc-mainnet.maticvigil.com',
     //   accounts: [process.env.PRIVATE_KEY],
     // },
+    mumbai: {
+      url: "https://rpc-mumbai.maticvigil.com",
+      accounts: [process.env.PRIVATE_KEY],
+    }
   },
   etherscan: {
     // Your API key for Etherscan
