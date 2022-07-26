@@ -23,7 +23,7 @@
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "0.1.1",
     "@openzeppelin/contracts": "4.7.1",
-    "@openzeppelin/contracts-upgradeable": "^4.7.1",
+    "@openzeppelin/contracts-upgradeable": "4.7.1",
     "@thirdweb-dev/contracts": "3.0.3",
     "@thirdweb-dev/react": "2.4.1",
     "@thirdweb-dev/sdk": "2.3.8",
@@ -35,7 +35,7 @@
     "dotenv": "16.0.1",
     "firebase": "9.8.2",
     "i18next": "21.8.13",
-    "ipfs-http-client": "^57.0.3",
+    "ipfs-http-client": "57.0.3",
     "lodash": "4.17.21",
     "moment": "2.29.3",
     "react": "18.0.0",
@@ -50,7 +50,7 @@
     "remark-gfm": "3.0.1",
     "semver": "7.3.7",
     "vite-plugin-svgr": "2.2.0",
-    "web3modal": "^1.9.8"
+    "web3modal": "1.9.8"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.9.2",
