@@ -22,17 +22,17 @@ const NFTmarketplace = () => {
 
   const loadNFTs = useCallback(async () => {
     /* create a generic provider and query for unsold market items */
-    let provider
-    if (DEV === 'develop') {
-      provider = new ethers.providers.JsonRpcProvider()
-    } else {
-      var url = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-      provider = new ethers.providers.JsonRpcProvider(url)
-    }
-    // const provider = new ethers.providers.JsonRpcProvider(
-    //   'https://rpc-mumbai.maticvigil.com'
-    // )
-    // const provider = new ethers.providers.JsonRpcProvider('https://rpc-mainnet.maticvigil.com')
+    // let provider
+    // if (DEV === 'develop') {
+    //   provider = new ethers.providers.JsonRpcProvider()
+    // } else {
+    //   // var url = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+    //   var url = 'https://rpc-mumbai.maticvigil.com'
+    //   provider = new ethers.providers.JsonRpcProvider(url)
+    // }
+    const provider = new ethers.providers.JsonRpcProvider(
+      'https://rpc-mumbai.maticvigil.com'
+    )
     const contract = new ethers.Contract(
       marketplaceAddress,
       NFTMarketplace.abi,
