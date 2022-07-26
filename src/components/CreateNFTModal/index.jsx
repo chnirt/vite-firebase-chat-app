@@ -82,6 +82,7 @@ export const CreateNftModal = forwardRef((props, ref) => {
       }
       const url = await uploadToIPFS(ipfsData)
 
+      let provider
       if (DEV === 'develop') {
         const web3Modal = new Web3Modal()
         const connection = await web3Modal.connect()
