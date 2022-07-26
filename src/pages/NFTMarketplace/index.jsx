@@ -5,6 +5,7 @@ import Web3Modal from 'web3modal'
 import { Button, Card, Image } from 'antd'
 
 import { Loading } from '../../components'
+import { DEV, INFURA_PROJECT_ID } from '../../env'
 
 import { marketplaceAddress } from '../../../config'
 
@@ -21,7 +22,13 @@ const NFTmarketplace = () => {
 
   const loadNFTs = useCallback(async () => {
     /* create a generic provider and query for unsold market items */
-    const provider = new ethers.providers.JsonRpcProvider()
+    let provider
+    if (DEV === 'develop') {
+      provider = new ethers.providers.JsonRpcProvider()
+    } else {
+      var url = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+      provider = new ethers.providers.JsonRpcProvider(url)
+    }
     // const provider = new ethers.providers.JsonRpcProvider(
     //   'https://rpc-mumbai.maticvigil.com'
     // )
@@ -60,9 +67,16 @@ const NFTmarketplace = () => {
 
   const buyNft = useCallback(async (nft) => {
     /* needs the user to sign the transaction, so will use Web3Provider and sign it */
-    const web3Modal = new Web3Modal()
-    const connection = await web3Modal.connect()
-    const provider = new ethers.providers.Web3Provider(connection)
+
+    let provider
+    if (DEV === 'develop') {
+      const web3Modal = new Web3Modal()
+      const connection = await web3Modal.connect()
+      provider = new ethers.providers.Web3Provider(connection)
+    } else {
+      var url = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+      provider = new ethers.providers.JsonRpcProvider(url)
+    }
     const signer = provider.getSigner()
     const contract = new ethers.Contract(
       marketplaceAddress,
@@ -101,7 +115,12 @@ const NFTmarketplace = () => {
                 title={nftName}
                 description={`${nftPrice} Eth`}
                 avatar={
-                  <Image style={{ height: 100 }} alt="example" src={nftImage} preview={false} />
+                  <Image
+                    style={{ height: 100 }}
+                    alt="example"
+                    src={nftImage}
+                    preview={false}
+                  />
                 }
               />
               <Button

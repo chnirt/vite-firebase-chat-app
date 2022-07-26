@@ -12,6 +12,7 @@ import {
 } from '../../../config'
 
 import NFTMarketplace from '../../../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
+import { DEV, INFURA_PROJECT_ID } from '../../env'
 
 
 const CreateNFT = () => {
@@ -54,9 +55,15 @@ const CreateNFT = () => {
 
   async function listNFTForSale() {
     const url = await uploadToIPFS()
-    const web3Modal = new Web3Modal()
-    const connection = await web3Modal.connect()
-    const provider = new ethers.providers.Web3Provider(connection)
+    let provider
+    if (DEV === 'develop') {
+      const web3Modal = new Web3Modal()
+      const connection = await web3Modal.connect()
+      provider = new ethers.providers.Web3Provider(connection)
+    } else {
+      var infuraUrl = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+      provider = new ethers.providers.JsonRpcProvider(infuraUrl)
+    }
     const signer = provider.getSigner()
 
     /* create the NFT */
