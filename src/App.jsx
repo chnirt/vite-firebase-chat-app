@@ -40,7 +40,7 @@ const LazyMessengerScreen = lazy(() => import('./pages/Messenger'))
 const LazyAudioPlayerScreen = lazy(() => import('./pages/AudioPlayer'))
 const LazySpotifyScreen = lazy(() => import('./pages/Spotify'))
 
-const LazyThirdwebScreen = lazy(() => import('./pages/thirdweb'))
+const LazyThirdwebScreen = lazy(() => import('./pages/Thirdweb'))
 
 const LazyNFTMarketplaceScreen = lazy(() => import('./pages/NFTMarketplace'))
 const LazyCreateNFTScreen = lazy(() => import('./pages/CreateNFT'))
