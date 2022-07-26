@@ -5,6 +5,7 @@ import {
   IoChatbubbleEllipsesOutline,
   IoHomeOutline,
   IoSettingsOutline,
+  IoLogoBitcoin,
 } from 'react-icons/io5'
 import {
   AiOutlineCompass,
@@ -48,12 +49,19 @@ export const Navbar = () => {
       switch (e.key) {
         case '0':
           return navigate(`user/${auth?.user?.username}`)
+        case '01':
+          return navigate(`../${paths.myNFTs}`)
         case '1':
           return navigate(`user/${auth?.user?.username}`)
         case '2':
           return navigate(`../${paths.profile}`)
         case '4':
           return handleSignOut()
+
+        case 'create-0':
+          return Global.CreateBlogModal.show()
+        case 'create-1':
+          return Global.CreateNFTModal.show()
         default:
           return null
       }
@@ -61,12 +69,12 @@ export const Navbar = () => {
     [handleSignOut]
   )
 
-  const handleVisibleChange = useCallback(() => { }, [])
+  // const handleVisibleChange = useCallback(() => { }, [])
 
   const handleCreatePost = useCallback(() => Global.CreateBlogModal.show(), [])
 
   const handleExplore = useCallback(() => {
-    navigate(paths.nftMarketplace)
+    // navigate(paths.myNFTs)
   }, [])
 
   const navigateHome = useCallback(() => {
@@ -87,13 +95,17 @@ export const Navbar = () => {
 
   const handleShowNotification = useCallback(() => {
     // navigate(paths.profile)
+    Global.CreateNFTModal.show()
   }, [])
 
   const tText = {
     profile: t('src.components.Navbar.profile'),
+    myNFTs: t('src.components.Navbar.myNFTs'),
     saved: t('src.components.Navbar.saved'),
     setting: t('src.components.Navbar.setting'),
     logout: t('src.components.Navbar.logout'),
+    cnp: t('src.components.Navbar.cnp'),
+    cnnft: t('src.components.Navbar.cnnft'),
   }
 
   const items = useMemo(
@@ -102,6 +114,11 @@ export const Navbar = () => {
         key: '0',
         label: tText.profile,
         icon: <CgProfile color="#767676" size={16} />,
+      },
+      {
+        key: '01',
+        label: tText.myNFTs,
+        icon: <IoLogoBitcoin color="#767676" size={16} />,
       },
       {
         key: '1',
@@ -125,6 +142,22 @@ export const Navbar = () => {
     []
   )
 
+  const createItems = useMemo(
+    () => [
+      {
+        key: 'create-0',
+        label: tText.cnp,
+        // icon: <CgProfile color="#767676" size={16} />,
+      },
+      {
+        key: 'create-1',
+        label: tText.cnnft,
+        // icon: <CgBookmark color="#767676" size={16} />,
+      },
+    ],
+    []
+  )
+
   const menu = (
     <Menu
       style={{
@@ -133,6 +166,17 @@ export const Navbar = () => {
       }}
       onClick={handleMenuClick}
       items={items}
+    />
+  )
+
+  const createMenu = (
+    <Menu
+      style={{
+        width: '200px',
+        borderRadius: '0.5rem',
+      }}
+      onClick={handleMenuClick}
+      items={createItems}
     />
   )
 
@@ -246,7 +290,7 @@ export const Navbar = () => {
               }
               onClick={navigateChat}
             />
-            <Button
+            {/* <Button
               style={{
                 border: 0,
                 boxShadow: 'none',
@@ -258,7 +302,28 @@ export const Navbar = () => {
               shape="circle"
               icon={<AiOutlinePlusSquare size={20} color="#767676" />}
               onClick={handleCreatePost}
-            />
+            /> */}
+            <Dropdown
+              overlay={createMenu}
+              placement="bottomRight"
+              arrow={{ pointAtCenter: true }}
+              trigger={['click']}
+            // arrow={false}
+            // onVisibleChange={handleVisibleChange}
+            >
+              <Button
+                style={{
+                  border: 0,
+                  boxShadow: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                ghost
+                shape="circle"
+                icon={<AiOutlinePlusSquare size={20} color="#767676" />}
+              />
+            </Dropdown>
             <Button
               style={{
                 border: 0,
@@ -303,8 +368,8 @@ export const Navbar = () => {
               placement="bottomRight"
               arrow={{ pointAtCenter: true }}
               trigger={['click']}
-              // arrow={false}
-              onVisibleChange={handleVisibleChange}
+            // arrow={false}
+            // onVisibleChange={handleVisibleChange}
             >
               <Button
                 style={{

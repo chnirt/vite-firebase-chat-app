@@ -20,6 +20,7 @@ export const paths = {
   nftMarketplace: 'nft-marketplace',
   createNFT: 'create-nft',
   myNFTs: 'my-nfts',
+  resellNFT: "resell-nft",
   profile: 'profile',
   changePassword: 'change-password',
   spotify: 'spotify',
@@ -39,6 +40,7 @@ export const eventNames = {
   editAvatar: 'edit_avatar',
   editProfile: 'edit_profile',
   changePassword: 'change_password',
+  createNFT: "create_nft"
 }
 
 export const avatarPlaceholder =

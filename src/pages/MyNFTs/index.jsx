@@ -3,6 +3,8 @@ import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Web3Modal from 'web3modal'
+import { Button, Card, Image } from 'antd'
+import { useNavigate } from 'react-router-dom'
 // import { useRouter } from 'next/router'
 
 import {
@@ -10,14 +12,24 @@ import {
 } from '../../../config'
 
 import NFTMarketplace from '../../../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
+import { Loading } from '../../components'
+import { paths } from '../../constants'
+
+const gridStyle = {
+  width: '25%',
+  textAlign: 'center',
+}
 
 const MyNFTs = () => {
   const [nfts, setNfts] = useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
   // const router = useRouter()
+  let navigate = useNavigate()
+
   useEffect(() => {
     loadNFTs()
   }, [])
+
   async function loadNFTs() {
     const web3Modal = new Web3Modal({
       network: "mainnet",
@@ -40,6 +52,7 @@ const MyNFTs = () => {
         seller: i.seller,
         owner: i.owner,
         image: meta.data.image,
+        name: meta.data.name,
         tokenURI
       }
       return item
@@ -49,27 +62,63 @@ const MyNFTs = () => {
   }
   function listNFT(nft) {
     // router.push(`/resell-nft?id=${nft.tokenId}&tokenURI=${nft.tokenURI}`)
+    navigate(`../${paths.resellNFT}?id=${nft.tokenId}&tokenURI=${nft.tokenURI}`)
   }
+  if (loadingState === 'not-loaded') return <Loading />
+
   if (loadingState === 'loaded' && !nfts.length) return (<h1 className="py-10 px-20 text-3xl">No NFTs owned</h1>)
+
   return (
-    <div className="flex justify-center">
-      <div className="p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-          {
-            nfts.map((nft, i) => (
-              <div key={i} className="border shadow rounded-xl overflow-hidden">
-                <img src={nft.image} className="rounded" />
-                <div className="p-4 bg-black">
-                  <p className="text-2xl font-bold text-white">Price - {nft.price} Eth</p>
-                  <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded" onClick={() => listNFT(nft)}>List</button>
-                </div>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </div>
+    <Card title="My NFTs">
+      {nfts.length > 0 && nfts.map((nft, ci) => {
+        const nftName = nft?.name
+        const nftPrice = nft?.price
+        const nftImage = nft?.image
+        return (
+          <Card.Grid key={`nft-${ci}`} style={gridStyle} >
+            <Card.Meta
+              title={nftName}
+              description={`${nftPrice} Eth`}
+              avatar={
+                <Image style={{ height: 100 }} alt="example" src={nftImage} preview={false} />
+              }
+            />
+            <Button
+              type="primary"
+              style={{
+                backgroundColor: '#0095f6',
+                borderColor: '#0095f6',
+                borderRadius: 4,
+                marginTop: 16,
+              }}
+              onClick={() => listNFT(nft)}
+            >
+              List
+            </Button>
+          </Card.Grid>
+        )
+      })}
+    </Card>
   )
+  // return (
+  //   <div className="flex justify-center">
+  //     <div className="p-4">
+  //       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+  //         {
+  //           nfts.map((nft, i) => (
+  //             <div key={i} className="border shadow rounded-xl overflow-hidden">
+  //               <img src={nft.image} className="rounded" />
+  //               <div className="p-4 bg-black">
+  //                 <p className="text-2xl font-bold text-white">Price - {nft.price} Eth</p>
+  //                 <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded" onClick={() => listNFT(nft)}>List</button>
+  //               </div>
+  //             </div>
+  //           ))
+  //         }
+  //       </div>
+  //     </div>
+  //   </div>
+  // )
 }
 
 export default MyNFTs

@@ -17,14 +17,25 @@
         "wac": "Write a caption...",
         "sfc": "Select from computer"
       },
+      "CreateNftModal": {
+        "cnnft": "Create new NFT",
+        "create": "Create",
+        "name": "Name",
+        "description": "Description",
+        "price": "Price",
+        "sfc": "Select from computer"
+      },
       "MyAutoComplete": {
         "search": "Search"
       },
       "Navbar": {
         "profile": "Profile",
+        "myNFTs": "My NFTs",
         "saved": "Saved",
         "setting": "Setting",
-        "logout": "Log out"
+        "logout": "Log out",
+        "cnp": "Create new blog",
+        "cnnft": "Create new NFT"
       },
       "SettingModal": {
         "changePassword": "Change password",

@@ -41,9 +41,11 @@ const LazyAudioPlayerScreen = lazy(() => import('./pages/AudioPlayer'))
 const LazySpotifyScreen = lazy(() => import('./pages/Spotify'))
 
 const LazyThirdwebScreen = lazy(() => import('./pages/thirdweb'))
+
 const LazyNFTMarketplaceScreen = lazy(() => import('./pages/NFTMarketplace'))
 const LazyCreateNFTScreen = lazy(() => import('./pages/CreateNFT'))
 const LazyMyNFTscreen = lazy(() => import('./pages/MyNFTs'))
+const LazyResellNFTScreen = lazy(() => import('./pages/ResellNFT'))
 
 const LazyProfileScreen = lazy(() => import('./pages/Profile'))
 const LazyChangePasswordScreen = lazy(() => import('./pages/ChangePassword'))
@@ -220,6 +222,14 @@ function App() {
           element: (
             <Suspense fallback={<Loading />}>
               <LazyMyNFTscreen />
+            </Suspense>
+          ),
+        },
+        {
+          path: paths.resellNFT,
+          element: (
+            <Suspense fallback={<Loading />}>
+              <LazyResellNFTScreen />
             </Suspense>
           ),
         },

@@ -18,14 +18,25 @@
         "wac": "Viết chú thích...",
         "sfc": "Chọn từ máy tính"
       },
+      "CreateNftModal": {
+        "cnnft": "Tạo NFT mới",
+        "create": "Tạo",
+        "name": "Tên",
+        "description": "Mô tả",
+        "price": "Giá",
+        "sfc": "Chọn từ máy tính"
+      },
       "MyAutoComplete": {
         "search": "Tìm kiếm"
       },
       "Navbar": {
         "profile": "Hồ sơ",
+        "myNFTs": "NFTs của tôi",
         "saved": "Đã lưu",
         "setting": "Cài đặt",
-        "logout": "Đăng xuất"
+        "logout": "Đăng xuất",
+        "cnp": "Tạo bài đăng mới",
+        "cnnft": "Tạo NFT mới"
       },
       "SettingModal": {
         "changePassword": "Đổi mật khẩu",
