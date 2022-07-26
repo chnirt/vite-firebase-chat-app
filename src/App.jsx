@@ -7,17 +7,14 @@ import './App.less'
 import { Layout } from './layout'
 import { PublicRoute, PrivateRoute } from './helpers'
 import { Loading } from './components'
-import { useRemoteConfig, WebRTCProvider } from './context'
+import { MetaMaskProvider, useRemoteConfig, WebRTCProvider } from './context'
 import { analytics } from './firebase'
 import { getRemoteAll, getRemoteValue } from './firebase/remoteConfig'
 import { eventNames, paths } from './constants'
-import {
-  setUpBaseName,
-  setUpAppHeight,
-} from './utils'
+import { setUpBaseName, setUpAppHeight } from './utils'
 import { logAnalyticsEvent } from './firebase/analytics'
 
-const activeChainId = ChainId.Goerli;
+const activeChainId = ChainId.Goerli
 
 const LazySignInScreen = lazy(() => import('./pages/SignIn'))
 const LazySignUpScreen = lazy(() => import('./pages/SignUp'))
@@ -205,7 +202,9 @@ function App() {
           path: paths.nftMarketplace,
           element: (
             <Suspense fallback={<Loading />}>
-              <LazyNFTMarketplaceScreen />
+              <MetaMaskProvider>
+                <LazyNFTMarketplaceScreen />
+              </MetaMaskProvider>
             </Suspense>
           ),
         },

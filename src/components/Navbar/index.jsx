@@ -15,6 +15,7 @@ import {
 import { FiHeart } from 'react-icons/fi'
 import { UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { t } from 'i18next'
 
 import { MyAutoComplete } from '../MyAutoComplete'
 import { useAuth, useLoading } from '../../context'
@@ -23,7 +24,6 @@ import { avatarPlaceholder, paths } from '../../constants'
 import { useLocalStorage } from '../../hooks'
 import { signOutFirebase } from '../../firebase/service'
 import { Global } from '../../global'
-import { t } from 'i18next'
 
 export const Navbar = () => {
   let navigate = useNavigate()
