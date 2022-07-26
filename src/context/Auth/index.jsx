@@ -27,6 +27,7 @@ export const userChannel = new BroadcastChannel('user')
 const AuthContext = createContext(defaultState)
 
 export const AuthProvider = ({ children }) => {
+  const [loading, setLoading] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [userDocReference, setUserDocReference] = useState(null)
   const [user, setUser] = useState(null)
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = useCallback(
     async (fbUser) => {
       try {
+        setLoading(true)
         const userDocRef = getDocRef('users', fbUser.uid)
         const userDocData = await getDocument(userDocRef)
         if (userDocReference === null) {
@@ -43,6 +45,7 @@ export const AuthProvider = ({ children }) => {
         setUser(userDocData)
       } catch (error) {
       } finally {
+        setLoading(false)
         setLoaded(true)
       }
     },
@@ -95,11 +98,12 @@ export const AuthProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       isAuth,
+      loading,
       loaded,
       user,
       fetchUser,
     }),
-    [user, loaded, fetchUser]
+    [isAuth, loading, loaded, user, fetchUser]
   )
 
   if (!loaded) return <Loading />

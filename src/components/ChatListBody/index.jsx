@@ -64,13 +64,12 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
         docs
           .map(async (docSnapshot) => {
             const data = docSnapshot.data()
-            const latestMessage = data?.latestMessage
             const q = query(
               getColRef('users'),
               ...(data?.members.length > 0
                 ? [where('uid', 'in', data?.members)]
                 : []),
-              orderBy('createdAt', 'desc'),
+              orderBy('createdAt', 'desc')
             )
             const querySnapshot = await getDocs(q)
             const docs = querySnapshot.docs
@@ -84,6 +83,9 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
               (member) => member.id !== auth?.user?.uid
             )[0]?.jwkKeys?.publicKeyJwk
             const privateKey = auth?.user?.jwkKeys?.privateKeyJwk
+
+            const latestMessage = data?.latestMessage
+            const isMessage = data?.type === 'message'
             const decryptedMessage = await handleDecryptE2EE(
               publicKey,
               privateKey,
@@ -92,7 +94,7 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
             return {
               id: docSnapshot.id,
               ...docSnapshot.data(),
-              latestMessage: decryptedMessage,
+              latestMessage: isMessage ? decryptedMessage : latestMessage,
             }
           })
           .reverse()
@@ -142,14 +144,52 @@ export const ChatListBody = ({ handleJoinChat = () => { } }) => {
     )
 
     // onSnapshot
-    onSnapshot(next, (querySnapshot) => {
+    onSnapshot(next, async (querySnapshot) => {
       const docs = querySnapshot.docs.slice(0, LIMIT)
-      const data = docs.map((docSnapshot) => {
-        return {
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }
-      })
+      // const data = docs.map((docSnapshot) => {
+      //   return {
+      //     id: docSnapshot.id,
+      //     ...docSnapshot.data(),
+      //   }
+      // })
+      const data = await Promise.all(
+        docs
+          .map(async (docSnapshot) => {
+            const data = docSnapshot.data()
+            const q = query(
+              getColRef('users'),
+              ...(data?.members.length > 0
+                ? [where('uid', 'in', data?.members)]
+                : []),
+              orderBy('createdAt', 'desc')
+            )
+            const querySnapshot = await getDocs(q)
+            const docs = querySnapshot.docs
+            const members = docs.map((docSnapshot) => {
+              return {
+                id: docSnapshot.id,
+                ...docSnapshot.data(),
+              }
+            })
+            const publicKey = [...members].filter(
+              (member) => member.id !== auth?.user?.uid
+            )[0]?.jwkKeys?.publicKeyJwk
+            const privateKey = auth?.user?.jwkKeys?.privateKeyJwk
+            const latestMessage = data?.latestMessage
+            const isMessage = data?.type === 'message'
+            const decryptedMessage = await handleDecryptE2EE(
+              publicKey,
+              privateKey,
+              latestMessage
+            )
+            return {
+              id: docSnapshot.id,
+              ...docSnapshot.data(),
+              latestMessage: isMessage ? decryptedMessage : latestMessage,
+            }
+          })
+          .reverse()
+      )
       setData((prevState) => [...prevState, ...data])
       const lastVisible = docs[docs.length - 1]
       setLast(lastVisible)

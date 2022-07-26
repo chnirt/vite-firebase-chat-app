@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import { useLoading } from '../../context'
 import { signOutFirebase } from '../../firebase/service'
 import { paths } from '../../constants'
+import { t } from 'i18next'
 
 export const SettingModal = forwardRef((props, ref) => {
   const appLoading = useLoading()
@@ -51,25 +52,31 @@ export const SettingModal = forwardRef((props, ref) => {
     []
   )
 
+  const tText = {
+    changePassword: t('src.components.SettingModal.changePassword'),
+    logout: t('src.components.SettingModal.logout'),
+    cancel: t('src.components.SettingModal.cancel'),
+  }
+
   const menuList = useMemo(
     () => [
       {
-        title: 'Change password',
+        title: tText.changePassword,
         onClick: () => {
           handleCancel()
           navigate(`../${paths.profile}`)
         },
       },
       {
-        title: 'Log out',
+        title: tText.logout,
         onClick: handleSignOut,
       },
       {
-        title: 'Cancel',
+        title: tText.cancel,
         onClick: handleCancel,
       },
     ],
-    []
+    [tText]
   )
 
   return (

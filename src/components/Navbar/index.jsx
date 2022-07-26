@@ -6,7 +6,11 @@ import {
   IoHomeOutline,
   IoSettingsOutline,
 } from 'react-icons/io5'
-import { AiOutlineCompass, AiOutlinePlusSquare } from 'react-icons/ai'
+import {
+  AiOutlineCompass,
+  AiOutlinePlusSquare,
+  AiOutlineWallet,
+} from 'react-icons/ai'
 import { FiHeart } from 'react-icons/fi'
 import { UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
@@ -18,6 +22,7 @@ import { avatarPlaceholder, paths } from '../../constants'
 import { useLocalStorage } from '../../hooks'
 import { signOutFirebase } from '../../firebase/service'
 import { Global } from '../../global'
+import { t } from 'i18next'
 
 export const Navbar = () => {
   let navigate = useNavigate()
@@ -76,25 +81,36 @@ export const Navbar = () => {
     navigate(paths.messenger)
   }, [])
 
+  const navigateNftMarketplace = useCallback(() => {
+    navigate(paths.nftMarketplace)
+  }, [])
+
   const handleShowNotification = useCallback(() => {
     // navigate(paths.profile)
   }, [])
+
+  const tText = {
+    profile: t('src.components.Navbar.profile'),
+    saved: t('src.components.Navbar.saved'),
+    setting: t('src.components.Navbar.setting'),
+    logout: t('src.components.Navbar.logout'),
+  }
 
   const items = useMemo(
     () => [
       {
         key: '0',
-        label: 'Profile',
+        label: tText.profile,
         icon: <CgProfile color="#767676" size={16} />,
       },
       {
         key: '1',
-        label: 'Saved',
+        label: tText.saved,
         icon: <CgBookmark color="#767676" size={16} />,
       },
       {
         key: '2',
-        label: 'Setting',
+        label: tText.setting,
         icon: <IoSettingsOutline color="#767676" size={16} />,
       },
       {
@@ -103,7 +119,7 @@ export const Navbar = () => {
       },
       {
         key: '4',
-        label: 'Log Out',
+        label: tText.logout,
       },
     ],
     []
@@ -242,6 +258,19 @@ export const Navbar = () => {
               shape="circle"
               icon={<AiOutlinePlusSquare size={20} color="#767676" />}
               onClick={handleCreatePost}
+            />
+            <Button
+              style={{
+                border: 0,
+                boxShadow: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              ghost
+              shape="circle"
+              icon={<AiOutlineWallet size={20} color="#767676" />}
+              onClick={navigateNftMarketplace}
             />
             <Button
               style={{

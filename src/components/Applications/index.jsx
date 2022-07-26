@@ -159,6 +159,11 @@ export const Applications = () => {
     })()
   }, [])
 
+  const tText = {
+    TYS: t('src.screens.profile.TYS'),
+    loadMore: t('src.screens.profile.loadMore')
+  }
+
   const loadMore = useMemo(
     () =>
       !initLoading && !loading && list.length > 0 ? (
@@ -171,15 +176,11 @@ export const Applications = () => {
             marginBottom: 12,
           }}
         >
-          <Button onClick={onLoadMore}>loading more</Button>
+          <Button onClick={onLoadMore}>{tText.loadMore}</Button>
         </div>
       ) : null,
     [initLoading, loading, onLoadMore, list]
   )
-
-  const tText = {
-    TYS: t('src.screens.profile.TYS'),
-  }
 
   return (
     <Fragment>

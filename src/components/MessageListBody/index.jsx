@@ -71,6 +71,7 @@ export const MessageListBody = ({ currentChat }) => {
           .map(async (docSnapshot) => {
             const data = docSnapshot.data()
             const text = data?.text
+            const isMessage = data?.type === 'message'
             const decryptedMessage = await handleDecryptE2EE(
               publicKey,
               privateKey,
@@ -79,7 +80,7 @@ export const MessageListBody = ({ currentChat }) => {
             return {
               id: docSnapshot.id,
               ...docSnapshot.data(),
-              text: decryptedMessage,
+              text: isMessage ? decryptedMessage : text,
             }
           })
           .reverse()
@@ -146,6 +147,7 @@ export const MessageListBody = ({ currentChat }) => {
           .map(async (docSnapshot) => {
             const data = docSnapshot.data()
             const text = data?.text
+            const isMessage = data?.type === 'message'
             const decryptedMessage = await handleDecryptE2EE(
               publicKey,
               privateKey,
@@ -154,7 +156,7 @@ export const MessageListBody = ({ currentChat }) => {
             return {
               id: docSnapshot.id,
               ...docSnapshot.data(),
-              text: decryptedMessage,
+              text: isMessage ? decryptedMessage : text,
             }
           })
           .reverse()

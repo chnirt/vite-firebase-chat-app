@@ -3,7 +3,35 @@
 
   "src": {
     "components": {
-      "IC": "Cuộc gọi đến"
+      "IC": "Cuộc gọi đến",
+      "CommentItem": {
+        "replyTo": "Trả lời"
+      },
+      "CommentModal": {
+        "comments": "Bình luận",
+        "message": "Nhắn...",
+        "post": "Gửi"
+      },
+      "CreateBlogModal": {
+        "cnp": "Tạo bài đăng mới",
+        "share": "Đăng lại",
+        "wac": "Viết chú thích...",
+        "sfc": "Chọn từ máy tính"
+      },
+      "MyAutoComplete": {
+        "search": "Tìm kiếm"
+      },
+      "Navbar": {
+        "profile": "Hồ sơ",
+        "saved": "Đã lưu",
+        "setting": "Cài đặt",
+        "logout": "Đăng xuất"
+      },
+      "SettingModal": {
+        "changePassword": "Đổi mật khẩu",
+        "logout": "Đăng xuất",
+        "cancel": "Hủy"
+      }
     },
     "screens": {
       "dashboard": {
@@ -42,6 +70,21 @@
         "Terms": " Điều kiện.",
         "LWS": "Đăng nhập với Firebase"
       },
+      "userDetail": {
+        "editProfileButton": "Chỉnh sửa hồ sơ",
+        "messageButton": "Nhắn tin",
+        "followingButton": "Đang theo dõi",
+        "followButton": "Theo dõi",
+
+        "posts": "bài viết",
+        "followers": "người theo dõi",
+        "following": "đang theo dõi",
+        "TAB": {
+          "POSTS": "Bài viết",
+          "SAVED": "Bài lưu",
+          "TAGGED": "Bài gắn thẻ"
+        }
+      },
       "profile": {
         "editProfile": "Chỉnh sửa hồ sơ",
         "changePassword": "Đổi mật khẩu",
@@ -52,6 +95,7 @@
         "confirmPassword": "Xác nhận mật khẩu",
 
         "TYS": "Gõ tìm kiếm của bạn",
+        "loadMore": "Tải thêm",
 
         "CPP": "Thay đổi ảnh đại diện",
         "fullName": "Họ tên",

@@ -7,6 +7,7 @@ import React, {
 } from 'react'
 import debounce from 'lodash/debounce'
 import { increment } from 'firebase/firestore'
+import { t } from 'i18next'
 
 import { useAuth } from '../../context'
 import { MyAvatar } from '../MyAvatar'
@@ -37,6 +38,8 @@ export const CommentModal = forwardRef((props, ref) => {
 
   const handleOk = useCallback(async () => {
     try {
+      if (!comment) return
+
       const newComment = String(comment).trim()
       const commentColRef = getColRef('blogs', currentBlog?.id, 'comments')
       const commentData = {
@@ -57,7 +60,8 @@ export const CommentModal = forwardRef((props, ref) => {
     } catch (error) {
       message.error(error.message)
     } finally {
-      handleCancel()
+      handleAfterClose()
+      // handleCancel()
     }
   }, [currentBlog, comment, repliedComment])
 
@@ -78,11 +82,17 @@ export const CommentModal = forwardRef((props, ref) => {
     []
   )
 
+  const tText = {
+    comments: t('src.components.CommentModal.comments'),
+    message: t('src.components.CommentModal.message'),
+    post: t('src.components.CommentModal.post')
+  }
+
   const avatar = auth?.user?.avatar
 
   return (
     <Modal
-      title="Comments"
+      title={tText.comments}
       visible={isModalVisible}
       onOk={handleOk}
       onCancel={handleCancel}
@@ -94,7 +104,7 @@ export const CommentModal = forwardRef((props, ref) => {
               borderWidth: 0,
               flex: 1,
             }}
-            placeholder="Message..."
+            placeholder={tText.message}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             maxLength={200}
@@ -108,7 +118,7 @@ export const CommentModal = forwardRef((props, ref) => {
             type="link"
             onClick={handleOk}
           >
-            Post
+            {tText.post}
           </Button>
         </Row>
       }

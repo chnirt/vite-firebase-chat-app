@@ -2,7 +2,35 @@
   "hello": "Hello!",
   "src": {
     "components": {
-      "IC": "Incoming Call"
+      "IC": "Incoming Call",
+      "CommentItem": {
+        "replyTo": "Reply to"
+      },
+      "CommentModal": {
+        "comments": "Comments",
+        "message": "Message...",
+        "post": "Post"
+      },
+      "CreateBlogModal": {
+        "cnp": "Create new post",
+        "share": "Share",
+        "wac": "Write a caption...",
+        "sfc": "Select from computer"
+      },
+      "MyAutoComplete": {
+        "search": "Search"
+      },
+      "Navbar": {
+        "profile": "Profile",
+        "saved": "Saved",
+        "setting": "Setting",
+        "logout": "Log out"
+      },
+      "SettingModal": {
+        "changePassword": "Change password",
+        "logout": "Log out",
+        "cancel": "Cancel"
+      }
     },
     "screens": {
       "dashboard": {
@@ -41,6 +69,21 @@
         "Terms": " Terms.",
         "LWS": "Login with {{appName}}"
       },
+      "userDetail": {
+        "editProfileButton": "Edit Profile",
+        "messageButton": "Message",
+        "followingButton": "Following",
+        "followButton": "Follow",
+
+        "posts": "posts",
+        "followers": "followers",
+        "following": "following",
+        "TAB": {
+          "POSTS": "POSTS",
+          "SAVED": "SAVED",
+          "TAGGED": "TAGGED"
+        }
+      },
       "profile": {
         "editProfile": "Edit Profile",
         "changePassword": "Change Password",
@@ -51,6 +94,7 @@
         "confirmPassword": "Confirm Password",
 
         "TYS": "Type your search",
+        "loadMore": "Load more",
 
         "CPP": "Change profile photo",
         "fullName": "Full name",

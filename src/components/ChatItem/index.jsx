@@ -1,13 +1,12 @@
 import { Avatar, Col, Row, Typography } from 'antd'
 import { getDocs, query, where } from 'firebase/firestore'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { UserOutlined } from '@ant-design/icons'
 
 import { useAuth } from '../../context'
 import { getColRef } from '../../firebase/service'
 import { avatarPlaceholder } from '../../constants'
-import { useCallback } from 'react'
 
 export const ChatItem = ({ chat, handleJoinChat = () => { } }) => {
   const auth = useAuth()

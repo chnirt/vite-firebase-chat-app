@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { avatarPlaceholder } from '../../constants'
 import { getDocRef, getDocument } from '../../firebase/service'
+import { t } from 'i18next'
 
 export const CommentItem = ({ comment, handleReply = () => { }, children }) => {
   const [currentUser, setCurrentUser] = useState(null)
@@ -20,6 +21,10 @@ export const CommentItem = ({ comment, handleReply = () => { }, children }) => {
     fetchUserDetail()
   }, [fetchUserDetail])
 
+  const tText = {
+    replyTo: t('src.components.CommentItem.replyTo')
+  }
+
   const avatar = currentUser?.avatar
   const username = currentUser?.username
   const text = comment?.text
@@ -31,7 +36,7 @@ export const CommentItem = ({ comment, handleReply = () => { }, children }) => {
           key="comment-nested-reply-to"
           onClick={() => handleReply(comment)}
         >
-          Reply to
+          {tText.replyTo}
         </span>,
       ]}
       author={<Link to={`/user/${username}`}>@{username}</Link>}

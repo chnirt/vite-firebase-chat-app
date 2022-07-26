@@ -6,6 +6,7 @@ import { CgSearch } from 'react-icons/cg'
 import debounce from 'lodash/debounce'
 
 import { getColRef } from '../../firebase/service'
+import { t } from 'i18next'
 
 export const MyAutoComplete = () => {
   const [search, setSearch] = useState('')
@@ -48,6 +49,10 @@ export const MyAutoComplete = () => {
     navigate(`/user/${searchText}`)
   }, [])
 
+  const tText = {
+    search: t('src.components.MyAutoComplete.search'),
+  }
+
   return (
     <div>
       <AutoComplete
@@ -77,7 +82,7 @@ export const MyAutoComplete = () => {
           }}
           value={search}
           onChange={setSearch}
-          placeholder={'Search'}
+          placeholder={tText.search}
           prefix={
             <CgSearch
               style={{

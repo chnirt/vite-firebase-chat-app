@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   documentId,
@@ -28,6 +28,7 @@ import { Music, PostList } from '../../components'
 import { useAuth, useLoading } from '../../context'
 import { avatarPlaceholder, colors, paths } from '../../constants'
 import { Global } from '../../global'
+import { t } from 'i18next'
 
 const UserDetail = () => {
   let { username } = useParams()
@@ -419,6 +420,20 @@ const UserDetail = () => {
     }
   }, [user])
 
+  const tText = {
+    editProfileButton: t('src.screens.userDetail.editProfileButton'),
+    messageButton: t('src.screens.userDetail.messageButton'),
+    followingButton: t('src.screens.userDetail.followingButton'),
+    followButton: t('src.screens.userDetail.followButton'),
+
+    posts: t('src.screens.userDetail.posts'),
+    followers: t('src.screens.userDetail.followers'),
+    following: t('src.screens.userDetail.following'),
+    tabPosts: t('src.screens.userDetail.TAB.POSTS'),
+    tabSaved: t('src.screens.userDetail.TAB.SAVED'),
+    tabTagged: t('src.screens.userDetail.TAB.TAGGED'),
+  }
+
   if (!user) return null
 
   return (
@@ -445,9 +460,9 @@ const UserDetail = () => {
           // span={18}
           xs={8}
           sm={8}
-        // md={18}
-        // lg={24}
-        // xl={24}
+          // md={18}
+          // lg={24}
+          // xl={24}
         >
           <Avatar
             shape="circle"
@@ -467,9 +482,9 @@ const UserDetail = () => {
           // span={18}
           xs={16}
           sm={16}
-        // md={18}
-        // lg={24}
-        // xl={24}
+          // md={18}
+          // lg={24}
+          // xl={24}
         >
           <Row
             style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}
@@ -478,19 +493,35 @@ const UserDetail = () => {
               {otherUsername}
             </Typography.Title>
             {isOwner ? (
-              <Button
-                style={{
-                  borderColor: '#767676',
-                  color: '#767676',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginLeft: 20,
-                }}
-                onClick={navigateProfile}
-              >
-                Edit profile
-              </Button>
+              <div>
+                <Button
+                  style={{
+                    borderColor: '#767676',
+                    color: '#767676',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 20,
+                  }}
+                  onClick={navigateProfile}
+                >
+                  {tText.editProfileButton}
+                </Button>
+                <Button
+                  style={{
+                    border: 0,
+                    boxShadow: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 5,
+                  }}
+                  ghost
+                  shape="circle"
+                  icon={<IoSettingsOutline color="#767676" size={24} />}
+                  onClick={navigateSetting}
+                />
+              </div>
             ) : isFollowing ? (
               <div>
                 <Button
@@ -504,7 +535,7 @@ const UserDetail = () => {
                   }}
                   onClick={() => handleMessage(user)}
                 >
-                  Message
+                  {tText.messageButton}
                 </Button>
                 <Button
                   style={{
@@ -520,7 +551,7 @@ const UserDetail = () => {
                   }}
                   onClick={() => handleUnfollow(user)}
                 >
-                  Following
+                  {tText.followingButton}
                 </Button>
               </div>
             ) : (
@@ -539,36 +570,22 @@ const UserDetail = () => {
                 type="primary"
                 onClick={() => handleFollow(user)}
               >
-                Follow
+                {tText.followButton}
               </Button>
             )}
-
-            <Button
-              style={{
-                border: 0,
-                boxShadow: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: 5,
-              }}
-              ghost
-              shape="circle"
-              icon={<IoSettingsOutline color="#767676" size={24} />}
-              onClick={navigateSetting}
-            />
           </Row>
           <Row style={{ marginBottom: 20 }}>
             <Typography.Text style={{ marginRight: 40 }}>
-              <Typography.Text strong>{blogList.length}</Typography.Text> posts
+              <Typography.Text strong>{blogList.length}</Typography.Text>{' '}
+              {tText.posts}
             </Typography.Text>
             <Typography.Text style={{ marginRight: 40 }}>
               <Typography.Text strong>{followerTotal}</Typography.Text>{' '}
-              followers
+              {tText.followers}
             </Typography.Text>
             <Typography.Text>
               <Typography.Text strong>{followingTotal}</Typography.Text>{' '}
-              following
+              {tText.following}
             </Typography.Text>
           </Row>
           <Row
@@ -616,7 +633,7 @@ const UserDetail = () => {
             >
               <MdGridOn color="#767676" size={16} />
               <Typography.Text style={{ marginLeft: 8 }} strong>
-                POSTS
+                {tText.tabPosts}
               </Typography.Text>
             </Row>
           }
@@ -634,7 +651,7 @@ const UserDetail = () => {
             >
               <CgBookmark color="#767676" size={16} />
               <Typography.Text style={{ marginLeft: 8 }} strong>
-                SAVED
+                {tText.tabSaved}
               </Typography.Text>
             </Row>
           }
@@ -652,7 +669,7 @@ const UserDetail = () => {
             >
               <BiUserPin color="#767676" size={16} />
               <Typography.Text style={{ marginLeft: 8 }} strong>
-                TAGGED
+                {tText.tabTagged}
               </Typography.Text>
             </Row>
           }

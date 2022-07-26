@@ -29,6 +29,7 @@ import {
   getDocRef,
 } from '../../firebase/service'
 import { logAnalyticsEvent } from '../../firebase/analytics'
+import { t } from 'i18next'
 // import { capitalizeAvatarUsername } from '../../utils'
 
 export const CreateBlogModal = forwardRef((props, ref) => {
@@ -146,10 +147,17 @@ export const CreateBlogModal = forwardRef((props, ref) => {
     }
   }, [isModalVisible])
 
+  const tText = {
+    cnp: t('src.components.CreateBlogModal.cnp'),
+    share: t('src.components.CreateBlogModal.share'),
+    wac: t('src.components.CreateBlogModal.wac'),
+    sfc: t('src.components.CreateBlogModal.sfc'),
+  }
+
   return (
     <Fragment>
       <Modal
-        title="Create new post"
+        title={tText.cnp}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -162,7 +170,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
             type="link"
             onClick={handleOk}
           >
-            Share
+            {tText.share}
           </Button>,
         ]}
         centered
@@ -221,9 +229,12 @@ export const CreateBlogModal = forwardRef((props, ref) => {
               },
             ]}
           >
-            <Mentions rows={1} placeholder="Write a caption..." maxLength={200}>
+            <Mentions rows={1} placeholder={tText.wac} maxLength={200}>
               {usernames.map((username, ui) => (
-                <Mentions.Option key={`username-${username}-${ui}`} value={username}>
+                <Mentions.Option
+                  key={`username-${username}-${ui}`}
+                  value={username}
+                >
                   {username}
                 </Mentions.Option>
               ))}
@@ -286,7 +297,7 @@ export const CreateBlogModal = forwardRef((props, ref) => {
                   borderRadius: 4,
                 }}
               >
-                Select from computer
+                {tText.sfc}
               </Button>
             </Upload>
           </Form.Item>
