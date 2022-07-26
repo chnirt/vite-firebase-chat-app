@@ -24,7 +24,7 @@ import { t } from 'i18next'
 import { avatarPlaceholder, eventNames } from '../../constants'
 import { useAuth } from '../../context'
 import { logAnalyticsEvent } from '../../firebase/analytics'
-import { DEV, INFURA_PROJECT_ID } from '../../env'
+import { DEV, INFURA_PROJECT_ID, PRIVATE_KEY } from '../../env'
 
 import {
   marketplaceAddress
@@ -83,15 +83,17 @@ export const CreateNftModal = forwardRef((props, ref) => {
       const url = await uploadToIPFS(ipfsData)
 
       let provider
+      let signer
       if (DEV === 'develop') {
         const web3Modal = new Web3Modal()
         const connection = await web3Modal.connect()
         provider = new ethers.providers.Web3Provider(connection)
+        signer = provider.getSigner()
       } else {
         var infuraUrl = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
         provider = new ethers.providers.JsonRpcProvider(infuraUrl)
+        signer = new ethers.Wallet(PRIVATE_KEY);
       }
-      const signer = provider.getSigner()
 
       /* create the NFT */
       const nftPrice = ethers.utils.parseUnits(price, 'ether')
