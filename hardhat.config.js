@@ -11,7 +11,7 @@ module.exports = {
   networks: {
     hardhat: {
       // chainId: 1337,
-      chainId: 80001
+      // chainId: 80001
     },
     // goerli: {
     //   url: `https://goerli.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,

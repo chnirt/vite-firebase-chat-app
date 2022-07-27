@@ -68,15 +68,9 @@ const NFTmarketplace = () => {
   const buyNft = useCallback(async (nft) => {
     /* needs the user to sign the transaction, so will use Web3Provider and sign it */
 
-    let provider
-    if (DEV === 'develop') {
-      const web3Modal = new Web3Modal()
-      const connection = await web3Modal.connect()
-      provider = new ethers.providers.Web3Provider(connection)
-    } else {
-      var url = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-      provider = new ethers.providers.JsonRpcProvider(url)
-    }
+    const web3Modal = new Web3Modal()
+    const connection = await web3Modal.connect()
+    const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
     const contract = new ethers.Contract(
       marketplaceAddress,
