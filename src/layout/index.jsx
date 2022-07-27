@@ -6,59 +6,59 @@ import { useLoading } from '../context'
 import { auth } from '../firebase'
 import { useLocalStorage } from '../hooks'
 import { Navbar } from '../components'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 // import { colors } from '../constants'
 
-const LinkRoutes = [
-  {
-    path: '/',
-    name: 'Home',
-  },
-  {
-    path: '/blog',
-    name: 'Blog',
-  },
-  {
-    path: '/whatsapp',
-    name: 'WhatsApp',
-  },
-  {
-    path: '/pexels',
-    name: 'Pexels',
-  },
-  {
-    path: '/search',
-    name: 'Search',
-  },
-  {
-    path: '/messenger',
-    name: 'Messenger',
-  },
-  {
-    path: '/audioPlayer',
-    name: 'Audio Player',
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-  },
-  {
-    path: '/change-password',
-    name: 'Change Password',
-  },
-  {
-    path: '/nft-marketplace',
-    name: 'NFT Marketplace',
-  },
-  {
-    path: '/create-nft',
-    name: 'Create NFT',
-  },
-  {
-    path: '/my-nfts',
-    name: 'My NFTs',
-  },
-]
+// const LinkRoutes = [
+//   {
+//     path: '/',
+//     name: 'Home',
+//   },
+//   {
+//     path: '/blog',
+//     name: 'Blog',
+//   },
+//   {
+//     path: '/whatsapp',
+//     name: 'WhatsApp',
+//   },
+//   {
+//     path: '/pexels',
+//     name: 'Pexels',
+//   },
+//   {
+//     path: '/search',
+//     name: 'Search',
+//   },
+//   {
+//     path: '/messenger',
+//     name: 'Messenger',
+//   },
+//   {
+//     path: '/audioPlayer',
+//     name: 'Audio Player',
+//   },
+//   {
+//     path: '/profile',
+//     name: 'Profile',
+//   },
+//   {
+//     path: '/change-password',
+//     name: 'Change Password',
+//   },
+//   {
+//     path: '/nft-marketplace',
+//     name: 'NFT Marketplace',
+//   },
+//   {
+//     path: '/create-nft',
+//     name: 'Create NFT',
+//   },
+//   {
+//     path: '/my-nfts',
+//     name: 'My NFTs',
+//   },
+// ]
 
 export const Layout = ({ children }) => {
   // const { user } = useAuth()

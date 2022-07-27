@@ -10,7 +10,6 @@ import { marketplaceAddress } from '../../../config'
 import NFTMarketplace from '../../../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
 import { paths } from '../../constants'
 import { Loading } from '../../components'
-import { DEV, INFURA_PROJECT_ID } from '../../env'
 
 const ResellNFT = () => {
   const [loading, setLoading] = useState(true)
@@ -51,14 +50,9 @@ const ResellNFT = () => {
 
   async function listNFTForSale() {
     if (!price) return
-    if (DEV === 'develop') {
-      const web3Modal = new Web3Modal()
-      const connection = await web3Modal.connect()
-      provider = new ethers.providers.Web3Provider(connection)
-    } else {
-      var url = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-      provider = new ethers.providers.JsonRpcProvider(url)
-    }
+    const web3Modal = new Web3Modal()
+    const connection = await web3Modal.connect()
+    const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
 
     const priceFormatted = ethers.utils.parseUnits(formInput.price, 'ether')

@@ -85,20 +85,6 @@ export const CreateNftModal = forwardRef((props, ref) => {
       }
       const url = await uploadToIPFS(ipfsData)
 
-      // let provider
-      // let signer
-      // if (DEV === 'develop') {
-      //   const web3Modal = new Web3Modal()
-      //   const connection = await web3Modal.connect()
-      //   provider = new ethers.providers.Web3Provider(connection)
-      //   signer = provider.getSigner()
-      // } else {
-      //   // var infuraUrl = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-      //   var infuraUrl = 'https://rpc-mumbai.maticvigil.com'
-      //   provider = new ethers.providers.JsonRpcProvider(infuraUrl)
-      //   // signer = provider.getSigner(CONTRACT_ADDRESS)
-      //   signer = provider.getSigner()
-      // }
       const web3Modal = new Web3Modal()
       const connection = await web3Modal.connect()
       const provider = new ethers.providers.Web3Provider(connection)

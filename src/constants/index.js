@@ -49,6 +49,7 @@ export const avatarPlaceholder =
 export const colors = {
   spotify: '#18d860',
   firebase: '#FFCA28',
+  metamask: '#f5851a',
   border: '#767676',
   select: '#000000',
 }

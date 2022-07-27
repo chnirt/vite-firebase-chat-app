@@ -1,5 +1,12 @@
-import { ethers } from 'ethers'
-import { createContext, useContext, useState, useMemo, useEffect } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react'
 
 const defaultState = {}
 
@@ -11,21 +18,35 @@ export const MetaMaskProvider = ({ children }) => {
   const [accountBalance, setAccountBalance] = useState('')
   const [isConnected, setIsConnected] = useState(false)
 
-  const { ethereum } = window
-  const provider = new ethers.providers.Web3Provider(window.ethereum)
-
   useEffect(() => {
     const { ethereum } = window
     const checkMetamaskAvailability = async () => {
-      if (!ethereum) {
-        setHaveMetamask(false)
+      try {
+        if (!ethereum) {
+          setHaveMetamask(false)
+        }
+        setHaveMetamask(true)
+
+        const accounts = await ethereum.request({ method: 'eth_accounts' })
+        // console.log(accounts)
+        if (accounts.length > 0) {
+          setAccountAddress(accounts[0])
+          setIsConnected(true)
+        }
+      } catch (error) {
+        setIsConnected(false)
       }
-      setHaveMetamask(true)
     }
     checkMetamaskAvailability()
   }, [])
 
-  const connectWallet = async () => {
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined') {
+      console.log('MetaMask is installed!')
+    }
+  }, [])
+
+  const connectWallet = useCallback(async () => {
     try {
       if (!ethereum) {
         setHaveMetamask(false)
@@ -38,7 +59,7 @@ export const MetaMaskProvider = ({ children }) => {
     } catch (error) {
       setIsConnected(false)
     }
-  }
+  }, [])
 
   const value = useMemo(
     () => ({
@@ -53,40 +74,7 @@ export const MetaMaskProvider = ({ children }) => {
 
   return (
     <MetaMaskContext.Provider value={value}>
-      {haveMetamask ? (
-        <div>
-          {isConnected ? (
-            <div>
-              {children}
-              {/* <div className="card-row">
-                <h3>Wallet Address:</h3>
-                <p>
-                  {accountAddress.slice(0, 4)}...
-                  {accountAddress.slice(38, 42)}
-                </p>
-              </div>
-              <div className="card-row">
-                <h3>Wallet Balance:</h3>
-                <p>{accountBalance}</p>
-              </div> */}
-            </div>
-          ) : (
-            <>
-              {/* <img src={logo} className="App-logo" alt="logo" /> */}
-              <p>🎉 Logo</p>
-            </>
-          )}
-          {isConnected ? (
-            <p>🎉 Connected Successfully</p>
-          ) : (
-            <button onClick={connectWallet}>
-              Connect
-            </button>
-          )}
-        </div>
-      ) : (
-        <p>Please Install MataMask</p>
-      )}
+      {children}
     </MetaMaskContext.Provider>
   )
 }

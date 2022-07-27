@@ -4,12 +4,13 @@ import axios from 'axios'
 import Web3Modal from 'web3modal'
 import { Button, Card, Image } from 'antd'
 
-import { Loading } from '../../components'
-import { DEV, INFURA_PROJECT_ID } from '../../env'
+import { Loading, MetaMaskLogo } from '../../components'
 
 import { marketplaceAddress } from '../../../config'
 
 import NFTMarketplace from '../../../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
+import { useMetaMask } from '../../context'
+import { colors } from '../../constants'
 
 const gridStyle = {
   width: '25%',
@@ -17,19 +18,12 @@ const gridStyle = {
 }
 
 const NFTmarketplace = () => {
+  const { haveMetamask, isConnected, connectWallet } = useMetaMask()
   const [nfts, setNfts] = useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
 
   const loadNFTs = useCallback(async () => {
     /* create a generic provider and query for unsold market items */
-    // let provider
-    // if (DEV === 'develop') {
-    //   provider = new ethers.providers.JsonRpcProvider()
-    // } else {
-    //   // var url = `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
-    //   var url = 'https://rpc-mumbai.maticvigil.com'
-    //   provider = new ethers.providers.JsonRpcProvider(url)
-    // }
     const provider = new ethers.providers.JsonRpcProvider(
       'https://rpc-mumbai.maticvigil.com'
     )
@@ -90,6 +84,32 @@ const NFTmarketplace = () => {
   useEffect(() => {
     loadNFTs()
   }, [])
+
+  if (!haveMetamask) return <p>Please Install MetaMask</p>
+
+  if (!isConnected)
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <MetaMaskLogo />
+        <Button
+          type="primary"
+          style={{
+            backgroundColor: colors.metamask,
+            borderColor: colors.metamask,
+            borderRadius: 4,
+          }}
+          onClick={connectWallet}
+        >
+          Connect to MetaMask
+        </Button>
+      </div>
+    )
 
   if (loadingState === 'not-loaded') return <Loading />
 

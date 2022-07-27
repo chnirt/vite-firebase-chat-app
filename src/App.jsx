@@ -99,9 +99,11 @@ function App() {
       element: (
         <Suspense fallback={<Loading />}>
           <PrivateRoute>
-            <Layout>
-              <LazyHomeScreen />
-            </Layout>
+            <MetaMaskProvider>
+              <Layout>
+                <LazyHomeScreen />
+              </Layout>
+            </MetaMaskProvider>
           </PrivateRoute>
         </Suspense>
       ),
@@ -202,9 +204,7 @@ function App() {
           path: paths.nftMarketplace,
           element: (
             <Suspense fallback={<Loading />}>
-              <MetaMaskProvider>
-                <LazyNFTMarketplaceScreen />
-              </MetaMaskProvider>
+              <LazyNFTMarketplaceScreen />
             </Suspense>
           ),
         },

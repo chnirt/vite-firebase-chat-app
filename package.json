@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "0.1.1",
+    "@metamask/logo": "3.1.1",
     "@openzeppelin/contracts": "4.7.1",
     "@openzeppelin/contracts-upgradeable": "4.7.1",
     "@thirdweb-dev/contracts": "3.0.3",

@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom'
 import { t } from 'i18next'
 
 import { MyAutoComplete } from '../MyAutoComplete'
-import { useAuth, useLoading } from '../../context'
+import { useAuth, useLoading, useMetaMask } from '../../context'
 import { ReactComponent as Logo } from '../../assets/logo/logo-standard.svg'
 import { avatarPlaceholder, paths } from '../../constants'
 import { useLocalStorage } from '../../hooks'
@@ -30,6 +30,7 @@ export const Navbar = () => {
   const loading = useLoading()
   const auth = useAuth()
   const [, , removeToken] = useLocalStorage('token', '')
+  const { isConnected } = useMetaMask()
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -71,7 +72,7 @@ export const Navbar = () => {
 
   // const handleVisibleChange = useCallback(() => { }, [])
 
-  const handleCreatePost = useCallback(() => Global.CreateBlogModal.show(), [])
+  // const handleCreatePost = useCallback(() => Global.CreateBlogModal.show(), [])
 
   const handleExplore = useCallback(() => {
     // navigate(paths.myNFTs)
@@ -95,7 +96,7 @@ export const Navbar = () => {
 
   const handleShowNotification = useCallback(() => {
     // navigate(paths.profile)
-    Global.CreateNFTModal.show()
+    // Global.CreateNFTModal.show()
   }, [])
 
   const tText = {
@@ -118,6 +119,7 @@ export const Navbar = () => {
       {
         key: '01',
         label: tText.myNFTs,
+        disabled: !isConnected,
         icon: <IoLogoBitcoin color="#767676" size={16} />,
       },
       {
@@ -139,7 +141,7 @@ export const Navbar = () => {
         label: tText.logout,
       },
     ],
-    []
+    [isConnected]
   )
 
   const createItems = useMemo(
@@ -152,10 +154,11 @@ export const Navbar = () => {
       {
         key: 'create-1',
         label: tText.cnnft,
+        disabled: !isConnected
         // icon: <CgBookmark color="#767676" size={16} />,
       },
     ],
-    []
+    [isConnected]
   )
 
   const menu = (
