@@ -77,3 +77,16 @@ https://github.com/WalletConnect/web3modal
 https://docs.infura.io/infura/networks/ethereum/how-to/make-requests
 
 https://faucet.polygon.technology/
+
+https://blog.logrocket.com/deploy-react-app-kubernetes-using-docker/
+
+```
+kubectl get deployment -w
+kubectl get pods
+kubectl delete deploy react-deployment
+kubectl apply -f deployment.yaml
+kubectl apply -f load-balancer.yaml
+kubectl get services -w
+kubectl delete service my-service
+minikube ip
+```

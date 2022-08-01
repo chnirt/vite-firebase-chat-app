@@ -18,7 +18,16 @@
     "hardhat:test": "npx hardhat test",
     "hardhat:clg:goerli": "npx hardhat console --network goerli",
     "hardhat:dp:goerli": "npx hardhat run scripts/deploy.js --network goerli",
-    "hardhat:verify": "npx hardhat verify DEPLOYED_CONTRACT_ADDRESS \"Constructor argument 1\" --network goerli"
+    "hardhat:verify": "npx hardhat verify DEPLOYED_CONTRACT_ADDRESS \"Constructor argument 1\" --network goerli",
+    "docker:build": "docker build -t chintrinh/react-docker .",
+    "docker:run": "docker run -d -p 3000:80 chintrinh/react-docker",
+    "docker:rm": "docker run --rm -it chintrinh/react-docker",
+    "docker:restart": "docker run -p 80:80 --restart=always nginx",
+    "docker:stop": "docker stop $(docker ps -a -q)",
+    "docker:delete": "docker rm $(docker ps -a -q) && docker rmi $(docker images -a -q)",
+    "docker:push": "docker push chintrinh/react-docker:latest",
+    "deployment:delete": "kubectl delete deploy",
+    "services:delete": "kubectl delete service"
   },
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "0.1.1",
